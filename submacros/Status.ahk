@@ -1,6 +1,6 @@
 ﻿/*
 Natro Macro, https://bit.ly/NatroMacro
-Copyright Â© 2022-2023 Natro Dev Team (natromacroserver@gmail.com)
+Copyright © 2022-2023 Natro Dev Team (natromacroserver@gmail.com)
 
 This file is part of Natro Macro. Our source code will always be open and available.
 

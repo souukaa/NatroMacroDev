@@ -1,4 +1,4 @@
-/*
+﻿/*
 Natro Macro, https://bit.ly/NatroMacro
 Copyright © 2022-2023 Natro Dev Team (natromacroserver@gmail.com)
 
