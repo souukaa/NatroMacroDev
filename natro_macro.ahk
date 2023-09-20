@@ -6213,7 +6213,6 @@ nm_saveConfig(){
 	GuiControlGet, DisableToolUse
 	GuiControlGet, AnnounceGuidingStar
 	GuiControlGet, NewWalk
-	GuiControlGet, KeyDelay
 	GuiControlGet, ConvertDelay
 	GuiControlGet, ReconnectMessage
 	GuiControlGet, PublicFallback
@@ -6226,7 +6225,6 @@ nm_saveConfig(){
 	IniWrite, %DisableToolUse%, settings\nm_config.ini, Settings, DisableToolUse
 	IniWrite, %AnnounceGuidingStar%, settings\nm_config.ini, Settings, AnnounceGuidingStar
 	IniWrite, %NewWalk%, settings\nm_config.ini, Settings, NewWalk
-	IniWrite, %KeyDelay%, settings\nm_config.ini, Settings, KeyDelay
 	IniWrite, %ConvertDelay%, settings\nm_config.ini, Settings, ConvertDelay
 	IniWrite, %ReconnectMessage%, settings\nm_config.ini, Settings, ReconnectMessage
 	IniWrite, %PublicFallback%, settings\nm_config.ini, Settings, PublicFallback
