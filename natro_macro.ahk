@@ -14821,7 +14821,7 @@ DisconnectCheck(testCheck := 0)
 					Sleep, 1000
 					break 2
 				}
-				if (A_Index = 30) {
+				if (A_Index = 180) {
 					nm_setStatus("Error", "No BSS Found`nRetry: " i)
 					Sleep, 1000
 					break 2
@@ -14846,7 +14846,7 @@ DisconnectCheck(testCheck := 0)
 					Sleep, 1000
 					break 2
 				}
-				if (A_Index = 240) {
+				if (A_Index = 180) {
 					nm_setStatus("Error", "BSS Load Timeout`nRetry: " i)
 					Sleep, 1000
 					break 2
