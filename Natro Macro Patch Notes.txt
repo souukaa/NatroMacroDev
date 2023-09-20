@@ -1,3 +1,23 @@
+0.9.6 Patch Notes
+
+New Features 
+- Compatible with microsoft store
+- Red pollen quests will now also go to pepper
+- Updated Contributors tab
+
+
+Bug fixes
+- Fixed health detection on mondo
+- Fixed health detection on normal bugs
+- Fixed names in contributors tab
+- Fixed f/b and l/r not working for any patterns below SuperCat alphabetically
+- Fixed not being able to type in KeyDelay
+- Increased size of Keydelay box to fit 3 numbers
+- Fixed PlanterTimers always being at a set spot
+- Fixed an amulet being kept/replaced when doing planters
+- Fixed Bucko, RoboPass, and planter pineapple paths
+
+
 0.9.5 Patch Notes
 
 New Features 

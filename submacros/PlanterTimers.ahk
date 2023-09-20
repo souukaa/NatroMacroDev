@@ -25,7 +25,7 @@ if (TimerX && TimerY)
 	loop %MonitorCount%
 	{
 		SysGet, Mon, MonitorWorkArea, %A_Index%
-		if(TimerX>MonLeft && TimerX<MonRight && GuiY>MonTop && GuiY<MonBottom)
+		if(TimerX>MonLeft && TimerX<MonRight && TimerY>MonTop && TimerY<MonBottom)
 			break
 		if(A_Index=MonitorCount)
 			TimerX:=TimerY:=0

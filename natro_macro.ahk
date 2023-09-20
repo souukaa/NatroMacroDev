@@ -1,6 +1,6 @@
 ﻿/*
 Natro Macro, https://bit.ly/NatroMacro
-Copyright Â© 2022-2023 Natro Dev Team (natromacroserver@gmail.com)
+Copyright © 2022-2023 Natro Dev Team (natromacroserver@gmail.com)
 
 This file is part of Natro Macro. Our source code will always be open and available.
 
@@ -552,9 +552,7 @@ config["Collect"] := {"ClockCheck":1
 	, "StingerCloverCheck":1
 	, "StingerDailyBonusCheck":0
 	, "NightLastDetected":1
-	, "VBLastKilled":1
-	, "BlenderCheck":0
-	, "LastBlender":1}
+	, "VBLastKilled":1}
 
 config["Boost"] := {"FieldBoostStacks":0
 	, "FieldBooster1":"None"
@@ -672,13 +670,6 @@ for k,v in config ; load the default values as globals, will be overwritten if a
 
 if FileExist(A_ScriptDir "\settings\nm_config.ini") ; update default values with new ones read from any existing .ini
 	nm_ReadIni(A_ScriptDir "\settings\nm_config.ini")
-
-loop, 3 {
-    if (FieldPattern%A_Index% = "Typewriter") {
-		FieldPattern%A_Index% := "e_lol"
-        IniWrite, % FieldPattern%A_Index%, settings\nm_config.ini, Gather, FieldPattern%A_Index%
-	}
-}
 
 ini := ""
 for k,v in config ; overwrite any existing .ini with updated one with all new keys and old values
@@ -1461,8 +1452,13 @@ ObjFullyClone(obj)
 if FileExist(A_ScriptDir "\settings\field_config.ini") ; update default values with new ones read from any existing .ini
 	nm_LoadFieldDefaults()
 
+loop 3 {
+	if (!InStr(patternlist, FieldPattern%A_Index%))
+		nm_FieldDefaults(A_Index)
+}
+
 ini := ""
-for k,v in FieldDefault ; overwrite any e_configxisting .ini with updated one with all new keys and old values
+for k,v in FieldDefault ; overwrite any existing .ini with updated one with all new keys and old values
 {
 	ini .= "[" k "]`r`n"
 	for i,j in v
@@ -2005,7 +2001,6 @@ Gui, Add, GroupBox, x5 y25 w160 h65, GUI SETTINGS
 Gui, Add, Checkbox, x10 y73 vAlwaysOnTop gnm_AlwaysOnTop Checked%AlwaysOnTop%, Always On Top
 Gui, Add, Text, x10 y40 w70 +left +BackgroundTrans,GUI Theme:
 nm_importStyles()
-
 Gui, Add, DropDownList, x85 y34 w72 h100 vGuiTheme gnm_guiThemeSelect Disabled, % LTrim(StrReplace(StylesList, "|" GuiTheme "|", "|" GuiTheme "||"), "|")
 Gui, Add, Text, x10 y57 w100 +left +BackgroundTrans,GUI Transparency:
 Gui, Add, DropDownList, x105 y55 w52 h100 vGuiTransparency gnm_guiTransparencySet Disabled, % LTrim(StrReplace("|0|5|10|15|20|25|30|35|40|45|50|55|60|65|70|", "|" GuiTransparency "|", "|" GuiTransparency "||"), "|")
@@ -2033,8 +2028,8 @@ Gui, Add, Button, x20 y207 w130 h22 gnm_ResetConfig, Reset All Settings
 ;input settings
 Gui, Add, GroupBox, x170 y25 w160 h93, INPUT SETTINGS
 Gui, Add, Text, x180 y40 w100 +left +BackgroundTrans,Add Key Delay (ms):
-Gui, Add, Edit, % "x280 y38 w40 h18 limit4 number vKeyDelayEdit gnm_saveKeyDelay Disabled", KeyDelay
-Gui, Add, UpDown, % "Range0-9999 vKeyDelay gnm_saveKeyDelay Disabled"
+Gui, Add, Edit, x280 y38 w47 h18 limit4 number vKeyDelayEdit gnm_saveKeyDelay
+Gui, Add, UpDown, Range0-9999 vKeyDelay gnm_saveKeyDelay Disabled, % KeyDelay
 Gui, Font, Underline
 Gui, Add, Text, x182 y58 w85 -Wrap c0x0046ee vAutoClickerButton, AutoClicker (%AutoClickerHotkey%)
 Gui, Font, s8 cDefault Norm, Tahoma
@@ -2129,7 +2124,10 @@ Gui, Add, Checkbox, x135 yp+19 +BackgroundTrans vCoconutDisCheck gnm_saveCollect
 Gui, Add, Checkbox, x225 y57 +BackgroundTrans vRoyalJellyDisCheck gnm_saveCollect Checked%RoyalJellyDisCheck% Disabled, Royal Jelly
 Gui, Add, Checkbox, x225 yp+19 +BackgroundTrans vGlueDisCheck gnm_saveCollect Checked%GlueDisCheck% Disabled, Glue
 ;beesmas
-beesmasActive:=1
+beesmasActive:=0
+if (beesmasActive = 0)
+	BeesmasGatherInterruptCheck := StockingsCheck := WreathCheck := FeastCheck := RBPDeLevelChck := GingerbreadCheck := SnowMachineCheck := CandlesCheck := SamovarCheck := LidArtCheck := GummyBeaconCheck := 0
+
 Gui, Font, w700
 Gui, Add, GroupBox, x10 y153 w290 h84 vBeesmasGroupBox, % "Beesmas" (beesmasActive ? "" : " (Reserved)")
 Gui, Font, s8 cDefault Norm, Tahoma
@@ -2155,7 +2153,7 @@ Gui, Font, w700
 Gui, Add, GroupBox, x10 y42 w180 h188 vBugRunGroupBox Hidden, Bug Run
 Gui, Font, s8 cDefault Norm, Tahoma
 Gui, Add, Checkbox, x80 y43 vBugRunCheck gnm_BugRunCheck Checked%BugRunCheck% Hidden, Select All
-Gui, Add, Text, x16 y62 +BackgroundTrans Hidden vTextMonsterRespawn, % "-       % Monster Respawn Time"
+Gui, Add, Text, x16 y62 +BackgroundTrans Hidden vTextMonsterRespawn, % "–       % Monster Respawn Time"
 Gui, Add, Edit, x24 y61 w18 h16 Limit2 number +BackgroundTrans vMonsterRespawnTime gnm_MonsterRespawnTime Hidden, %MonsterRespawnTime%
 Gui, Add, Button, x173 y62 w12 h14 gnm_MonsterRespawnTimeHelp vMonsterRespawnTimeHelp Hidden, ?
 Gui, Add, Checkbox, x20 y82 w125 h15 +BackgroundTrans vBugrunInterruptCheck gnm_saveCollect Checked%BugrunInterruptCheck% Hidden, Allow Gather Interrupt
@@ -2772,18 +2770,19 @@ mp_PlantPlanter(PlanterIndex) {
 	Loop, 50
 	{
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "Roblox ahk_exe RobloxPlayerBeta.exe")
-		pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
-		if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
-			MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-			loop 3 {
+		loop 3 {
+			pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+			if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
+				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+				sleep, 150
 				Click
 				sleep 100
+				Gdip_DisposeImage(pBMScreen)
+				MouseMove, 350, 100
+				break 2
 			}
-			MouseMove, 350, 100
 			Gdip_DisposeImage(pBMScreen)
-			break
 		}
-		Gdip_DisposeImage(pBMScreen)
 
 		if (A_Index = 50) {
 			nm_setStatus("Missing", MPlanterName)
@@ -3005,30 +3004,37 @@ mp_HarvestPlanter(PlanterIndex) {
 
 		Sleep, 50 ; wait for game to update frame
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "Roblox ahk_exe RobloxPlayerBeta.exe")
-		pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
 		if (PlanterHarvestFull%PlanterIndex% == "Full") {
-			if (Gdip_ImageSearch(pBMScreen, bitmaps["no"], pos, , , , , 2, , 3) = 1) {
-				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-				loop 3 {
+			loop 3 {
+				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+				if (Gdip_ImageSearch(pBMScreen, bitmaps["no"], pos, , , , , 2, , 3) = 1) {
+					MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+					sleep, 150
 					Click
 					sleep 100
+					MouseMove, 350, 100
+					Gdip_DisposeImage(pBMScreen)
+					nm_PlanterTimeUpdate(FieldName)
+					return 2
 				}
-				MouseMove, 350, 100
-				nm_PlanterTimeUpdate(FieldName)
-				return 2
+				Gdip_DisposeImage(pBMScreen)
 			}
 		}
 		else {
-			if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
-				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-				loop 3 {
+			loop 3 {
+				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+				if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
+					MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+					sleep, 150
 					Click
 					sleep 100
+					Gdip_DisposeImage(pBMScreen)
+					MouseMove, 350, 100
+					break
 				}
-				MouseMove, 350, 100
+				Gdip_DisposeImage(pBMScreen)
 			}
 		}
-		Gdip_DisposeImage(pBMScreen)
 
 		;reset values
 		CycleIndex := PlanterManualCycle%PlanterIndex%
@@ -7159,26 +7165,27 @@ nm_ContributorsImage(page:=1){
 
 	if (hBM1 = "")
 	{
-		devs := [["natro#9071",0xffa202c0]
-			, ["zez#8710",0xff7df9ff]
-			, ["scriptingNoob",0xfffa01c5]
-			, ["Zaappiix#2372",0xffa2a4a3]
-			, ["SP#0305",0xfffc6600]
+		devs := [["bastianauryn",0xffa202c0]
+			, ["zez_",0xff7df9ff]
+			, ["ScriptingNoob",0xfffa01c5]
+			, ["zaappiix",0xffa2a4a3]
+			, ["xspx",0xfffc6600]
 			, ["BlackBeard6#2691",0xff8780ff]
-			, ["baguetto#8775",0xff3d85c6]
-			, ["Raychel#2101",0xffb7c9e2]]
+			, ["baguetto",0xff3d85c6]
+			, ["raychal71",0xffb7c9e2]]
 
-		testers := [["FHL09#4061",0xffff00ff]
-			, ["Ziz/Jake#9154",0xffa45ee9]
-			, ["Nick 9#9476",0xffdfdfdf]
-			, ["Heat#9350",0xff3f8d4d]
-			, ["valibreaz#8493",0xff7aa22c]
-			, ["RandomUserHere#7409",0xff2bc016]
-			, ["crazyrocketman#5003",0xffffdc64]
-			, ["chase#9999",0xff794044]
+		testers := [["fhl09",0xffff00ff]
+			, ["ziz_jake",0xffa45ee9]
+			, ["nick9",0xffdfdfdf]
+			, ["heatsky",0xff3f8d4d]
+			, ["valibreaz",0xff7aa22c]
+			, ["randomuserhere",0xff2bc016]
+			, ["crazyrocketman_",0xffffdc64]
+			, ["chaxe",0xff794044]
 			, ["phucduc#9444",0xffffde48]
-			, ["anniespony#8135",0xff0096ff]
-			, ["idote#2468",0xfff47fff]]
+			, ["anniespony",0xff0096ff]
+			, ["idote",0xfff47fff]
+			, ["axetar",0xffec8fd0]]
 
 		contributors := []
 		contributors.Push(["wilalwil2#4175","gold"]
@@ -7220,7 +7227,7 @@ nm_ContributorsImage(page:=1){
 			, ["mariposa#5719","gold"]
 			, ["imdom#2002","gold"]
 			, ["SagePage590#1084","gold"]
-			, ["ÄÃ¤m just ÃÃ£m#6392","gold"]
+			, ["Čäm just Çãm#6392","gold"]
 			, ["Pizza Guy#9720","gold"]
 			, ["WolfySoy#7178","gold"]
 			, ["jak#1000","gold"]
@@ -7233,7 +7240,7 @@ nm_ContributorsImage(page:=1){
 			, ["Diosaur#5829","gold"]
 			, ["templan#4763","gold"]
 			, ["Householdsage60","gold"]
-			, ["èé ­ OldMan#8750","gold"]
+			, ["老頭 OldMan#8750","gold"]
 			, ["Memoryless#3001","gold"]
 			, ["N&R Games#7387","gold"]
 			, ["Izu#1234","gold"]
@@ -7249,7 +7256,7 @@ nm_ContributorsImage(page:=1){
 			, ["wholg#5801","gold"]
 			, ["idiot#9999","gold"]
 			, ["Blu#6083","gold"]
-			, ["ã¬ããã¹ããã#1111","gold"]
+			, ["レッドステッド#1111","gold"]
 			, ["Argentina#2302","gold"]
 			, ["-ryann#8474","gold"]
 			, ["SKNinja#0690","gold"])
@@ -7265,7 +7272,7 @@ nm_ContributorsImage(page:=1){
 			, ["NoddaPro","gold"]
 			, ["Hoboyo#1752","gold"]
 			, ["Rodr1c#1896","gold"]
-			, ["ê³êê¤êª#6807","gold"]
+			, ["ꃳ꒒꒤ꋪ#6807","gold"]
 			, ["DrPepperMan#6686","gold"]
 			, ["PogChong2#6885","gold"]
 			, ["Guff#3659","gold"]
@@ -7274,7 +7281,7 @@ nm_ContributorsImage(page:=1){
 			, ["NerdDrummerBoi","gold"]
 			, ["PooDilly#8488","gold"]
 			, ["3706#0001","gold"]
-			, ["ã â¿ â¤ â¢ â£ â â","gold"]
+			, ["ツ Ⓙ ⓤ ⓢ ⓣ ⓘ ⓝ","gold"]
 			, ["chloeshih#0001","gold"]
 			, ["tim57#2100","gold"])
 		contributors.Push(["Anonymous 1","gold"]
@@ -7310,7 +7317,7 @@ nm_ContributorsImage(page:=1){
 			, ["Heyee#6624","blue"]
 			, ["Zip#1313","blue"]
 			, ["nikiPOW3#8874","blue"]
-			, ["T-âexâ#0325","blue"]
+			, ["T-ℝex♛#0325","blue"]
 			, ["Memoryless#3001","blue"]
 			, ["Fiva.#8959","blue"]
 			, ["KrazyBro#6300","blue"]
@@ -7356,7 +7363,7 @@ nm_ContributorsImage(page:=1){
 		for k,v in testers
 		{
 			pBrush := Gdip_CreateLinearGrBrushFromRect(0, 65+(k-1)*13, 242, 12, 0xff000000 + (Min(Round(Gdip_RFromARGB(v[2])*1.2), 255) << 16) + (Min(Round(Gdip_GFromARGB(v[2])*1.2), 255) << 8) + Min(Round(Gdip_BFromARGB(v[2])*1.2), 255), 0xff000000 + (Min(Round(Gdip_RFromARGB(v[2])*0.9), 255) << 16) + (Min(Round(Gdip_GFromARGB(v[2])*0.9), 255) << 8) + Min(Round(Gdip_BFromARGB(v[2])*0.9), 255)), pPen := Gdip_CreatePenFromBrush(pBrush,1)
-			Gdip_DrawOrientedString(G, v[1], "Tahoma", 11, 0, 114, 64+(k-1)*13, 130, 10, 0, pBrush, pPen)
+			Gdip_DrawOrientedString(G, v[1], "Tahoma", 11, 0, 114, 64+(k-1)*12, 130, 10, 0, pBrush, pPen)
 			Gdip_DeletePen(pPen), Gdip_DeleteBrush(pBrush)
 		}
 
@@ -7431,27 +7438,28 @@ nm_ContributorsImage(page:=1){
 	return ((hBM%i% = "") ? 1 : 0)
 }
 nm_ContributorsDiscordLink(){
-	static id_list := {"779430642043191307": [4,43,62,53]
+	static id_list := {"779430642043191307": [4,43,62,53] ;DEV TEAM
 		, "253742141124116481": [4,57,53,67]
-		, "245481556355973121": [4,70,72,80]
+		, "245481556355973121": [4,68,72,80]
 		, "747945550888042537": [4,82,78,92]
 		, "240431161191432193": [4,95,50,105]
 		, "278608676296589313": [4,109,98,119]
 		, "323507959957028874": [4,123,80,133]
 		, "259441167068954624": [4,135,75,145]
-		, "334634052361650177": [112,43,176,53]
-		, "227604929806729217": [112,57,186,67]
-		, "700353887512690759": [112,70,176,80]
-		, "725444258835726407": [112,82,169,92]
-		, "244504077579452417": [112,95,190,105]
-		, "744072472890179665": [112,109,233,119]
-		, "720088699475591180": [112,123,224,133]
-		, "529089693749608468": [112,135,174,145]
-		, "710486399744475136": [112,148,188,158]
-		, "217700684835979265": [112,161,202,171]
-		, "350433227380621322": [112,174,202,184]}
+		, "334634052361650177": [113,41,176,50] ;TESTERS || 134 HERE <====================================
+		, "227604929806729217": [113,55,186,63] ;x, y, w, h
+		, "700353887512690759": [113,64,176,73]
+		, "725444258835726407": [113,74,169,85]
+		, "244504077579452417": [113,86,190,97]
+		, "744072472890179665": [113,99,233,110]
+		, "720088699475591180": [113,111,224,123]
+		, "529089693749608468": [113,124,174,134]
+		, "710486399744475136": [113,135,188,144]
+		, "217700684835979265": [113,146,202,158]
+		, "350433227380621322": [113,159,176,169]
+		, "487989990937198602": [113,170,180,183]}
 	MouseGetPos, mouse_x, mouse_y, , hCtrl, 2
-	ControlGetPos, ctrl_x, ctrl_y, , , , ahk_id %hCtrl%
+	ControlGetPos, ctrl_x, ctrl_y, , , , ahk_id %hCtrl% ;gets the location of the natro window
 	x := mouse_x - ctrl_x, y := mouse_y - ctrl_y
 	for k,v in id_list
 	{
@@ -7508,9 +7516,9 @@ nm_saveAutoClicker(){
 	GuiControl, % (ClickMode ? "Disable" : "Enable"), ClickCountEdit
 }
 nm_saveKeyDelay(){
-    global GuiControlGet, KeyDelay
+    global 
+	GuiControlGet, KeyDelay
     IniWrite, %KeyDelay%, settings\nm_config.ini, Settings, KeyDelay
-	GuiControl,, KeyDelayEdit, %KeyDelay% 
 }
 nm_TicketShopCalculatorButton(){
 	Run, https://docs.google.com/spreadsheets/d/1_5JP_9uZUv7PUqjL76T5orEA3MIHe4R8gLu27L8KJ-A/
@@ -9638,7 +9646,7 @@ nm_Bugrun(){
 	global BuckoRhinoBeetles, BuckoMantis, RileyLadybugs, RileyScorpions, RileyAll
 	global CurrentAction, PreviousAction
 	global GatherFieldBoostedStart, LastGlitter
-	global BeesmasGatherInterruptCheck, StockingsCheck, LastStockings, FeastCheck, LastFeast, RBPDelevelCheck, LastRBPDelevel, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon, beesmasActive
+	global BeesmasGatherInterruptCheck, StockingsCheck, LastStockings, FeastCheck, LastFeast, RBPDelevelCheck, LastRBPDelevel, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon
 	global MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff
 	global BugrunSpiderCheck, BugrunSpiderLoot, LastBugrunSpider, BugrunLadybugsCheck, BugrunLadybugsLoot, LastBugrunLadybugs, BugrunRhinoBeetlesCheck, BugrunRhinoBeetlesLoot, LastBugrunRhinoBeetles, BugrunMantisCheck, BugrunMantisLoot, LastBugrunMantis, BugrunWerewolfCheck, BugrunWerewolfLoot, LastBugrunWerewolf, BugrunScorpionsCheck, BugrunScorpionsLoot, LastBugrunScorpions, intialHealthCheck
 	global CocoCrabCheck, LastCocoCrab, StumpSnailCheck, LastStumpSnail, CommandoCheck, LastCommando, TunnelBearCheck, TunnelBearBabyCheck, KingBeetleCheck, KingBeetleBabyCheck, LastTunnelBear, LastKingBeetle, InputSnailHealth, SnailTime, InputChickHealth, ChickTime, SprinklerType
@@ -9654,7 +9662,7 @@ nm_Bugrun(){
 	if((nowUnix()-GatherFieldBoostedStart<900) || (nowUnix()-LastGlitter<900) || nm_boostBypassCheck()){
 		return
 	}
-	if ((BeesmasGatherInterruptCheck && beesmasActive) && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800)))
+	if ((BeesmasGatherInterruptCheck) && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800)))
 		return
 
 	nm_setShiftLock(0)
@@ -9807,9 +9815,8 @@ nm_Bugrun(){
 						nm_setStatus("Traveling", "Ladybugs (Strawberry)")
 						If (MoveMethod="walk")
 							nm_walkTo(BugRunField)
-						else {
+						else
 							nm_cannonTo(BugRunField)
-						}
 						Sleep, 1000
 					}
 					bypass:=0
@@ -12138,12 +12145,12 @@ nm_Mondo(){
 			                    break
 			                }
 			                ;check for mondo death here
-							loop 20
+							loop 60 ; Changed from 5 seconds to 15 seconds for when mondo goes off screen
 							{
 								mondoDead:=nm_HealthDetection()
 								if(mondoDead.Length() > 0)
 									Break
-								if (A_Index=20)
+								if (A_Index=40)
 								{
 									repeat:=0
 									send {%RotRight%}
@@ -12322,7 +12329,7 @@ nm_GoGather(){
 	global PlanterMode, gotoPlanterField
 	global QuestLadybugs, QuestRhinoBeetles, QuestSpider, QuestMantis, QuestScorpions, QuestWerewolf
 	global PolarQuestGatherInterruptCheck, BuckoQuestGatherInterruptCheck, RileyQuestGatherInterruptCheck, BugrunInterruptCheck, LastBugrunLadybugs, LastBugrunRhinoBeetles, LastBugrunSpider, LastBugrunMantis, LastBugrunScorpions, LastBugrunWerewolf, BlackQuestCheck, BlackQuestComplete, QuestGatherField, BuckoQuestCheck, BuckoQuestComplete, RileyQuestCheck, RileyQuestComplete, PolarQuestCheck, PolarQuestComplete, RotateQuest, QuestGatherMins, QuestGatherReturnBy, BuckoRhinoBeetles, BuckoMantis, RileyLadybugs, RileyScorpions, RileyAll, GameFrozenCounter, HiveSlot, BugrunLadybugsCheck, BugrunRhinoBeetlesCheck, BugrunSpiderCheck, BugrunMantisCheck, BugrunScorpionsCheck, BugrunWerewolfCheck, MonsterRespawnTime
-	global BeesmasGatherInterruptCheck, StockingsCheck, LastStockings, FeastCheck, LastFeast, RBPDelevelCheck, LastRBPDelevel, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon, beesmasActive
+	global BeesmasGatherInterruptCheck, StockingsCheck, LastStockings, FeastCheck, LastFeast, RBPDelevelCheck, LastRBPDelevel, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon
 	global GatherStartTime, TotalGatherTime, SessionGatherTime, ConvertStartTime, TotalConvertTime, SessionConvertTime
 	global bitmaps
 	FormatTime, utc_min, %A_NowUTC%, m
@@ -12332,7 +12339,7 @@ nm_GoGather(){
 			return
 		}
 		;BEESMAS GatherInterruptCheck
-		if (BeesmasGatherInterruptCheck && beesmasActive) && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800))
+		if (BeesmasGatherInterruptCheck && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800)))
 			return
 		;MONDO
 		if((MondoBuffCheck && utc_min>=0 && utc_min<14 && (nowUnix()-LastMondoBuff)>960 && (MondoAction="Buff" || MondoAction="Kill")) || (MondoBuffCheck && utc_min>=0 && utc_min<12 && (nowUnix()-LastGuid)<60 && PMondoGuid && MondoAction="Guid") || (MondoBuffCheck  && (utc_min>=0 && utc_min<=8) && (nowUnix()-LastMondoBuff)>960 && PMondoGuid && MondoAction="Tag"))
@@ -12696,7 +12703,7 @@ nm_GoGather(){
 			interruptReason := "Kill Bugs"
 			break
 		}
-		if (BeesmasGatherInterruptCheck && beesmasActive) && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800)){
+		if (BeesmasGatherInterruptCheck) && ((StockingsCheck && (nowUnix()-LastStockings)>3600) || (FeastCheck && (nowUnix()-LastFeast)>5400) || (RBPDelevelCheck && (nowUnix()-LastRBPDelevel)>10800) || (GingerbreadCheck && (nowUnix()-LastGingerbread)>7200) || (SnowMachineCheck && (nowUnix()-LastSnowMachine)>7200) || (CandlesCheck && (nowUnix()-LastCandles)>14400) || (SamovarCheck && (nowUnix()-LastSamovar)>21600) || (LidArtCheck && (nowUnix()-LastLidArt)>28800) || (GummyBeaconCheck && (nowUnix()-LastGummyBeacon)>28800)){
 			interruptReason := "Beesmas Machine"
 			break
 		}
@@ -16620,7 +16627,9 @@ nm_RileyQuestProg(){
 				else if (action="collect" && QuestGatherField="none") {
 					;red, blue, white, any
 					if(where="red"){
-						if(HiveBees>=15){
+						if(HiveBees>=35){
+							where:="Pepper"
+						} else if(HiveBees>=15){
 							where:="Rose"
 						} else if (HiveBees>=5) {
 							where:="Strawberry"
@@ -16628,7 +16637,7 @@ nm_RileyQuestProg(){
 							where:="Mushroom"
 						}
 					} else if (where="blue") {
-						if(HiveBees>=15){
+					 	if(HiveBees>=15){
 							where:="Pine Tree"
 						} else if (HiveBees>=5) {
 							where:="Bamboo"
@@ -16955,7 +16964,9 @@ nm_BuckoQuestProg(){
 				else if (action="collect" && QuestGatherField="none") {
 					;red, blue, white, any
 					if(where="red"){
-						if(HiveBees>=15){
+						if(HiveBees>=35){
+							where:="Pepper"
+						} else if(HiveBees>=15){
 							where:="Rose"
 						} else if (HiveBees>=5) {
 							where:="Strawberry"
@@ -17295,7 +17306,9 @@ nm_BlackQuestProg(){
 				completeness:="Incomplete"
 				;red, blue, white, any
 				if(where="red"){
-					if(HiveBees>=15){
+					if(HiveBees>=35){
+						where:="Pepper"
+					} else if(HiveBees>=15){
 						where:="Rose"
 					} else if (HiveBees>=5) {
 						where:="Strawberry"
@@ -19270,18 +19283,19 @@ ba_placePlanter(fieldName, planter, planterNum, atField:=0){
 	Loop, 50
 	{
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "Roblox ahk_exe RobloxPlayerBeta.exe")
-		pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
-		if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
-			MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-			loop 3 {
+		loop 3 {
+			pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+			if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
+				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+				sleep, 150
 				Click
 				sleep 100
+				Gdip_DisposeImage(pBMScreen)
+				MouseMove, 350, 100
+				break 2
 			}
-			MouseMove, 350, 100
 			Gdip_DisposeImage(pBMScreen)
-			break
 		}
-		Gdip_DisposeImage(pBMScreen)
 
 		if (A_Index = 50) {
 			nm_setStatus("Missing", planterName)
@@ -19388,30 +19402,38 @@ ba_harvestPlanter(planterNum){
 
 		Sleep, 50 ; wait for game to update frame
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "Roblox ahk_exe RobloxPlayerBeta.exe")
-		pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
 		if (HarvestFullGrown = 1) {
-			if (Gdip_ImageSearch(pBMScreen, bitmaps["no"], pos, , , , , 2, , 3) = 1) {
-				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-				loop 3 {
+			loop 3 {
+				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+				if (Gdip_ImageSearch(pBMScreen, bitmaps["no"], pos, , , , , 2, , 3) = 1) {
+					MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+					sleep, 150
 					Click
 					sleep 100
+					MouseMove, 350, 100
+					Gdip_DisposeImage(pBMScreen)
+					nm_PlanterTimeUpdate(FieldName)
+					return 1
 				}
-				MouseMove, 350, 100
-				nm_PlanterTimeUpdate(FieldName)
-				return 1
+				Gdip_DisposeImage(pBMScreen)
 			}
 		}
 		else {
-			if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
-				MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
-				loop 3 {
+			loop 3 {
+				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+((6*windowHeight)//10 - 60) "|500|150")
+				if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], pos, , , , , 2, , 2) = 1) {
+					MouseMove, windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), ((6*windowHeight)//10 - 60)+SubStr(pos, InStr(pos, ",")+1)
+					sleep, 150
 					Click
 					sleep 100
+					MouseMove, 350, 100
+					Gdip_DisposeImage(pBMScreen)
+					break
 				}
-				MouseMove, 350, 100
+				Gdip_DisposeImage(pBMScreen)
 			}
 		}
-		Gdip_DisposeImage(pBMScreen)
+
 
 		;reset values
 		PlanterName%planterNum% := "None"
