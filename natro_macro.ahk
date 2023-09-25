@@ -2157,13 +2157,14 @@ Gui, Add, Checkbox, % "x201 yp+17 +BackgroundTrans vGummyBeaconCheck gnm_saveCol
 ;KILL
 ;bugrun
 Gui, Font, w700
-Gui, Add, GroupBox, x10 y42 w180 h188 vBugRunGroupBox Hidden, Bug Run
+Gui, Add, GroupBox, x10 y42 w134 h188 vBugRunGroupBox Hidden, Bug Run
 Gui, Font, s8 cDefault Norm, Tahoma
-Gui, Add, Checkbox, x80 y43 vBugRunCheck gnm_BugRunCheck Checked%BugRunCheck% Hidden, Select All
-Gui, Add, Text, x16 y62 +BackgroundTrans Hidden vTextMonsterRespawn, % "–       % Monster Respawn Time"
+Gui, Add, Checkbox, x76 y43 vBugRunCheck gnm_BugRunCheck Checked%BugRunCheck% Hidden, Select All
+Gui, Add, Text, x16 y62 +BackgroundTrans Hidden vTextMonsterRespawnPercent, % "–       %"
+Gui, Add, Text, x52 y55 w80 +BackgroundTrans +Center Hidden vTextMonsterRespawn, Monster Respawn Time
 Gui, Add, Edit, x24 y61 w18 h16 Limit2 number +BackgroundTrans vMonsterRespawnTime gnm_MonsterRespawnTime Hidden, %MonsterRespawnTime%
-Gui, Add, Button, x173 y62 w12 h14 gnm_MonsterRespawnTimeHelp vMonsterRespawnTimeHelp Hidden, ?
-Gui, Add, Checkbox, x20 y82 w125 h15 +BackgroundTrans vBugrunInterruptCheck gnm_saveCollect Checked%BugrunInterruptCheck% Hidden, Allow Gather Interrupt
+Gui, Add, Button, x128 y63 w12 h14 gnm_MonsterRespawnTimeHelp vMonsterRespawnTimeHelp Hidden, ?
+Gui, Add, Checkbox, x16 y82 w125 h15 +BackgroundTrans vBugrunInterruptCheck gnm_saveCollect Checked%BugrunInterruptCheck% Hidden, Allow Gather Interrupt
 Gui, Add, text, x16 y100 +BackgroundTrans Hidden vTextLoot, Loot
 Gui, Add, text, x49 y100 +BackgroundTrans Hidden vTextKill, Kill
 Gui, Add, Text, x15 y114 w114 h1 0x7 Hidden vTextLineBugRun1
@@ -2182,56 +2183,62 @@ Gui, Add, Checkbox, xp yp+18 +BackgroundTrans vBugrunScorpionsCheck gnm_saveColl
 Gui, Add, Checkbox, xp yp+18 +BackgroundTrans vBugrunWerewolfCheck gnm_saveCollect Checked%BugrunWerewolfCheck% Disabled Hidden, Werewolf
 ;stingers
 Gui, Font, w700
-Gui, Add, GroupBox, x200 y42 w290 h60 vStingersGroupBox Hidden, Stingers
+Gui, Add, GroupBox, x149 y42 w341 h60 vStingersGroupBox Hidden, Stingers
 Gui, Font, s8 cDefault Norm, Tahoma
-Gui, Add, Checkbox, x266 y43 +BackgroundTrans vStingerCheck gnm_saveStingers Checked%StingerCheck% Disabled Hidden, Kill Vicious Bee
-Gui, Add, Checkbox, % "x360 y43 vStingerDailyBonusCheck gnm_saveStingers Checked" StingerDailyBonusCheck " Hidden Disabled" !StingerCheck, Only Daily Bonus
-Gui, Add, Checkbox, % "x210 y62 vStingerCloverCheck gnm_saveStingers Checked" StingerCloverCheck " Hidden Disabled" !StingerCheck, Clover
-Gui, Add, Checkbox, % "x210 y80 vStingerSpiderCheck gnm_saveStingers Checked" StingerSpiderCheck " Hidden Disabled" !StingerCheck, Spider
-Gui, Add, Checkbox, % "x290 y62 vStingerCactusCheck gnm_saveStingers Checked" StingerCactusCheck " Hidden Disabled" !StingerCheck, Cactus
-Gui, Add, Checkbox, % "x290 y80 vStingerRoseCheck gnm_saveStingers Checked" StingerRoseCheck " Hidden Disabled" !StingerCheck, Rose
-Gui, Add, Checkbox, % "x370 y62 vStingerMountainTopCheck gnm_saveStingers Checked" StingerMountainTopCheck " Hidden Disabled" !StingerCheck, Mountain Top
-Gui, Add, Checkbox, % "x370 y80 vStingerPepperCheck gnm_saveStingers Checked" StingerPepperCheck " Hidden Disabled" !StingerCheck, Pepper
+Gui, Add, Checkbox, x217 y43 +BackgroundTrans vStingerCheck gnm_saveStingers Checked%StingerCheck% Disabled Hidden, Kill Vicious Bee
+Gui, Add, Checkbox, % "x315 y43 vStingerDailyBonusCheck gnm_saveStingers Checked" StingerDailyBonusCheck " Hidden Disabled" !StingerCheck, Only Daily Bonus
+Gui, Add, Text, x168 y69 +BackgroundTrans Hidden vTextFields, Fields:
+Gui, Add, Checkbox, % "x220 y62 vStingerCloverCheck gnm_saveStingers Checked" StingerCloverCheck " Hidden Disabled" !StingerCheck, Clover
+Gui, Add, Checkbox, % "x220 y80 vStingerSpiderCheck gnm_saveStingers Checked" StingerSpiderCheck " Hidden Disabled" !StingerCheck, Spider
+Gui, Add, Checkbox, % "x305 y62 vStingerCactusCheck gnm_saveStingers Checked" StingerCactusCheck " Hidden Disabled" !StingerCheck, Cactus
+Gui, Add, Checkbox, % "x305 y80 vStingerRoseCheck gnm_saveStingers Checked" StingerRoseCheck " Hidden Disabled" !StingerCheck, Rose
+Gui, Add, Checkbox, % "x390 y62 vStingerMountainTopCheck gnm_saveStingers Checked" StingerMountainTopCheck " Hidden Disabled" !StingerCheck, Mountain Top
+Gui, Add, Checkbox, % "x390 y80 vStingerPepperCheck gnm_saveStingers Checked" StingerPepperCheck " Hidden Disabled" !StingerCheck, Pepper
 ;bosses
 Gui, Font, w700
-Gui, Add, GroupBox, x200 y105 w290 h125 vBossesGroupBox Hidden, Bosses
+Gui, Add, GroupBox, x149 y104 w341 h126 vBossesGroupBox Hidden, Bosses
 Gui, Font, s8 cDefault Norm, Tahoma
-
-Gui, Add, Checkbox, x210 y125 +BackgroundTrans vKingBeetleCheck gnm_saveCollect Checked%KingBeetleCheck% Disabled Hidden, King Beetle
-Gui, Add, Checkbox, x210 y145 +BackgroundTrans vTunnelBearCheck gnm_saveCollect Checked%TunnelBearCheck% Disabled Hidden, Tunnel Bear
-Gui, Add, Checkbox, x210 y165 +BackgroundTrans vCocoCrabCheck gnm_CocoCrabCheck Checked%CocoCrabCheck% Disabled Hidden, Coco Crab
-Gui, Add, Checkbox, x210 y185 +BackgroundTrans vStumpSnailCheck gnm_saveCollect Checked%StumpSnailCheck% Disabled Hidden, Stump Snail
-Gui, Add, Checkbox, x210 y205 +BackgroundTrans vCommandoCheck gnm_saveCollect Checked%CommandoCheck% Disabled Hidden, Commando
-Gui, Add, Checkbox, x295 y125 w13 h13 +BackgroundTrans vTunnelBearBabyCheck gnm_saveCollect Checked%TunnelBearBabyCheck% Disabled Hidden
-Gui, Add, Checkbox, x295 y145 w13 h13 +BackgroundTrans vKingBeetleBabyCheck gnm_saveCollect Checked%KingBeetleBabyCheck% Disabled Hidden
+Gui, Add, Button, x209 y104 w12 h14 gnm_BossConfigHelp vBossConfigHelp Hidden, ?
+Gui, Add, Checkbox, x152 y123 +BackgroundTrans vKingBeetleCheck gnm_saveCollect Checked%KingBeetleCheck% Disabled Hidden, King Beetle
+Gui, Add, Checkbox, xp yp+21 +BackgroundTrans vTunnelBearCheck gnm_saveCollect Checked%TunnelBearCheck% Disabled Hidden, Tunnel Bear
+Gui, Add, Checkbox, xp yp+21 +BackgroundTrans vCocoCrabCheck gnm_CocoCrabCheck Checked%CocoCrabCheck% Disabled Hidden, Coco Crab
+Gui, Add, Checkbox, xp yp+21 +BackgroundTrans vStumpSnailCheck gnm_saveCollect Checked%StumpSnailCheck% Disabled Hidden, Stump Snail
+Gui, Add, Checkbox, xp yp+21 +BackgroundTrans vCommandoCheck gnm_saveCollect Checked%CommandoCheck% Disabled Hidden, Commando
+Gui, Add, Checkbox, x270 y123 w13 h13 +BackgroundTrans vTunnelBearBabyCheck gnm_saveCollect Checked%TunnelBearBabyCheck% Disabled Hidden
+Gui, Add, Checkbox, xp yp+21 w13 h13 +BackgroundTrans vKingBeetleBabyCheck gnm_saveCollect Checked%KingBeetleBabyCheck% Disabled Hidden
 hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["babylovegui"])
-Gui, Add, Picture, +BackgroundTrans vBabyLovePicture1 x313 y122 w18 h18 Hidden, HBITMAP:*%hBM%
-Gui, Add, Picture, +BackgroundTrans vBabyLovePicture2 x313 y142 w18 h18 Hidden, HBITMAP:*%hBM%
+Gui, Add, Picture, +BackgroundTrans vBabyLovePicture1 x286 y120 w18 h18 Hidden, HBITMAP:*%hBM%
+Gui, Add, Picture, +BackgroundTrans vBabyLovePicture2 xp yp+21 w18 h18 Hidden, HBITMAP:*%hBM%
 DllCall("DeleteObject", "ptr", hBM)
 Gdip_DisposeImage(bitmaps["babylovegui"])
-Gui, Add, Checkbox, x368 y125 w13 h13 +BackgroundTrans vKingBeetleAmuletMode gnm_saveAmulet Checked%KingBeetleAmuletMode% Disabled Hidden
-Gui, Add, Checkbox, x368 y145 w13 h13 +BackgroundTrans vShellAmuletMode gnm_saveAmulet Checked%ShellAmuletMode% Disabled Hidden
+Gui, Add, Checkbox, x370 y123 w13 h13 +BackgroundTrans vKingBeetleAmuletMode gnm_saveAmulet Checked%KingBeetleAmuletMode% Disabled Hidden
+Gui, Add, Checkbox, x231 y186 w13 h13 +BackgroundTrans vShellAmuletMode gnm_saveAmulet Checked%ShellAmuletMode% Disabled Hidden
 hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["kingbeetleamu"])
-Gui, Add, Picture, +BackgroundTrans vKingBeetleAmuPicture x386 y121 w20 h20 Hidden, HBITMAP:*%hBM%
+Gui, Add, Picture, +BackgroundTrans vKingBeetleAmuPicture x386 y119 w20 h20 Hidden, HBITMAP:*%hBM%
 DllCall("DeleteObject", "ptr", hBM)
 Gdip_DisposeImage(bitmaps["kingbeetleamu"])
 hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["supremeshellamu"])
-Gui, Add, Picture, +BackgroundTrans vShellAmuPicture x386 y141 w20 h20 Hidden, HBITMAP:*%hBM%
+Gui, Add, Picture, +BackgroundTrans vShellAmuPicture x247 y182 w20 h20 Hidden, HBITMAP:*%hBM%
 DllCall("DeleteObject", "ptr", hBM)
 Gdip_DisposeImage(bitmaps["supremeshellamu"])
-Gui, Add, Button, x260 y105 w12 h14 gnm_BossConfigHelp vBossConfigHelp Hidden, ?
-Gui, Add, Text, x410 y125 w78 vKingBeetleAmuletModeText Hidden, % (KingBeetleAmuletMode = 1) ? "Keep Old" : "Do Nothing"
-Gui, Add, Text, x410 y145 w78 vShellAmuletModeText Hidden, % (ShellAmuletMode = 1) ? "Keep Old" : "Do Nothing"
-Gui, Add, Button, x295 y185 w90 h15 +Center vInputSnailHealth gnm_setSnailHealth Hidden, Edit Snail Health
-;Gui, Add, Text, x295 y185 w5 +Left +BackgroundTrans vHPtext  Hidden, % "HP%:"
-;Gui, Add, Edit, x325 y185 w60 h16 +BackgroundTrans limit5 Range1-100 vInputSnailHealth gnm_setSnailHealth  Hidden, %InputSnailHealth%
-Gui, Add, Text, x395 y185 w5 +Left +BackgroundTrans vTime  Hidden, Mins:
-Gui, Add, DropDownList, x425 y183 w55 vSnailTime gnm_SnailTime Hidden, % LTrim(StrReplace("|5|10|15|Kill|", "|" SnailTime "|", "|" SnailTime "||"), "|")
-Gui, Add, Button, x295 y205 w90 h15 +Center vInputChickHealth gnm_setChickHealth Hidden, Edit Chick Health 
-;Gui, Add, Text, x295 y205 w5 +Left +BackgroundTrans vHPtext2  Hidden, % "HP%:"
-;Gui, Add, Edit, x325 y205 w60 h16 +BackgroundTrans limit5 Range1-100 vInputChickHealth gnm_setChickHealth  Hidden, %InputChickHealth%
-Gui, Add, Text, x395 y205 w5 +Left +BackgroundTrans vTime2  Hidden, Mins:
-Gui, Add, DropDownList, x425 y203 w55 vChickTime gnm_ChickTime Hidden, % LTrim(StrReplace("|5|10|15|Kill|", "|" ChickTime "|", "|" ChickTime "||"), "|")
+Gui, Add, Text, x410 y123 w56 vKingBeetleAmuletModeText Hidden, % (KingBeetleAmuletMode = 1) ? " Keep Old" : "Do Nothing"
+Gui, Add, Text, x271 y186 w56 vShellAmuletModeText Hidden, % (ShellAmuletMode = 1) ? " Keep Old" : "Do Nothing"
+Gui, Add, Text, x246 y207 vChickLevelTextLabel Hidden, Level:
+Gui, Add, Text, x276 y207 w30 vChickLevelText +Center Hidden, ?
+Gui, Add, UpDown, w10 h16 vChickLevel gnm_setChickHealth Range3-25 Hidden, 10
+GuiControl, , ChickLevelText, ? ; no point in storing this value, have it undefined on start
+Gui, Add, Text, x329 y186 vSnailHPText Hidden, HP:
+Gui, Add, Text, xp yp+21 vChickHPText Hidden, HP:
+Gui, Add, Edit, x347 y184 w60 h18 +BackgroundTrans Number Limit8 gnm_setSnailHealth vSnailHealthEdit Hidden, % Round(30000000*InputSnailHealth/100)
+Gui, Add, Edit, xp yp+21 w60 h18 +BackgroundTrans Number Limit8 gnm_setChickHealth vChickHealthEdit Hidden
+Gui, Font, s7
+Gui, Add, Text, % "x409 y188 w40 vSnailHealthText Hidden c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputSnailHealth), 150)), Round(Min(3*InputSnailHealth, 150)), 0), % InputSnailHealth "%"
+Gui, Add, Text, % "xp yp+21 w40 vChickHealthText Hidden c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputChickHealth), 150)), Round(Min(3*InputChickHealth, 150)), 0), % InputChickHealth "%"
+Gui, Font, s8
+Gui, Add, Text, x447 y186 w20 vSnailTimeText +Center Hidden, % (SnailTime = "Kill") ? SnailTime : SnailTime "m"
+Gui, Add, UpDown, xp+20 yp-1 w10 h16 -16 Range1-4 vSnailTimeUpDown gnm_SnailTime Hidden, % (SnailTime = "Kill") ? 4 : SnailTime//5
+Gui, Add, Text, x447 y207 w20 vChickTimeText +Center Hidden, % (ChickTime = "Kill") ? ChickTime : ChickTime "m"
+Gui, Add, UpDown, xp+20 yp-1 w10 h16 -16 Range1-4 vChickTimeUpDown gnm_ChickTime Hidden, % (ChickTime = "Kill") ? 4 : ChickTime//5
 
 
 nm_saveCollect()
@@ -4495,34 +4502,30 @@ nm_saveAmulet(hCtrl){
 	local k
 	GuiControlGet, k, Name, %hCtrl%
 	GuiControlGet, %k%
-	GuiControl, , %k%Text, % (%k% = 1) ? "Keep Old" : "Do Nothing"
+	GuiControl, , %k%Text, % (%k% = 1) ? " Keep Old" : "Do Nothing"
 	IniWrite, % %k%, settings\nm_config.ini, Collect, %k%
 }
-nm_setSnailHealth()
+nm_setSnailHealth(hEdit)
 {
-    global InputSnailHealth
-	Loop
-    {
-        InputBox, inputHP, Snail HP Settings, Enter Snail's health to convert to percentage notation`n`nCurrent HP Left:  %InputSnailHealth% percent, , 250, 175
-        if ErrorLevel
-        {
-            break
-        }
-        if (inputHP <= 30000000 && inputHP > 0)
-        {
-            NewSnailHealth := Round((inputHP / 30000000) * 100, 2)
-			InputSnailHealth := NewSnailHealth
-			IniWrite, %NewSnailHealth%, settings\nm_config.ini, Collect, InputSnailHealth
-        	MsgBox, Snail's Health has been updated to %InputSnailHealth% percent.
-            break
-        }
-        else
-        {
-            MsgBox % "Invalid input."
-        }
-    }
+	global InputSnailHealth
+	ControlGet, p, CurrentCol, , , ahk_id %hEdit%
+	GuiControlGet, inputHP, , SnailHealthEdit
+
+	if (inputHP ~= "[^\d]" || (inputHP > 30000000)) ; invalid HP
+	{
+		GuiControl, , %hEdit%, % Round(30000000*InputSnailHealth/100)
+		SendMessage, 0xB1, % p-2, % p-2, , ahk_id %hEdit%
+		nm_ShowErrorBalloonTip(hEdit, "Unacceptable Number", "You cannot enter a number above 30M!")
+	}
+	else
+	{
+		InputSnailHealth := Round((inputHP / 30000000) * 100, 2)
+		GuiControl, % "+c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputSnailHealth), 150)), Round(Min(3*InputSnailHealth, 150)), 0) " +Redraw", SnailHealthText
+		GuiControl, , SnailHealthText, % InputSnailHealth "%"
+		IniWrite, %InputSnailHealth%, settings\nm_config.ini, Collect, InputSnailHealth
+	}
 }
-nm_setChickHealth(hEdit)
+nm_setChickHealth(hCtrl)
 {
     global InputChickHealth
 	;Gumdrops carried me, they so pro
@@ -4542,56 +4545,45 @@ nm_setChickHealth(hEdit)
 	, 16: 1000000
 	, 17: 2500000
 	, 18: 5000000
-	, 19: 7500000
-	, 20: 10000000}
-    Loop
-    {
-        InputBox, inputHP, Chick HP Settings, Enter Chick's HP to convert to percentage notation`n`nCurrent HP Left: %InputChickHealth% percent, , 250, 175
-        if ErrorLevel
-        {
-            break
-        }
-		InputBox, chickLevel, Chick HP Settings, Enter The current chick level, , 250, 125
-		if ErrorLevel
-        {
-        	break
-        }
-		for k, v in chickArray
+	, 19: 7500000}
+
+	GuiControlGet, k, Name, %hCtrl%
+	GuiControlGet, inputHP, , ChickHealthEdit
+	GuiControlGet, ChickLevel
+	MaxHealth := chickArray.HasKey(ChickLevel) ? chickArray[ChickLevel] : 10000000
+
+	if (k = "ChickHealthEdit")
+	{
+		if (inputHP ~= "[^\d]" || (inputHP > MaxHealth))
 		{
-			if (chickLevel < 20 && chickLevel >= 3)
-			{
-				if (k = chickLevel)
-				{
-					totalHP := v 
-				}
-			}
-			else if (chickLevel > 20)
-			{
-				totalHP := 10000000
-			}
+			ControlGet, p, CurrentCol, , , ahk_id %hCtrl%
+			GuiControl, , %hCtrl%, % Round(MaxHealth*InputChickHealth/100)
+			SendMessage, 0xB1, % p-2, % p-2, , ahk_id %hCtrl%
+			nm_ShowErrorBalloonTip(hCtrl, "Unacceptable Number", "You cannot enter a number above " MaxHealth " for this level!")
+			return
 		}
-        if (inputHP <= totalHP && inputHP > 0)
-        {
-            NewChickHealth := Round((inputHP / totalHP) * 100, 2)
-			InputChickHealth := NewChickHealth
-			IniWrite, %NewChickHealth%, settings\nm_config.ini, Collect, InputChickHealth
-        	MsgBox, Chick's Health has been updated to %InputChickHealth% percent.
-            break
-        }
-        else
-        {
-            MsgBox % "Invalid input."
-        }
-    }
+	}
+	else if (inputHP > MaxHealth)
+		GuiControl, , ChickHealthEdit, % (inputHP := MaxHealth)
+	GuiControl, , ChickLevelText, % ChickLevel
+
+	InputChickHealth := Round(Min(100, (inputHP / (chickArray.HasKey(ChickLevel) ? chickArray[ChickLevel] : 10000000)) * 100), 2)
+	GuiControl, % "+c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputChickHealth), 150)), Round(Min(3*InputChickHealth, 150)), 0) " +Redraw", ChickHealthText
+	GuiControl, , ChickHealthText, % InputChickHealth "%"
+	IniWrite, %InputChickHealth%, settings\nm_config.ini, Collect, InputChickHealth
 }
 nm_SnailTime(){
 	global SnailTime
-	GuiControlGet SnailTime
+	static arr := [5,10,15,"Kill"]
+	GuiControlGet, SnailTimeUpDown
+	GuiControl, , SnailTimeText, % ((SnailTime := arr[SnailTimeUpDown]) = "Kill") ? SnailTime : SnailTime "m"
 	IniWrite, %SnailTime%, settings\nm_config.ini, Collect, SnailTime
 }
 nm_ChickTime(){
 	global ChickTime
-	GuiControlGet ChickTime
+	static arr := [5,10,15,"Kill"]
+	GuiControlGet, ChickTimeUpDown
+	GuiControl, , ChickTimeText, % ((ChickTime := arr[ChickTimeUpDown]) = "Kill") ? ChickTime : ChickTime "m"
 	IniWrite, %ChickTime%, settings\nm_config.ini, Collect, ChickTime
 }
 nm_BugrunCheck(){
@@ -4676,10 +4668,10 @@ nm_TabCollectLock(){
 	GuiControl, disable, StumpSnailCheck
 	GuiControl, disable, ShellAmuletMode
 	GuiControl, disable, CommandoCheck
-	GuiControl, disable, InputSnailHealth
-	GuiControl, disable, SnailTime
-	GuiControl, disable, InputChickHealth
-	GuiControl, disable, ChickTime
+	GuiControl, disable, InputSnailHealthButton
+	GuiControl, disable, SnailTimeUpDown
+	GuiControl, disable, InputChickHealthButton
+	GuiControl, disable, ChickTimeUpDown
 }
 nm_TabCollectUnLock(){
 	global beesmasActive
@@ -4734,10 +4726,10 @@ nm_TabCollectUnLock(){
 	GuiControl, enable, StumpSnailCheck
 	GuiControl, enable, ShellAmuletMode
 	GuiControl, enable, CommandoCheck
-	GuiControl, enable, InputSnailHealth
-	GuiControl, enable, SnailTime
-	GuiControl, enable, InputChickHealth
-	GuiControl, enable,	ChickTime
+	GuiControl, enable, InputSnailHealthButton
+	GuiControl, enable, SnailTimeUpDown
+	GuiControl, enable, InputChickHealthButton
+	GuiControl, enable,	ChickTimeUpDown
 }
 nm_saveBoost(){
 	global
@@ -4925,19 +4917,6 @@ nm_importStyles() {
 
 	if !(Instr(StylesList, GuiTheme))
 		StylesList .= GuiTheme "|"
-}
-nm_InputSnailHealth() {
-	global InputSnailHealth
-	if (InputSnailHealth > 30000000)
-		InputSnailhealth := 30000000
-	InputSnailHealth := Round((InputSnailHealth / 30000000) * 100, 2)
-	IniWrite, %InputSnailHealth%, settings\nm_config.ini, Kill, InputSnailHealth
-}
-nm_InputChickHealth() {
-	global InputChickHealth
-	if (InputChickHealth > 100)
-		InputChickHealth := 100
-	IniWrite, %InputChickHealth%, settings\nm_config.ini, Kill, InputChickHealth
 }
 nm_HotkeyEditTime(hCtrl){
 	global
@@ -5973,7 +5952,7 @@ nm_MonsterRespawnTime(hEdit){
 	ControlGet, p, CurrentCol, , , ahk_id %hEdit%
 	GuiControlGet, NewMonsterRespawnTime, , %hEdit%
 
-    if (NewMonsterRespawnTime ~= "[^\d]" || (NewMonsterRespawnTime > 40)) ; contains char other than digit, or more than 50
+    if (NewMonsterRespawnTime ~= "[^\d]" || (NewMonsterRespawnTime > 40)) ; contains char other than digit, or more than 40
 	{
         GuiControl, , %hEdit%, %MonsterRespawnTime%
         SendMessage, 0xB1, % p-2, % p-2, , ahk_id %hEdit%
@@ -7486,7 +7465,7 @@ nm_ContributorsPageButton(hwnd){
 nm_CollectKillButton(hCtrl){
 	global
 	static CollectControls := ["CollectGroupBox","DispensersGroupBox","BeesmasGroupBox","BeesmasImage","ClockCheck","MondoBuffCheck","MondoAction","AntPassCheck","AntPassAction","RoboPassCheck","HoneystormCheck","HoneyDisCheck","TreatDisCheck","BlueberryDisCheck","StrawberryDisCheck","CoconutDisCheck","RoyalJellyDisCheck","GlueDisCheck","BeesmasGatherInterruptCheck","StockingsCheck","WreathCheck","FeastCheck","RBPDelevelCheck","GingerbreadCheck","SnowMachineCheck","CandlesCheck","SamovarCheck","LidArtCheck","GummyBeaconCheck"]
-	, KillControls := ["BugRunGroupBox","BugRunCheck","MonsterRespawnTime","TextMonsterRespawn","MonsterRespawnTimeHelp","BugrunInterruptCheck","TextLoot","TextKill","TextLineBugRun1","TextLineBugRun2","BugrunLadybugsLoot","BugrunRhinoBeetlesLoot","BugrunSpiderLoot","BugrunMantisLoot","BugrunScorpionsLoot","BugrunWerewolfLoot","BugrunLadybugsCheck","BugrunRhinoBeetlesCheck","BugrunSpiderCheck","BugrunMantisCheck","BugrunScorpionsCheck","BugrunWerewolfCheck","StingersGroupBox","StingerCheck","StingerDailyBonusCheck","StingerCloverCheck","StingerSpiderCheck","StingerCactusCheck","StingerRoseCheck","StingerMountainTopCheck","StingerPepperCheck","BossesGroupBox","TunnelBearCheck","KingBeetleCheck","CocoCrabCheck","StumpSnailCheck","CommandoCheck","TunnelBearBabyCheck","KingBeetleBabyCheck","BabyLovePicture1","BabyLovePicture2","KingBeetleAmuletMode","ShellAmuletMode","KingBeetleAmuPicture","ShellAmuPicture","KingBeetleAmuletModeText","ShellAmuletModeText","InputChickHealth","Time","SnailTime","InputSnailHealth","Time2","ChickTime","BossConfigHelp"]
+	, KillControls := ["BugRunGroupBox","BugRunCheck","MonsterRespawnTime","TextMonsterRespawnPercent","TextMonsterRespawn","MonsterRespawnTimeHelp","BugrunInterruptCheck","TextLoot","TextKill","TextLineBugRun1","TextLineBugRun2","BugrunLadybugsLoot","BugrunRhinoBeetlesLoot","BugrunSpiderLoot","BugrunMantisLoot","BugrunScorpionsLoot","BugrunWerewolfLoot","BugrunLadybugsCheck","BugrunRhinoBeetlesCheck","BugrunSpiderCheck","BugrunMantisCheck","BugrunScorpionsCheck","BugrunWerewolfCheck","StingersGroupBox","StingerCheck","StingerDailyBonusCheck","TextFields","StingerCloverCheck","StingerSpiderCheck","StingerCactusCheck","StingerRoseCheck","StingerMountainTopCheck","StingerPepperCheck","BossesGroupBox","TunnelBearCheck","KingBeetleCheck","CocoCrabCheck","StumpSnailCheck","CommandoCheck","TunnelBearBabyCheck","KingBeetleBabyCheck","BabyLovePicture1","BabyLovePicture2","KingBeetleAmuletMode","ShellAmuletMode","KingBeetleAmuPicture","ShellAmuPicture","KingBeetleAmuletModeText","ShellAmuletModeText","ChickLevelTextLabel","ChickLevelText","ChickLevel","SnailHPText","SnailHealthEdit","SnailHealthText","ChickHPText","ChickHealthEdit","ChickHealthText","SnailTimeText","SnailTimeUpDown","ChickTimeText","ChickTimeUpDown","BossConfigHelp"]
 
 	p := (hCtrl = hKill)
 	GuiControl, % (p ? "Enable" : "Disable"), % hCollect
@@ -20270,16 +20249,21 @@ nm_UpdateGUIVar(var)
 		nm_HotbarWhile()
 
 		Case "SnailTime":
-		Guicontrol, , %k%, % StrReplace("|5|10|15|Kill|", "|" %k% "|", "|" %k% "||")
+		GuiControl, , SnailTimeUpDown, % (SnailTime = "Kill") ? 4 : SnailTime//5
+		nm_SnailTime()
 
 		Case "ChickTime":
-		Guicontrol, , %k%, % StrReplace("|5|10|15|Kill|", "|" %k% "|", "|" %k% "||")
+		GuiControl, , ChickTimeUpDown, % (ChickTime = "Kill") ? 4 : ChickTime//5
+		nm_ChickTime()
 
 		case "InputSnailHealth":
-		nm_InputSnailHealth()
+		GuiControl, , SnailHealthEdit, Round(30000000*InputSnailHealth/100)
+		GuiControl, % "+c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputSnailHealth), 150)), Round(Min(3*InputSnailHealth, 150)), 0) " +Redraw", SnailHealthText
+		GuiControl, , SnailHealthText, % InputSnailHealth "%"
 
 		case "InputChickHealth":
-		nm_InputChickHealth()
+		GuiControl, % "+c" Format("0x{1:02x}{2:02x}{3:02x}", Round(Min(3*(100-InputChickHealth), 150)), Round(Min(3*InputChickHealth, 150)), 0) " +Redraw", ChickHealthText
+		GuiControl, , ChickHealthText, % InputChickHealth "%"
 
 		case "":
 
