@@ -204,7 +204,7 @@ nm_import() ; at every start of macro, import patterns
 		}
 		`)""
 
-		exec := ComObjCreate(""WScript.Shell"").Exec(""" exe_path " /script /iLib nul /ErrorStdOut *""), exec.StdIn.Write(script), exec.StdIn.Close()
+		exec := ComObjCreate(""WScript.Shell"").Exec(A_AhkPath "" /script /iLib nul /ErrorStdOut *""), exec.StdIn.Write(script), exec.StdIn.Close()
 		if (stdout := exec.StdErr.ReadAll())
 			FileAppend, % stdout, **
 
@@ -3182,7 +3182,7 @@ nm_LoadingProgress(){
 	#NoEnv
 	#NoTrayIcon
 	#Requires AutoHotkey v1.1.36.01+
-	#Include " A_ScriptDir "\lib\Gdip_All.ahk
+	#Include %A_ScriptDir%\lib\Gdip_All.ahk
 	CoordMode, Mouse, Screen
 
 	pToken := Gdip_Startup()
@@ -3467,7 +3467,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 	OnExit(""""ExitFunc"""")
 	CoordMode, Mouse, Screen
 
-	#Include " A_ScriptDir "\lib
+	#Include %A_ScriptDir%\lib
 	#Include Gdip_All.ahk
 	#Include Gdip_ImageSearch.ahk
 	#Include HyperSleep.ahk
@@ -6352,10 +6352,10 @@ nm_WebhookGUI(){
 	#SingleInstance Force
 	#Requires AutoHotkey v1.1.36.01+
 	#MaxThreads 255
-	#Include " A_ScriptDir "\lib\Gdip_All.ahk
-	#Include " A_ScriptDir "\lib\Gdip_ImageSearch.ahk
+	#Include %A_ScriptDir%\lib\Gdip_All.ahk
+	#Include %A_ScriptDir%\lib\Gdip_ImageSearch.ahk
 
-	SetWorkingDir " A_ScriptDir "
+	SetWorkingDir %A_ScriptDir%
 	SetBatchLines -1
 	DetectHiddenWindows, On
 	SetTitleMatchMode, 2
@@ -6364,7 +6364,7 @@ nm_WebhookGUI(){
 
 	bitmaps := {}
 
-	#Include " A_ScriptDir "\nm_image_assets\webhook_gui\bitmaps.ahk
+	#Include %A_ScriptDir%\nm_image_assets\webhook_gui\bitmaps.ahk
 
 	; config
 	discordMode := """ discordMode """
@@ -6876,8 +6876,8 @@ nm_AutoStartManager(){
 			SplitPath, % v.args[1], ahkExe, ahkDir
 			SplitPath, A_AhkPath, , validAhkDir
 			validAhk := (ahkdir = validAhkDir)
-			validScript := ((v.args[2] = """ A_ScriptFullPath """) || (" A_IsCompiled " && (v.args[1] = """ A_ScriptFullPath """)))
-			autostart := ((v.args[3] = 1) || (" A_IsCompiled " && (v.args[2] = 1)))
+			validScript := ((v.args[2] = """ A_ScriptFullPath """) || (" (A_IsCompiled ? 1 : 0) " && (v.args[1] = """ A_ScriptFullPath """)))
+			autostart := ((v.args[3] = 1) || (" (A_IsCompiled ? 1 : 0) " && (v.args[2] = 1)))
 			delay := v.delay ? v.delay : ""None""
 			level := v.level
 			status := (validAhk && validScript) ? 0 : 3
@@ -7094,7 +7094,7 @@ nm_AutoStartManager(){
 	}
 	)"
 
-	file := FileOpen(path := A_ScriptDir "\submacros\AutoStartManager.ahk", "w-d"), file.Write(script), file.Close()
+	file := FileOpen(path := A_ScriptDir "\submacros\AutoStartManager.ahk", "w-d", "UTF-8"), file.Write(script), file.Close()
 	Run, "%exe_path%" /script "%path%" "%hGUI%"
 
 	return
@@ -13125,9 +13125,9 @@ nm_BitterberryFeeder()
 	#NoTrayIcon
 	#SingleInstance Force
 	#Requires AutoHotkey v1.1.36.01+
-	#Include " A_ScriptDir "\lib\Gdip_All.ahk
-	#Include " A_ScriptDir "\lib\Gdip_ImageSearch.ahk
-	#Include " A_ScriptDir "\submacros\shared\nm_misc.ahk
+	#Include %A_ScriptDir%\lib\Gdip_All.ahk
+	#Include %A_ScriptDir%\lib\Gdip_ImageSearch.ahk
+	#Include %A_ScriptDir%\submacros\shared\nm_misc.ahk
 
 	CoordMode, Mouse, Screen
 	SetBatchLines -1
@@ -13273,9 +13273,9 @@ nm_BasicEggHatcher()
 	#NoTrayIcon
 	#SingleInstance Force
 	#Requires AutoHotkey v1.1.36.01+
-	#Include " A_ScriptDir "\lib\Gdip_All.ahk
-	#Include " A_ScriptDir "\lib\Gdip_ImageSearch.ahk
-	#Include " A_ScriptDir "\submacros\shared\nm_misc.ahk
+	#Include %A_ScriptDir%\lib\Gdip_All.ahk
+	#Include %A_ScriptDir%\lib\Gdip_ImageSearch.ahk
+	#Include %A_ScriptDir%\submacros\shared\nm_misc.ahk
 
 	CoordMode, Mouse, Screen
 	SetBatchLines -1
@@ -14019,7 +14019,7 @@ nm_createWalk(movement, name:="") ; this function generates the 'walk' code and 
 		ListLines, Off
 		OnExit(""ExitFunc"")
 
-		#Include " A_ScriptDir "\lib
+		#Include %A_ScriptDir%\lib
 		#Include Gdip_All.ahk
 		#Include Gdip_ImageSearch.ahk
 		#Include HyperSleep.ahk
@@ -14080,7 +14080,7 @@ nm_createWalk(movement, name:="") ; this function generates the 'walk' code and 
 		ListLines, Off
 		OnExit(""ExitFunc"")
 
-		#Include " A_ScriptDir "\lib
+		#Include %A_ScriptDir%\lib
 		#Include Gdip_All.ahk
 		#Include Gdip_ImageSearch.ahk
 		#Include HyperSleep.ahk
