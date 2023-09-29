@@ -51,6 +51,20 @@ Reload(ahkpath) {
 	Run % """" ahkpath """ /r " params
 }
 
+; elevate script if required (check write permissions in ScriptDir)
+h := DllCall("CreateFile", "Str", A_ScriptFullPath, "UInt", 0x40000000, "UInt", 0, "UInt", 0, "UInt", 4, "UInt", 0, "UInt", 0), DllCall("CloseHandle", "UInt", h)
+if (h = -1)
+{
+	if (!A_IsAdmin || !(DllCall("GetCommandLine","Str") ~= " /restart(?!\S)"))
+		Try RunWait, *RunAs "%A_AhkPath%" /script /restart "%A_ScriptFullPath%"
+	if !A_IsAdmin {
+		MsgBox, 0x40010, Error, You must run Natro Macro as administrator in this folder!`nIf you don't want to do this, move the macro to a different folder (e.g. Downloads, Desktop)
+		ExitApp
+	}
+	; elevated but still can't write, read-only directory?
+	MsgBox, 0x40010, Error, You cannot run Natro Macro in this folder!`nTry moving the macro to a different folder (e.g. Downloads, Desktop)
+}
+
 ; close any remnant running natro scripts and start heartbeat
 DetectHiddenWindows, On
 SetTitleMatchMode, 2
@@ -84,7 +98,7 @@ If (!FileExist("settings")) ; make sure the settings folder exists
 	FileCreateDir, settings
 	If (ErrorLevel)
 	{
-		MsgBox, 0x30,, Couldn't create the settings directory! Make sure the script is elevated if it needs to be.
+		MsgBox, 0x40010, Error, Could not create the settings directory!`nTry moving the macro to a different folder (e.g. Downloads, Desktop)
 		ExitApp
 	}
 }
@@ -141,7 +155,7 @@ nm_import() ; at every start of macro, import patterns
 		FileCreateDir, settings\imported
 		If ErrorLevel
 		{
-			msgbox, 0x40030, , Couldn't create the directory for imported patterns! Make sure the script is elevated if it needs to be.
+			msgbox, 0x40010, Error, Could not create the directory for imported patterns!`nTry moving the macro to a different folder (e.g. Downloads, Desktop)
 			ExitApp
 		}
 	}
