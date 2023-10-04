@@ -153,7 +153,7 @@ KeyDelay:=20
 nm_import() ; at every start of macro, import patterns
 {
 	global
-	local import, script, stdout, file, pattern, exec, init, oldimport, new_patterns, _args
+	local imported, import, script, stdout, file, pattern, exec, init, oldimport, new_patterns, _args
 
 	If !FileExist("settings\imported") ; make sure the import folder exists
 	{
@@ -164,6 +164,8 @@ nm_import() ; at every start of macro, import patterns
 			ExitApp
 		}
 	}
+	else if FileExist("settings\imported\patterns.ahk")
+		file := FileOpen("settings\imported\patterns.ahk", "r"), imported := file.Read(), file.Close()
 
 	import := ""
 	patternlist := "|"
@@ -171,85 +173,88 @@ nm_import() ; at every start of macro, import patterns
 	Loop, Files, %A_WorkingDir%\patterns\*.ahk
 	{
 		file := FileOpen(A_LoopFilePath, "r"), pattern := file.Read(), file.Close()
-		script := "
-		(Join`r`n
-		#NoEnv
-		#NoTrayIcon
-		#SingleInstance Off
-		#Requires AutoHotkey v1.1.36.01+
-		SetBatchLines -1
-
-		TCFBKey:=FwdKey:=""" FwdKey """
-		AFCFBKey:=LeftKey:=""" LeftKey """
-		TCLRKey:=BackKey:=""" BackKey """
-		AFCLRKey:=RightKey:=""" RightKey """
-		RotLeft:=""" RotLeft """
-		RotRight:=""" RotRight """
-		RotUp:=""" RotUp """
-		RotDown:=""" RotDown """
-		ZoomIn:=""" ZoomIn """
-		ZoomOut:=""" ZoomOut """
-		SC_E:=""" SC_E """
-		SC_R:=""" SC_R """
-		SC_L:=""" SC_L """
-		SC_Esc:=""" SC_Esc """
-		SC_Enter:=""" SC_Enter """
-		SC_LShift:=""" SC_LShift """
-		SC_Space:=""" SC_Space """
-		SC_1:=""" SC_1 """
-		HiveSlot:=""" HiveSlot """
-		MoveMethod:=""" MoveMethod """
-		HiveBees:=""" HiveBees """
-		KeyDelay:=""" KeyDelay """
-
-		size:=1, reps:=1, facingcorner:=0
-
-		patterns := {}
-		pattern := " pattern "
-
-		script := ""
-		(Join``r``n
-		#SingleInstance Off
-		#Requires AutoHotkey v1.1.36.01+
-		"" pattern ""
-
-		Walk(param1, param2:=0)
+		if !InStr(imported, pattern "`r`n`r`n")
 		{
-		}
+			script := "
+			(Join`r`n
+			#NoEnv
+			#NoTrayIcon
+			#SingleInstance Off
+			#Requires AutoHotkey v1.1.36.01+
+			SetBatchLines -1
 
-		HyperSleep(param1)
-		{
-		}
-		`)""
+			TCFBKey:=FwdKey:=""" FwdKey """
+			AFCFBKey:=LeftKey:=""" LeftKey """
+			TCLRKey:=BackKey:=""" BackKey """
+			AFCLRKey:=RightKey:=""" RightKey """
+			RotLeft:=""" RotLeft """
+			RotRight:=""" RotRight """
+			RotUp:=""" RotUp """
+			RotDown:=""" RotDown """
+			ZoomIn:=""" ZoomIn """
+			ZoomOut:=""" ZoomOut """
+			SC_E:=""" SC_E """
+			SC_R:=""" SC_R """
+			SC_L:=""" SC_L """
+			SC_Esc:=""" SC_Esc """
+			SC_Enter:=""" SC_Enter """
+			SC_LShift:=""" SC_LShift """
+			SC_Space:=""" SC_Space """
+			SC_1:=""" SC_1 """
+			HiveSlot:=""" HiveSlot """
+			MoveMethod:=""" MoveMethod """
+			HiveBees:=""" HiveBees """
+			KeyDelay:=""" KeyDelay """
 
-		exec := ComObjCreate(""WScript.Shell"").Exec(A_AhkPath "" /script /iLib nul /ErrorStdOut *""), exec.StdIn.Write(script), exec.StdIn.Close()
-		if (stdout := exec.StdErr.ReadAll())
-			FileAppend, % stdout, **
+			size:=1, reps:=1, facingcorner:=0
 
-		nm_Walk(tiles, MoveKey1, MoveKey2:=0)
-		{
-			return ""
-			(LTrim Join``r``n
-			Send {"" MoveKey1 "" down}"" (MoveKey2 ? ""{"" MoveKey2 "" down}"" : """") ""
-			Walk("" tiles "")
-			Send {"" MoveKey1 "" up}"" (MoveKey2 ? ""{"" MoveKey2 "" up}"" : """") ""
+			patterns := {}
+			pattern := " pattern "
+
+			script := ""
+			(Join``r``n
+			#SingleInstance Off
+			#Requires AutoHotkey v1.1.36.01+
+			"" pattern ""
+
+			Walk(param1, param2:=0)
+			{
+			}
+
+			HyperSleep(param1)
+			{
+			}
 			`)""
-		}
-		)"
 
-		exec := ComObjCreate("WScript.Shell").Exec(exe_path64 " /script /ErrorStdOut *"), exec.StdIn.Write(script), exec.StdIn.Close()
-		if (stdout := exec.StdErr.ReadAll())
-			msgbox, 0x40010, Unable to Import Pattern!, % "Unable to import '" StrReplace(A_LoopFileName, ".ahk") "' pattern! Click 'OK' to continue loading the macro without this pattern installed, otherwise fix the error and reload the macro.`r`n`r`nThe error found on loading is stated below:`r`n" stdout, 60
-		else
-		{
-			import .= pattern "`r`n`r`n"
-			patternlist .= StrReplace(A_LoopFileName, ".ahk") "|"
+			exec := ComObjCreate(""WScript.Shell"").Exec(A_AhkPath "" /script /iLib nul /ErrorStdOut *""), exec.StdIn.Write(script), exec.StdIn.Close()
+			if (stdout := exec.StdErr.ReadAll())
+				FileAppend, % stdout, **
+
+			nm_Walk(tiles, MoveKey1, MoveKey2:=0)
+			{
+				return ""
+				(LTrim Join``r``n
+				Send {"" MoveKey1 "" down}"" (MoveKey2 ? ""{"" MoveKey2 "" down}"" : """") ""
+				Walk("" tiles "")
+				Send {"" MoveKey1 "" up}"" (MoveKey2 ? ""{"" MoveKey2 "" up}"" : """") ""
+				`)""
+			}
+			)"
+
+			exec := ComObjCreate("WScript.Shell").Exec(exe_path64 " /script /ErrorStdOut *"), exec.StdIn.Write(script), exec.StdIn.Close()
+			if (stdout := exec.StdErr.ReadAll())
+			{
+				msgbox, 0x40010, Unable to Import Pattern!, % "Unable to import '" StrReplace(A_LoopFileName, ".ahk") "' pattern! Click 'OK' to continue loading the macro without this pattern installed, otherwise fix the error and reload the macro.`r`n`r`nThe error found on loading is stated below:`r`n" stdout, 60
+				continue
+			}
 		}
+
+		import .= pattern "`r`n`r`n"
+		patternlist .= StrReplace(A_LoopFileName, ".ahk") "|"
 	}
 
-	init := (!FileExist(A_WorkingDir "\settings\imported\patterns.ahk") && import) ? 1 : 0
-	file := FileOpen(A_WorkingDir "\settings\imported\patterns.ahk", "r-d"), oldimport := file.Read(), file.Close()
-	if (import != oldimport)
+	init := (!imported && import) ? 1 : 0
+	if (import != imported)
 	{
 		file := FileOpen(A_WorkingDir "\settings\imported\patterns.ahk", "w-d"), file.Write(import), file.Close()
 		new_patterns := import ? 1 : 0
