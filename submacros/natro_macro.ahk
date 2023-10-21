@@ -14430,7 +14430,7 @@ nm_setSprinkler(field, loc, dist){
 	}
 }
 nm_fieldDriftCompensation(){
-	global FwdKey, LeftKey, BackKey, RightKey, DisableToolUse, PFieldDriftSteps
+	global FwdKey, LeftKey, BackKey, RightKey, DisableToolUse, PFieldDriftSteps, MoveSpeedNum
 
 	WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
 	winUp := windowHeight // 2.14, winDown := windowHeight // 1.88
@@ -14461,10 +14461,10 @@ nm_LocateSprinkler(ByRef X:="", ByRef Y:=""){ ; find client coordinates of appro
 	n := sprinklerImages.Length()
 
 	WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
-	pBMScreen := Gdip_BitmapFromScreen(windowX "|" windowY "|" windowWidth "|" windowHeight "|")
+	pBMScreen := Gdip_BitmapFromScreen(windowX "|" (windowY + 75) "|" (hWidth := windowWidth) "|" (hHeight := windowHeight - 75) "|")
 
-	Gdip_LockBits(pBMScreen, 0, 0, windowWidth, windowHeight, hStride, hScan, hBitmapData, 1)
-	hWidth := NumGet(hBitmapData,0,"UInt"), hHeight := NumGet(hBitmapData,4,"UInt")
+	Gdip_LockBits(pBMScreen, 0, 0, hWidth, hHeight, hStride, hScan, hBitmapData, 1)
+	hWidth := NumGet(hBitmapData, 0, "UInt"), hHeight := NumGet(hBitmapData, 4, "UInt")
 
 	for i,k in sprinklerImages
 	{
@@ -14475,8 +14475,8 @@ nm_LocateSprinkler(ByRef X:="", ByRef Y:=""){ ; find client coordinates of appro
 
 	d := 11 ; divisions (odd positive integer such that w,h > n%i%Width,n%i%Height for all i<=n)
 	m := d//2 ; midpoint of d (along with m + 1), used frequently in calculations
-	v := 20 ; variation
-	w := windowWidth//d, h := windowHeight//d
+	v := 50 ; variation
+	w := hWidth//d, h := hHeight//d
 
 	; to search from centre (approximately), we will split the rectangle like a pinwheel configuration and search outwards (notice SearchDirection)
 	Loop % m + 1
@@ -14538,7 +14538,7 @@ nm_LocateSprinkler(ByRef X:="", ByRef Y:=""){ ; find client coordinates of appro
 
 	if pos
 	{
-		x := SubStr(pos, 1, InStr(pos, ",") - 1), y := SubStr(pos, InStr(pos, ",") + 1)
+		x := SubStr(pos, 1, InStr(pos, ",") - 1), y := 75 + SubStr(pos, InStr(pos, ",") + 1)
 		return 1
 	}
 	else
@@ -19870,15 +19870,6 @@ return
 ;TIMERS
 timers:
 ba_showPlanterTimers()
-return
-
-f7::
-Loop
-{
-	nm_LocateSprinkler(x, y)
-	tooltip % x " " y
-	Sleep, 250
-}
 return
 
 nm_WM_COPYDATA(wParam, lParam){
