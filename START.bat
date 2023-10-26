@@ -43,8 +43,9 @@ if defined grandparent (
 				echo %yellow%Deleted successfully^^!%reset%
 				echo:
 				
-				<nul set /p "=%green%Press any key to start Natro Macro . . . %reset%"
-				pause >nul
+				echo %green%Unzip complete^^! Starting Natro Macro in 10 seconds.%reset%
+				<nul set /p =%green%Press any key to skip . . . %reset%
+				timeout /t 10 >nul
 				start "" "%USERPROFILE%\%%~a\!folder!\submacros\AutoHotkeyU32.exe" "%USERPROFILE%\%%~a\!folder!\submacros\natro_macro.ahk"
 				exit
 			)
