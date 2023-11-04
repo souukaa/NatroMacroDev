@@ -3391,7 +3391,7 @@ nm_TabBoostUnLock()
 nm_TabPlantersUnLock()
 nm_TabSettingsUnLock()
 nm_setStatus()
-Gui, Show, , Natro Macro
+Gui, Show, NA, Natro Macro
 GuiControl,focus, Tab
 
 ;enable hotkeys
@@ -3451,7 +3451,7 @@ nm_TabSelect(){
 }
 SetLoadingProgress(percent)
 {
-	Gui, Show, , % "Natro Macro (Loading " Round(percent) "%)"
+	Gui, Show, NA, % "Natro Macro (Loading " Round(percent) "%)"
 }
 nm_WebhookEasterEgg(){
 	global WebhookEasterEgg
