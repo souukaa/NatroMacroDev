@@ -27,11 +27,11 @@ set yellow=%\e%[93m
 set reset=%\e%[0m
 
 for %%a in (".\..") do set "grandparent=%%~nxa"
-if defined grandparent (
+if not [!grandparent!] == [] (
 	for /f "tokens=1,* delims=_" %%a in ("%grandparent%") do set "zip=%%b"
-	call set str=%%zip:*.zip=%%
-	call set zip=%%zip:!str!=%%
-	if defined zip (
+	if not [!zip!] == [] (
+		call set str=%%zip:*.zip=%%
+		call set zip=%%zip:!str!=%%
 		echo %cyan%Looking for !zip!...%reset%
 		cd %USERPROFILE%
 		for %%a in ("Downloads","Downloads\Natro Macro","Desktop","Documents","OneDrive\Downloads","OneDrive\Downloads\Natro Macro","OneDrive\Desktop","OneDrive\Documents") do (
@@ -56,7 +56,7 @@ if defined grandparent (
 				exit
 			)
 		)
-	) else (echo %red%Error: Could not determine .zip name of unextracted .zip^^!%reset%)
+	) else (echo %red%Error: Could not determine name of unextracted .zip^^!%reset%)
 ) else (echo %red%Error: Could not find Temp folder of unextracted .zip^^! ^(.bat has no grandparent^)%reset%)
 
 echo %red%Unable to automatically extract Natro Macro^^!%reset%
