@@ -1938,7 +1938,7 @@ Gui, Add, Button, x75 y260 w65 h20 -Wrap vPauseButton gpause, % " Pause (" Pause
 Gui, Add, Button, x145 y260 w65 h20 -Wrap vStopButton gstop, % " Stop (" StopHotkey ")"
 
 ;ADD TABS
-Gui, Add, Tab, x0 y-1 w502 h240 -Wrap hwndhTab vTab gnm_TabSelect, % "Gather|Collect/Kill|Boost|Quest|Planters|Status|Settings|Misc|Contributors" ((BuffDetectReset = 1) ? "|Advanced" : "")
+Gui, Add, Tab, x0 y-1 w500 h240 -Wrap hwndhTab vTab gnm_TabSelect, % "Gather|Collect/Kill|Boost|Quest|Planters|Status|Settings|Misc|Credits" ((BuffDetectReset = 1) ? "|Advanced" : "")
 SendMessage, 0x1331, 0, 20, , ahk_id %hTab% ; set minimum tab width
 Gui, Font, w700 Underline
 Gui, Add, Text, x0 y25 w126 +center +BackgroundTrans,Gathering
@@ -2080,7 +2080,7 @@ SetLoadingProgress(26)
 
 ;Contributors TAB
 ;------------------------
-Gui, Tab, Contributors
+Gui, Tab, Credits
 Gui, Add, Picture, +BackgroundTrans hwndhContributorsDevImage gnm_ContributorsDiscordLink x5 y24 AltSubmit
 Gui, Add, Picture, +BackgroundTrans hwndhContributorsImage x253 y24 AltSubmit
 Gui, Font, w700
