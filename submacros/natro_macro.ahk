@@ -12134,6 +12134,7 @@ nm_GoGather(){
 				FieldRotateTimes:=FieldRotateTimes1
 				FieldSprinklerLoc:=FieldSprinklerLoc1
 				FieldSprinklerDist:=FieldSprinklerDist1
+				FieldDriftCheck:=FieldDriftCheck1
 			} else {
 				FieldName:=QuestGatherField
 				FieldPattern:=FieldDefault[QuestGatherField]["pattern"]
