@@ -3409,7 +3409,7 @@ nm_LockTabs(lock:=1){
 		DllCall("DeleteObject", "Ptr", hBM)
 		GuiControl, +gDonateLink, ImageDonateLink
 
-		GuiControl, -g, ImageGitHubLink
+		GuiControl, +gGitHubRepoLink, ImageGitHubLink
 
 		c := "UnLock"
 	}
