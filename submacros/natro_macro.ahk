@@ -1737,48 +1737,45 @@ Menu, Tray, Click, 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;https://www.autohotkey.com/boards/viewtopic.php?f=6&t=5841&hilit=gui+skin
 SkinForm(Apply, A_WorkingDir . "\nm_image_assets\Styles\USkin.dll", A_WorkingDir . "\nm_image_assets\styles\" . GuiTheme . ".msstyles")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; AUTO-UPDATE
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; get latest release tag from GitHub
-try
+nm_AutoUpdateHandler(req)
 {
-	wr := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-	wr.Open("GET", "https://api.github.com/repos/NatroTeam/NatroMacro/releases/latest", 1)
-	wr.SetRequestHeader("accept", "application/vnd.github+json")
-	wr.Send()
-	wr.WaitForResponse()
-	if !(LatestVer := Trim((latest_release := JSON.parse(wr.ResponseText))["tag_name"], "v"))
-		throw
-}
-catch
-	LatestVer := 0
+	global
 
-; create auto-update GUI if outdated
-outdated_flag := 0
-if (VerCompare(VersionID, LatestVer) < 0)
-{
-	outdated_flag := 1
-	if (LatestVer != IgnoreUpdateVersion)
-		nm_AutoUpdateGUI()
-}
+	if (req.readyState != 4)
+        return
 
-; auto-update functions
+	if (req.status = 200)
+	{
+		LatestVer := Trim((latest_release := JSON.parse(req.responseText))["tag_name"], "v")
+		if (VerCompare(VersionID, LatestVer) < 0)
+		{
+			GuiControl, Show, ImageUpdateLink
+			VersionWidth += 16
+			GuiControl, MoveDraw, % hVersionText, % "x" 494-VersionWidth
+			GuiControl, MoveDraw, ImageGitHubLink, % "x" 494-VersionWidth-23
+			GuiControl, MoveDraw, ImageDiscordLink, % "x" 494-VersionWidth-48
+			
+			if (LatestVer != IgnoreUpdateVersion)
+				nm_AutoUpdateGUI()
+		}
+	}
+}
 nm_AutoUpdateGUI()
 {
 	global
-	local size, downloads
-	local Prev_DetectHiddenWindows
+	local size, downloads, posW, hBM
 	Gui, update:Destroy
-	Gui, update:+AlwaysOnTop +Border +hwndhUpdateGUI
+	Gui, update:+Border +hwndhUpdateGUI +Owner%hGUI% -MinimizeBox
 	Gui, update:Font, s9 cDefault Norm, Tahoma
-	Gui, update:Add, Text, x20 w260 +Center +BackgroundTrans, A newer version of Natro Macro was found!`nDo you want to update now?
-	Gui, update:Add, Text, +BackgroundTrans Hidden vVersionChange, % "Natro Macro v" VersionID " ⮕ v" LatestVer
-	GuiControlGet, pos, update:Pos, VersionChange
+	Gui, update:Add, Text, x20 w260 +Center +BackgroundTrans hwndhUpdateText, A newer version of Natro Macro was found!`nDo you want to update now?
+	posW := TextExtent("Natro Macro v" VersionID " ⮕ v" LatestVer, hUpdateText)
 	Gui, update:Add, Text, % "x" 149-posW//2 " y40 +Left +BackgroundTrans", % "Natro Macro v" VersionID " ⮕ "
 	Gui, update:Add, Text, x+0 yp +c379e37 +BackgroundTrans, % "v" LatestVer
-	Gui, update:Add, Text, +BackgroundTrans Hidden vVersionDetails, % (size := Round(latest_release["assets"][1]["size"]/1048576, 2)) " MB // Downloads: " (downloads := latest_release["assets"][1]["download_count"])
-	GuiControlGet, pos, update:Pos, VersionDetails
+	posW := TextExtent((size := Round(latest_release["assets"][1]["size"]/1048576, 2)) " MB // Downloads: " (downloads := latest_release["assets"][1]["download_count"]), hUpdateText)
 	Gui, update:Add, Text, % "x" 150-posW//2 " y54 +Left +BackgroundTrans", % size " MB // Downloads: " downloads
 	hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["githubgui"])
 	Gui, update:Add, Picture, x76 y+1 w16 h16 gGitHubRepoLink +BackgroundTrans, HBITMAP:*%hBM%
@@ -1794,30 +1791,39 @@ nm_AutoUpdateGUI()
 	Gui, update:Font, s9
 	Gui, update:Add, Button, x8 y144 w92 h26 gnm_NeverButton, Never
 	Gui, update:Add, Button, xp+96 yp wp hp vDismissButton gnm_DismissButton, Dismiss (120)
+	SetTimer, nm_DismissLabel, -1000
 	Gui, update:Font, Bold
 	Gui, update:Add, Button, xp+96 yp wp hp vUpdateButton gnm_UpdateButton, Update
 	Gui, update:Show, w300, Natro Macro Update
 	GuiControl, update:Focus, UpdateButton
-	Prev_DetectHiddenWindows := A_DetectHiddenWindows
-	DetectHiddenWindows Off
-	nm_DismissLabel(1)
-	SetTimer, nm_DismissLabel, -1000
 	WinWaitClose, ahk_id %hUpdateGUI%, , 125
-	DetectHiddenWindows %Prev_DetectHiddenWindows%
 	Gui, update:Destroy
-}
-nm_DismissLabel(init:=0)
-{
-	static countdown:=120
-	if (init = 1)
-		countdown := 120
-	if (--countdown <= 0)
+
+	updateGuiClose:
 		Gui, update:Destroy
-	else
-	{
-		GuiControl, update:, DismissButton, % "Dismiss (" countdown ")"
-		SetTimer, nm_DismissLabel, -1000
+		return
+	updateGuiEscape:
+		Gui, update:Destroy
+		return
+}
+nm_DismissLabel()
+{
+	static countdown
+	global hUpdateGUI
+	if (countdown = "")
+		countdown := 120
+
+	if WinExist("ahk_id " hUpdateGUI) {
+		if (--countdown <= 0) {
+			countdown := ""
+			Gui, update:Destroy
+		} else {
+			GuiControl, update:, DismissButton, % "Dismiss (" countdown ")"
+			SetTimer, nm_DismissLabel, -1000
+		}
 	}
+	else
+		countdown := ""
 }
 nm_DismissButton()
 {
@@ -1878,7 +1884,6 @@ nm_UpdateButton()
 	}
 	
 	Run, submacros\update.bat "%url%" "%olddir%" "%CopySettings%" "%CopyPatterns%" "%CopyPaths%" "%DeleteOld%" "%changedpaths%"
-	getout()
 	ExitApp
 }
 
@@ -1901,32 +1906,31 @@ Gui, Add, Button, x82 y240 w10 h15 vcurrentFieldUp gnm_currentFieldUp Disabled, 
 Gui, Add, Button, x165 y240 w10 h15 vcurrentFieldDown gnm_currentFieldDown Disabled, >
 Gui, Add, Text, x92 y240 w73 +center +BackgroundTrans +border vCurrentField,%CurrentField%
 Gui, Add, Text, x220 y240 w275 +left +BackgroundTrans vstate hwndhwndstate +border, %state%: %objective%
-Gui, Add, Text, x435 y264 gnm_showAdvancedSettings vVersionText, v%versionID%
-GuiControlGet, pos, Pos, VersionText
-; shift elements to left if macro version is not latest
-if (outdated_flag = 1)
-{
-	hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["warninggui"])
-	Gui, Add, Picture, % "+BackgroundTrans x482 y264 w14 h14 gnm_AutoUpdateGUI vImageUpdateLink", HBITMAP:*%hBM%
-	DllCall("DeleteObject", "ptr", hBM)
-	posW += 16
-}
-GuiControl, Move, VersionText, % "x" 494-posW
+Gui, Add, Text, x435 y264 gnm_showAdvancedSettings hwndhVersionText, v%versionID%
+VersionWidth := TextExtent("v" VersionID, hVersionText)
+GuiControl, Move, % hVersionText, % "x" 494-VersionWidth
+hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["warninggui"])
+Gui, Add, Picture, +BackgroundTrans x482 y264 w14 h14 gnm_AutoUpdateGUI vImageUpdateLink Hidden, HBITMAP:*%hBM%
+DllCall("DeleteObject", "ptr", hBM)
 hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["githubgui"])
-Gui, Add, Picture, % "+BackgroundTrans x" 494-posW-23 " y262 w18 h18 vImageGitHubLink", HBITMAP:*%hBM%
+Gui, Add, Picture, % "+BackgroundTrans x" 494-VersionWidth-23 " y262 w18 h18 vImageGitHubLink", HBITMAP:*%hBM%
 DllCall("DeleteObject", "ptr", hBM)
 pBM := Gdip_BitmapConvertGray(bitmaps["discordgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
-Gui, Add, Picture, % "+BackgroundTrans x" 494-posW-48 " y263 w21 h16 vImageDiscordLink", HBITMAP:*%hBM%
+Gui, Add, Picture, % "+BackgroundTrans x" 494-VersionWidth-48 " y263 w21 h16 vImageDiscordLink", HBITMAP:*%hBM%
 Gdip_DisposeImage(pBM), DllCall("DeleteObject", "ptr", hBM)
-Gui, Font, s8 cDefault Norm, Tahoma
 ;control buttons
+Gui, Font, s8 cDefault Norm, Tahoma
 Gui, Add, Button, x5 y260 w65 h20 -Wrap vStartButton gstart Disabled, % " Start (" StartHotkey ")"
 Gui, Add, Button, x75 y260 w65 h20 -Wrap vPauseButton gpause Disabled, % " Pause (" PauseHotkey ")"
 Gui, Add, Button, x145 y260 w65 h20 -Wrap vStopButton gstop Disabled, % " Stop (" StopHotkey ")"
-
-;ADD TABS
+;add tabs
 Gui, Add, Tab, x0 y-1 w500 h240 -Wrap hwndhTab vTab gnm_TabSelect, % "Gather|Collect/Kill|Boost|Quest|Planters|Status|Settings|Misc|Credits" ((BuffDetectReset = 1) ? "|Advanced" : "")
 SendMessage, 0x1331, 0, 20, , ahk_id %hTab% ; set minimum tab width
+;check for update
+try AsyncHttpRequest("GET", "https://api.github.com/repos/NatroTeam/NatroMacro/releases/latest", "nm_AutoUpdateHandler", {"accept": "application/vnd.github+json"})
+
+;GATHER TAB
+;------------------------
 Gui, Font, w700 Underline
 Gui, Add, Text, x0 y25 w126 +center +BackgroundTrans,Gathering
 Gui, Add, Text, x126 y25 w205 +center +BackgroundTrans,Pattern
@@ -2085,7 +2089,6 @@ SetLoadingProgress(27)
 
 ;MISC TAB
 ;------------------------
-
 Gui, Tab, Misc
 Gui, Font, w700
 Gui, Add, GroupBox, x5 y24 w160 h144, Hive Tools
