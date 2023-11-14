@@ -1883,7 +1883,7 @@ nm_UpdateButton()
 		}
 	}
 	
-	Run, submacros\update.bat "%url%" "%olddir%" "%CopySettings%" "%CopyPatterns%" "%CopyPaths%" "%DeleteOld%" "%changedpaths%"
+	Run, "%A_WorkingDir%\submacros\update.bat" "%url%" "%olddir%" "%CopySettings%" "%CopyPatterns%" "%CopyPaths%" "%DeleteOld%" "%changedpaths%"
 	ExitApp
 }
 
