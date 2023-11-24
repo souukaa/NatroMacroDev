@@ -2490,7 +2490,7 @@ Gui, Font, s8 cDefault Norm, Tahoma
 ;------------------------
 Gui, Tab, Planters
 ;GuiControl,focus, Tab
-Gui, Add, Slider, x364 y24 w130 h19 vPlanterMode gba_PlanterSwitch Range0-2 Thick16 TickInterval1 Page1 +BackgroundTrans Disabled, %PlanterMode%
+Gui, Add, Slider, x364 y24 w130 h19 vPlanterMode gba_PlanterSwitch Range0-2 AltSubmit Thick16 TickInterval1 Page1 +BackgroundTrans Disabled, %PlanterMode%
 Gui, Add, Text, x366 y43 h20 cRed +Center +BackgroundTrans, OFF
 Gui, Add, Text, x410 y43 h20 c0xFF9200 +Center +BackgroundTrans, MANUAL
 Gui, Add, Text, x478 y43 h20 cGreen +Center +BackgroundTrans, +
