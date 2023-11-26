@@ -13190,8 +13190,14 @@ nm_BitterberryFeeder()
 	IfMsgBox, Cancel
 		ExitApp
 
-	WinGetClientPos(x, y, w, h, ""ahk_id "" GetRobloxHWND())
+	hwnd := GetRobloxHWND()
 	WinActivate, Roblox
+	WinGetClientPos(x, y, w, h, ""ahk_id "" hwnd)
+	offsetY := GetYOffset(hwnd, offsetfail)
+	if (offsetfail = 1) {
+		msgbox, 0x40030, WARNING!!, % ""Unable to detect in-game GUI offset!``nStopping Feeder!``n``nThere are a few reasons why this can happen:``n - Incorrect graphics settings (check Troubleshooting Guide!)``n - Your 'Experience Language' is not set to English``n - Something is covering the top of your Roblox window``n``nJoin our Discord server for support!""
+		ExitApp
+	}
 	Gui, -Caption +E0x80000 +hwndhOverlay +AlwaysOnTop +ToolWindow -DPIScale
 	Gui, Show, NA
 	hbm := CreateDIBSection(w, h), hdc := CreateCompatibleDC(), obm := SelectObject(hdc, hbm)
@@ -13217,8 +13223,6 @@ nm_BitterberryFeeder()
 			MsgBox, 0x40010, Bitterberry Auto-Feeder v0.2, You ran out of Bitterberries!
 			break
 		}
-		hwnd := GetRobloxHWND()
-		offsetY := GetYOffset(hwnd)
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, ""ahk_id "" hwnd)
 		MouseMove, windowX+pos[1], windowY+pos[2]
 		SendInput {Click Down}
@@ -13327,8 +13331,14 @@ nm_BasicEggHatcher()
 	IfMsgBox, Cancel
 		ExitApp
 
+	hwnd := GetRobloxHWND()
 	WinActivate, Roblox
-	WinGetClientPos(x, y, w, h, ""ahk_id "" GetRobloxHWND())
+	WinGetClientPos(x, y, w, h, ""ahk_id "" hwnd)
+	offsetY := GetYOffset(hwnd, offsetfail)
+	if (offsetfail = 1) {
+		msgbox, 0x40030, WARNING!!, % ""Unable to detect in-game GUI offset!``nStopping Feeder!``n``nThere are a few reasons why this can happen:``n - Incorrect graphics settings (check Troubleshooting Guide!)``n - Your 'Experience Language' is not set to English``n - Something is covering the top of your Roblox window``n``nJoin our Discord server for support!""
+		ExitApp
+	}
 	Gui, -Caption +E0x80000 +hwndhOverlay +AlwaysOnTop +ToolWindow -DPIScale
 	Gui, Show, NA
 	hbm := CreateDIBSection(w, h), hdc := CreateCompatibleDC(), obm := SelectObject(hdc, hbm)
@@ -13358,8 +13368,6 @@ nm_BasicEggHatcher()
 			MsgBox, 0x40010, Basic Bee Replacement Program, % ""You ran out of "" ((rj = 1) ? ""Royal Jellies!"" : ""Basic Eggs!"")
 			break
 		}
-		hwnd := GetRobloxHWND()
-		offsetY := GetYOffset(hwnd)
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, ""ahk_id "" hwnd)
 		MouseMove, windowX+pos[1], windowY+pos[2]
 		SendInput {Click Down}
