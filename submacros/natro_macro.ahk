@@ -113,7 +113,7 @@ If (!FileExist("settings")) ; make sure the settings folder exists
 	}
 }
 
-VersionID := "0.9.8"
+VersionID := "0.9.7"
 currentWalk := {"pid":"", "name":""} ; stores "pid" (script process ID) and "name" (pattern/movement name)
 
 ;initial load warnings
@@ -1265,20 +1265,20 @@ FieldDefault["Sunflower"] := {"pattern":"CornerXSnake"
 	, "invertFB":0
 	, "invertLR":1}
 
-FieldDefault["Dandelion"] := {"pattern":"Lines"
+FieldDefault["Dandelion"] := {"pattern":"CornerXSnake"
 	, "size":"M"
-	, "width":2
+	, "width":6
 	, "camera":"None"
 	, "turns":1
-	, "sprinkler":"Upper Right"
-	, "distance":9
+	, "sprinkler":"Upper Left"
+	, "distance":10
 	, "percent":95
 	, "gathertime":10
 	, "convert":"Walk"
-	, "drift":1
+	, "drift":0
 	, "shiftlock":0
 	, "invertFB":0
-	, "invertLR":0}
+	, "invertLR":1}
 
 FieldDefault["Mushroom"] := {"pattern":"CornerXSnake"
 	, "size":"M"
@@ -1310,20 +1310,20 @@ FieldDefault["Blue Flower"] := {"pattern":"CornerXSnake"
 	, "invertFB":0
 	, "invertLR":0}
 
-FieldDefault["Clover"] := {"pattern":"Lines"
-	, "size":"M"
-	, "width":2
+FieldDefault["Clover"] := {"pattern":"Stationary"
+	, "size":"S"
+	, "width":1
 	, "camera":"None"
 	, "turns":1
-	, "sprinkler":"Left"
-	, "distance":4
+	, "sprinkler":"Center"
+	, "distance":1
 	, "percent":95
 	, "gathertime":10
 	, "convert":"Walk"
 	, "drift":0
 	, "shiftlock":0
 	, "invertFB":0
-	, "invertLR":1}
+	, "invertLR":0}
 
 FieldDefault["Spider"] := {"pattern":"CornerXSnake"
 	, "size":"M"
@@ -1400,17 +1400,17 @@ FieldDefault["Stump"] := {"pattern":"Stationary"
 	, "invertFB":0
 	, "invertLR":0}
 
-FieldDefault["Cactus"] := {"pattern":"Squares"
+FieldDefault["Cactus"] := {"pattern":"Stationary"
 	, "size":"S"
 	, "width":1
 	, "camera":"None"
 	, "turns":1
-	, "sprinkler":"Lower"
-	, "distance":5
+	, "sprinkler":"Center"
+	, "distance":1
 	, "percent":95
 	, "gathertime":10
 	, "convert":"Walk"
-	, "drift":1
+	, "drift":0
 	, "shiftlock":0
 	, "invertFB":0
 	, "invertLR":0}
@@ -1460,17 +1460,17 @@ FieldDefault["Rose"] := {"pattern":"CornerXSnake"
 	, "invertFB":0
 	, "invertLR":1}
 
-FieldDefault["Mountain Top"] := {"pattern":"Snake"
-	, "size":"S"
-	, "width":2
-	, "camera":"Right"
-	, "turns":2
-	, "sprinkler":"Right"
+FieldDefault["Mountain Top"] := {"pattern":"CornerXSnake"
+	, "size":"M"
+	, "width":3
+	, "camera":"Left"
+	, "turns":4
+	, "sprinkler":"Lower Left"
 	, "distance":5
 	, "percent":95
 	, "gathertime":10
 	, "convert":"Walk"
-	, "drift":1
+	, "drift":0
 	, "shiftlock":0
 	, "invertFB":0
 	, "invertLR":0}
@@ -1695,7 +1695,7 @@ sprinklerImages := ["saturator"]
 state:="Startup"
 objective:="UI"
 DailyReconnect:=0
-for k,v in ["PWindShineBoostedField","PMondoGuid","PFieldBoosted","PFieldGuidExtend","PFieldGuidExtendMins","PFieldBoostExtend","PFieldBoostBypass","PPopStarExtend"]
+for k,v in ["PMondoGuid","PFieldBoosted","PFieldGuidExtend","PFieldGuidExtendMins","PFieldBoostExtend","PFieldBoostBypass","PPopStarExtend"]
 	%v%:=0
 PFieldDriftSteps:=15
 #include *i %A_ScriptDir%\..\settings\personal.ahk
@@ -1794,18 +1794,18 @@ nm_AutoUpdateHandler(req)
 	if (req.status = 200)
 	{
 		LatestVer := Trim((latest_release := JSON.parse(req.responseText))["tag_name"], "v")
-if (VerCompare(VersionID, LatestVer) < 0)
-{
-	GuiControl, Show, ImageUpdateLink
+		if (VerCompare(VersionID, LatestVer) < 0)
+		{
+			GuiControl, Show, ImageUpdateLink
 			VersionWidth += 16
 			GuiControl, MoveDraw, % hVersionText, % "x" 494-VersionWidth
 			GuiControl, MoveDraw, ImageGitHubLink, % "x" 494-VersionWidth-23
 			GuiControl, MoveDraw, ImageDiscordLink, % "x" 494-VersionWidth-48
 			
-	if (LatestVer != IgnoreUpdateVersion)
-		nm_AutoUpdateGUI()
-}
-}
+			if (LatestVer != IgnoreUpdateVersion)
+				nm_AutoUpdateGUI()
+		}
+	}
 }
 nm_AutoUpdateGUI()
 {
@@ -1839,8 +1839,8 @@ nm_AutoUpdateGUI()
 	Gui, update:Add, Button, xp+96 yp wp hp vUpdateButton gnm_UpdateButton, Update
 	Gui, update:Show, w300, Natro Macro Update
 	GuiControl, update:Focus, UpdateButton
-		WinWaitClose, ahk_id %hUpdateGUI%, , 125
-		Gui, update:Destroy
+	WinWaitClose, ahk_id %hUpdateGUI%, , 125
+	Gui, update:Destroy
 
 	updateGuiClose:
 		Gui, update:Destroy
@@ -1855,7 +1855,7 @@ nm_DismissLabel()
 	global hUpdateGUI
 	if (countdown = "")
 		countdown := 120
-	
+
 	if WinExist("ahk_id " hUpdateGUI) {
 		if (--countdown <= 0) {
 			countdown := ""
@@ -1864,7 +1864,7 @@ nm_DismissLabel()
 			GuiControl, update:, DismissButton, % "Dismiss (" countdown ")"
 			SetTimer, nm_DismissLabel, -1000
 		}
-	}	
+	}
 	else
 		countdown := ""
 }
@@ -1927,7 +1927,7 @@ nm_UpdateButton()
 	}
 	
 	Run, "%A_WorkingDir%\submacros\update.bat" "%url%" "%olddir%" "%CopySettings%" "%CopyPatterns%" "%CopyPaths%" "%DeleteOld%" "%changedpaths%"
-		ExitApp
+	ExitApp
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1952,12 +1952,14 @@ Gui, Add, Text, x220 y240 w275 +left +BackgroundTrans vstate hwndhwndstate +bord
 Gui, Add, Text, x435 y264 gnm_showAdvancedSettings hwndhVersionText, v%versionID%
 VersionWidth := TextExtent("v" VersionID, hVersionText)
 GuiControl, Move, % hVersionText, % "x" 494-VersionWidth
-	hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["warninggui"])
-	Gui, Add, Picture, +BackgroundTrans x482 y264 w14 h14 gnm_AutoUpdateGUI vImageUpdateLink Hidden, HBITMAP:*%hBM%
-	DllCall("DeleteObject", "ptr", hBM)
-	hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["githubgui"])
+hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["warninggui"])
+Gui, Add, Picture, +BackgroundTrans x482 y264 w14 h14 gnm_AutoUpdateGUI vImageUpdateLink Hidden, HBITMAP:*%hBM%
+DllCall("DeleteObject", "ptr", hBM)
+hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["githubgui"])
 Gui, Add, Picture, % "+BackgroundTrans x" 494-VersionWidth-23 " y262 w18 h18 vImageGitHubLink", HBITMAP:*%hBM%
 DllCall("DeleteObject", "ptr", hBM)
+Gui, Font, s8 w700
+w := 255-posW-12
 pBM := Gdip_BitmapConvertGray(bitmaps["discordgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
 Gui, Add, Picture, % "+BackgroundTrans x" 494-VersionWidth-48 " y263 w21 h16 vImageDiscordLink", HBITMAP:*%hBM%
 Gdip_DisposeImage(pBM), DllCall("DeleteObject", "ptr", hBM)
@@ -3051,7 +3053,7 @@ mp_PlantPlanter(PlanterIndex) {
 	nm_endWalk()
 
 	nm_setStatus("Placing", MPlanterName)
-hwnd := GetRobloxHWND()
+	hwnd := GetRobloxHWND()
 	offsetY := GetYOffset(hwnd)
 	Loop, 10
 	{
@@ -3316,7 +3318,7 @@ mp_HarvestPlanter(PlanterIndex) {
 		Sleep, 100
 		sendinput {e up}
 
-hwnd := GetRobloxHWND()
+		hwnd := GetRobloxHWND()
 		offsetY := GetYOffset(hwnd)
 		Loop, 50
 		{
@@ -3501,15 +3503,32 @@ nm_LockTabs(lock:=1){
 	global bitmaps
 
 	;controls outside tabs
-		if (lock = 1)
+	Gui, Font, s8 cDefault w700 Tahoma
+	if (lock = 1)
 	{
 		GuiControl, Disable, CurrentFieldUp
 		GuiControl, Disable, CurrentFieldDown
 
-				pBM := Gdip_BitmapConvertGray(bitmaps["discordgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
+		GuiControl, Font, TextDiscordLink
+		GuiControl, -g, TextDiscordLink
+		pBM := Gdip_BitmapConvertGray(bitmaps["discordgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
 		GuiControl, , ImageDiscordLink, HBITMAP:*%hBM%
 		Gdip_DisposeImage(pBM), DllCall("DeleteObject", "Ptr", hBM)
 		GuiControl, -g, ImageDiscordLink
+
+		GuiControl, Font, TextRobloxLink
+		GuiControl, -g, TextRobloxLink
+		pBM := Gdip_BitmapConvertGray(bitmaps["robloxgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
+		GuiControl, , ImageRobloxLink, HBITMAP:*%hBM%
+		Gdip_DisposeImage(pBM), DllCall("DeleteObject", "Ptr", hBM)
+		GuiControl, -g, ImageRobloxLink
+		
+		GuiControl, Font, TextDonateLink
+		GuiControl, -g, TextDonateLink
+		pBM := Gdip_BitmapConvertGray(bitmaps["paypalgui"]), hBM := Gdip_CreateHBITMAPFromBitmap(pBM)
+		GuiControl, , ImageDonateLink, HBITMAP:*%hBM%
+		Gdip_DisposeImage(pBM), DllCall("DeleteObject", "Ptr", hBM)
+		GuiControl, -g, ImageDonateLink
 
 		GuiControl, -g, ImageGitHubLink
 		
@@ -3520,16 +3539,35 @@ nm_LockTabs(lock:=1){
 		GuiControl, Enable, CurrentFieldUp
 		GuiControl, Enable, CurrentFieldDown
 
-				hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["discordgui"])
+		Gui, Font, c0046ee
+
+		GuiControl, Font, TextDiscordLink
+		GuiControl, +gDiscordLink, TextDiscordLink
+		hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["discordgui"])
 		GuiControl, , ImageDiscordLink, HBITMAP:*%hBM%
 		DllCall("DeleteObject", "Ptr", hBM)
 		GuiControl, +gDiscordLink, ImageDiscordLink
+
+		GuiControl, Font, TextRobloxLink
+		GuiControl, +gRobloxLink, TextRobloxLink
+		hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["robloxgui"])
+		GuiControl, , ImageRobloxLink, HBITMAP:*%hBM%
+		DllCall("DeleteObject", "Ptr", hBM)
+		GuiControl, +gRobloxLink, ImageRobloxLink
+		
+		GuiControl, Font, TextDonateLink
+		GuiControl, +gDonateLink, TextDonateLink
+		hBM := Gdip_CreateHBITMAPFromBitmap(bitmaps["paypalgui"])
+		GuiControl, , ImageDonateLink, HBITMAP:*%hBM%
+		DllCall("DeleteObject", "Ptr", hBM)
+		GuiControl, +gDonateLink, ImageDonateLink
 
 		GuiControl, +gGitHubRepoLink, ImageGitHubLink
 
 		c := "UnLock"
 	}
-	
+	Gui, Font, cDefault Norm
+
 	for i,tab in tabs
 		nm_Tab%tab%%c%()
 }
@@ -3676,11 +3714,11 @@ nm_setBlenderData(hCtrl){
 				}
 				
 				GuiControl,, BlenderAmount, % BlenderAmount%A_Index%
-				GuiControl,, BlenderIndex, % ((BlenderIndex%A_Index% != "Infinite" && BlenderIndex%A_Index% != "∞") ? BlenderIndex%A_Index% : 1) 
+				GuiControl,, BlenderIndex, % ((BlenderIndex%A_Index% != "Infinite" && BlenderIndex%A_Index% != "∞") ? BlenderIndex%A_Index% : 0) 
 				SetImage(hAddBlenderItem, hBitmapsSB["RedExtract"])
+				GuiControl, ChooseString, BlenderIndexOption, Infinite
 				GuiControl,, BlenderAddSlot, Add to Slot %BlenderaddIndex%
-				GuiControl,, BlenderIndexOption, 0
-				Guicontrol, Show, BlenderIndex
+				GuiControl,, BlenderIndexOption, 1
 
 				For z, ui in ["BlenderItem", "BlenderLeft", "BlenderRight", "BlenderAddSlot", "BlenderAmountText", "BlenderAmount", "BlenderRepeatText", "BlenderIndexOption","blenderline1","blendertitle1","blenderline2","blenderline3","blenderline4","blenderline5"]
 					GuiControl, Show, %ui%
@@ -4209,7 +4247,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 	}
 	nm_gotocannon()
 	{
-global offsetY
+		global offsetY
 		pBMCannon := Gdip_BitmapFromBase64(""""iVBORw0KGgoAAAANSUhEUgAAABsAAAAMAQMAAACpyVQ1AAAABlBMVEUAAAD3//lCqWtQAAAAAXRSTlMAQObYZgAAAEdJREFUeAEBPADD/wDAAGBgAMAAYGAA/gBgYAD+AGBgAMAAYGAAwABgYADAAGBgAMAAYGAAwABgYADAAGBgAMAAYGAAwABgYDdgEn1l8cC/AAAAAElFTkSuQmCC"""")
 		Loop, 10
 		{
@@ -4268,7 +4306,7 @@ global offsetY
 	}
 	nm_reset()
 	{
-global offsetY
+		global offsetY
 		pBMH1 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH1), Gdip_GraphicsClear(G,0xff867018), Gdip_DeleteGraphics(G)
 		pBMH2 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH2), Gdip_GraphicsClear(G,0xff937d2d), Gdip_DeleteGraphics(G)
 		pBMH3 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH3), Gdip_GraphicsClear(G,0xff8e7d4d), Gdip_DeleteGraphics(G)
@@ -8291,10 +8329,10 @@ nm_ContributorsPageButton(hwnd){
 }
 nm_CollectKillButton(hCtrl){
 	global
-	static CollectControls := ["CollectGroupBox","DispensersGroupBox","BeesmasGroupBox","BeesmasFailImage","BeesmasImage","ClockCheck","MondoBuffCheck","MondoAction","AntPassCheck","AntPassAction","RoboPassCheck","HoneystormCheck","HoneyDisCheck","TreatDisCheck","BlueberryDisCheck","StrawberryDisCheck","CoconutDisCheck","RoyalJellyDisCheck","GlueDisCheck", "Blendergroupbox"]
+	static CollectControls := ["CollectGroupBox","DispensersGroupBox","BeesmasGroupBox","BeesmasFailImage","BeesmasImage","ClockCheck","MondoBuffCheck","MondoAction","AntPassCheck","AntPassAction","RoboPassCheck","HoneystormCheck","HoneyDisCheck","TreatDisCheck","BlueberryDisCheck","StrawberryDisCheck","CoconutDisCheck","RoyalJellyDisCheck","GlueDisCheck"]
 	, CollectControlsH := ["hMALeft","hMARight","hAPALeft","hAPARight","hBeesmas1","hBeesmas2","hBeesmas3","hBeesmas4","hBeesmas5","hBeesmas6","hBeesmas7","hBeesmas8","hBeesmas9","hBeesmas10","hBeesmas11"]
 	, KillControls := ["BugRunGroupBox","BugRunCheck","MonsterRespawnTime","TextMonsterRespawnPercent","TextMonsterRespawn","MonsterRespawnTimeHelp","BugrunInterruptCheck","TextLoot","TextKill","TextLineBugRun1","TextLineBugRun2","BugrunLadybugsLoot","BugrunRhinoBeetlesLoot","BugrunSpiderLoot","BugrunMantisLoot","BugrunScorpionsLoot","BugrunWerewolfLoot","BugrunLadybugsCheck","BugrunRhinoBeetlesCheck","BugrunSpiderCheck","BugrunMantisCheck","BugrunScorpionsCheck","BugrunWerewolfCheck","StingersGroupBox","StingerCheck","StingerDailyBonusCheck","TextFields","StingerCloverCheck","StingerSpiderCheck","StingerCactusCheck","StingerRoseCheck","StingerMountainTopCheck","StingerPepperCheck","BossesGroupBox","TunnelBearCheck","KingBeetleCheck","CocoCrabCheck","StumpSnailCheck","CommandoCheck","TunnelBearBabyCheck","KingBeetleBabyCheck","BabyLovePicture1","BabyLovePicture2","KingBeetleAmuletMode","ShellAmuletMode","KingBeetleAmuPicture","ShellAmuPicture","KingBeetleAmuletModeText","ShellAmuletModeText","ChickLevelTextLabel","ChickLevelText","ChickLevel","SnailHPText","SnailHealthEdit","SnailHealthText","ChickHPText","ChickHealthEdit","ChickHealthText","SnailTimeText","SnailTimeUpDown","ChickTimeText","ChickTimeUpDown","BossConfigHelp","TextLineBosses1","TextLineBosses2","TextLineBosses3","TextBosses1","TextBosses2","TextBosses3"]
-	, BlenderMain := ["BlenderItem1Picture", "BlenderItem2Picture", "BlenderItem3Picture", "BlenderAdd1", "BlenderAdd2", "BlenderAdd3", "BlenderAmount1", "BlenderAmount2", "BlenderAmount3", "LeftCurlB1", "LeftCurlB2", "LeftCurlB3", "RightCurlB1", "RightCurlB2", "RightCurlB3", "LeftBracB1", "LeftBracB2", "LeftBracB3", "RightBracketB1", "RightBracketB2", "RightBracketB3", "BlenderIndex1", "BlenderIndex2", "BlenderIndex3"]
+	, BlenderMain := ["BlenderItem1Picture", "BlenderItem2Picture", "BlenderItem3Picture", "BlenderAdd1", "BlenderAdd2", "BlenderAdd3", "BlenderAmount1", "BlenderAmount2", "BlenderAmount3", "LeftCurlB1", "LeftCurlB2", "LeftCurlB3", "RightCurlB1", "RightCurlB2", "RightCurlB3", "LeftBracB1", "LeftBracB2", "LeftBracB3", "RightBracB1", "RightBracB2", "RightBracB3", "BlenderIndex1", "BlenderIndex2", "BlenderIndex3"]
 	, BlenderSide := ["BlenderAmount", "BlenderAmountText", "BlenderRepeatText", "BlenderIndex", "BlenderItem", "BlenderLeft", "BlenderRight", "BlenderAddSlot", "BlenderIndexOption","blenderline1","blenderline2","blenderline3","blenderline4","blendertitle1"]
 
 	local p, i, c, k, v
@@ -8395,6 +8433,12 @@ nm_MakeSuggestionButton(){
 }
 DiscordLink(){
     nm_RunDiscord("invite/xbkXjwWh8U")
+}
+DonateLink(){
+    run, https://www.paypal.com/donate/?hosted_button_id=9KN7JHBCTAU8U&no_recurring=0&currency_code=USD
+}
+RobloxLink(){
+    run, https://www.roblox.com/groups/16490149/Natro-Macro
 }
 GitHubRepoLink(){
 	run, https://github.com/NatroTeam/NatroMacro
@@ -8993,7 +9037,7 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		If (imgPos[1] = 0){
 			MouseMove, windowX+(imgPos[2]), windowY+(imgPos[3])
 			Click
-			MouseMove, windowX+350, windowY+100
+			MouseMove, windowX+350, windowY+offsetY+100
 		}
 		;check to make sure you are not in blender screen
 		BlenderSS := Gdip_BitmapFromScreen(WindowX+Windowwidth//2 - 277 "|" windowY+WindowHeight//2 - 243 "|553|400")
@@ -9712,6 +9756,7 @@ nm_Collect(){
 				Sleep, 100
 				sendinput {%SC_E% up}
 				Sleep, 500
+				WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
 
 				SearchX := windowX+Windowwidth//2 - 277, SearchY := windowY+WindowHeight//2 - 243, BlenderSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|553|400")
 
@@ -9832,7 +9877,7 @@ nm_Collect(){
 
 					BlenderRot := Mod(BlenderRot, 3) + 1
 					nm_BlenderRotation()
-					if (BlenderIndex%BlenderRot% != "Infinite" && BlenderIndex%BlenderRot% != "∞") {
+					if (BlenderIndex%BlenderRot% != "Infinite") {
 						BlenderIndex%BlenderRot%-- ;subtract from blenderindex for looping only if its a number
 						GuiControl,, BlenderIndex%BlenderRot%, % BlenderIndex%BlenderRot%
 
@@ -13939,7 +13984,7 @@ nm_BitterberryFeeder()
 	bitmaps[""bitterberry""] := Gdip_BitmapFromBase64(""iVBORw0KGgoAAAANSUhEUgAAAG8AAAAbCAMAAABFqCGFAAAB11BMVEUbKjUcKzYdLDceLDceLTgfLjkgLzohMDoiMDsjMTwkMj0kMz0lND4mND8oNkApN0EqOEMrOUMsOkQtO0UuPEYvPUcwPkgyQEkzQUo0QUs1Q0w3RU44RU85Rk86SFE8SVM9SlM+S1Q/TFVATVZCT1hDUFlEUVlFUVpGU1xHVFxJVV5KVl9LV19NWWJPW2NRXWVSXmZUYGhVYWhWYWlXYmpXY2tbZm5cZ29daG9eanFibXRibnVkb3ZlcHdoc3ptd35ueX9veoBweoFzfYN0foR1f4V2gIZ4god6hIp7hYt+h41/iY6Aio+FjpSGj5SHkJWKk5iLlJmMlZqNlpqOl5uQmJ2QmZ2Rmp6Sm5+UnKCVnaGZoaWbo6ecpKigp6uhqKyjq66mrbCnrrGnr7Kor7OrsrWss7avtrmwt7myuLu2vL+4v8G5wMK6wMO8wsS+xMa/xcfAxsjBx8nDyMrEyszGzM3HzM7Izc/Jzs/Jz9DK0NHN0tPP1NXQ1dbR1tfS19jV2drX3NzY3N3Z3d7b4ODc4OHe4uLf4+Pg5OTg5eXi5ubj5+fm6urn6+vo7Ovp7ezq7e3r7u7r7+7s8O/t8fDu8fHv8vHw8/Lx9PPx9fTy9fTz9vX09/ZX5XClAAACKElEQVR42u3W61NMYQDH8W9iu7uEhAhJURIphYRci0QiFXKJXAttQnIPXdVWK/3+WHvK6dnZfaY3O443fm9+L34zz2fmzDPnHORt+O/9BS8HJ6mlL2Xys6XJlCVTLbUxepDQJaln9b5ZSXs4J7dsKeZIzB45kvzpRY6XHYLcsiU/Ju+YpOHD8NEdPPDUD8+kL52dwcW9K2kF3cazzqYX8d5Ar9QMQ7qMk/o/JU3WZfnWnx2RVEpWPLSFvJ1FKekVvZIss9v10C9JfXAy0hsswTdu937tx0nepHMgkDCifHPFLLPbn5dQI0k18NpyX05r3ot8nq2sejz+dCVNcwfeDAwq5CW1TzzPZLttNl3CmqA0k0G+or3kd7J7uTRIqqNw7oFJcrwKSbfhvWU2fRfuSw+h1eKxdsjqBeKYT6pz0G4Z7yt0WGbTkys4IFWSPKpwr1rSjzPQbPW+4SYY4U1Dm3V2WyeIHxhOpEpRnoJJnLJ6E3BJ84nwQlS7bTaeHxquwwuLN5XIeRmvVgu1iTJJ09FeB7wys83TNjYXslXR3mg1+Be8XeTe8bt1gbgbga6Msu5wL+lWoG8L62ZkZpt3FeCa/f15VAteLfDJrYkdOFn+NtybS9w9ycw27/tS8A1ZvGXZjTPGGzuYvNfUaM0GX2bVB5mDqgoOFaWkFT+SrLPxVA6VXn5vG+GJl14eG2c99Hrgojz0jhM/4KE3lkK5PPRa4cG/+x/8DdlCsT+3EwaSAAAAAElFTkSuQmCC"")
 	bitmaps[""feed""] := Gdip_BitmapFromBase64(""iVBORw0KGgoAAAANSUhEUgAAADwAAAAUAQMAAADrzcxqAAAABlBMVEUAAAD3//lCqWtQAAAAAXRSTlMAQObYZgAAAE1JREFUeNqNzbENwCAMRNHfpYxLSo/ACB4pG8SjMkImIAiwRIe46lX3+QtzAcE5wQ1cHeKQHhw10EwFwISK6YAvvCVg7LBamuM5fRGFBk/MFx8u1mbtAAAAAElFTkSuQmCC"")
 	bitmaps[""greensuccess""] := Gdip_BitmapFromBase64(""iVBORw0KGgoAAAANSUhEUgAAAA4AAAALCAYAAABPhbxiAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAyMzowMzowOCAxNToyMzo1N/c+ABwAAAAdSURBVChTY3T+H/6fgQzABKVJBqMa8YDhr5GBAQBwxAKu5PiUjAAAAA5lWElmTU0AKgAAAAgAAAAAAAAA0lOTAAAAAElFTkSuQmCC"")
-#Include %A_ScriptDir%\nm_image_assets\offset\bitmaps.ahk
+	#Include %A_ScriptDir%\nm_image_assets\offset\bitmaps.ahk
 
 	MsgBox, 0x40001, Bitterberry Auto-Feeder v0.2, BITTERBERRY AUTO FEEDER v0.2 by anniespony#8135``nMake sure BEE SLOT TO MUTATE is always visible``nDO NOT MOVE THE SCREEN OR RESIZE WINDOW FROM NOW ON.``nMAKE SURE BEE IS RADIOACTIVE AT ALL TIMES!
 	IfMsgBox, Cancel
@@ -15281,14 +15326,14 @@ nm_fieldDriftCompensation(){
 		if (!DisableToolUse)
 			click down
 		if ((x < winleft) && (hmove := LeftKey))
-				sendinput {%LeftKey% down}
-			else if ((x > winRight) && (hmove := RightKey))
-				sendinput {%RightKey% down}
-			if ((y < winUp) && (vmove := FwdKey))
-				sendinput {%FwdKey% down}
-			else if ((y > winDown) && (vmove := BackKey))
-				sendinput {%BackKey% down}
-			while (hmove || vmove) {
+			sendinput {%LeftKey% down}
+		else if ((x > winRight) && (hmove := RightKey))
+			sendinput {%RightKey% down}
+		if ((y < winUp) && (vmove := FwdKey))
+			sendinput {%FwdKey% down}
+		else if ((y > winDown) && (vmove := BackKey))
+			sendinput {%BackKey% down}
+		while (hmove || vmove) {
 			if (((hmove = LeftKey) && (x >= winLeft)) || ((hmove = RightKey) && (x <= winRight))) {
 				sendinput {%hmove% up}
 				hmove := ""
@@ -15299,8 +15344,8 @@ nm_fieldDriftCompensation(){
 			}
 			Sleep, 20
 			if ((A_Index >= 300)) {
-			sendinput {%LeftKey% up}{%RightKey% up}{%FwdKey% up}{%BackKey% up}
-break
+				sendinput {%LeftKey% up}{%RightKey% up}{%FwdKey% up}{%BackKey% up}
+				break
 			}
 			if (nm_LocateSprinkler(x, y) = 0) {
 				sendinput {%LeftKey% up}{%RightKey% up}{%FwdKey% up}{%BackKey% up}
@@ -15997,7 +16042,7 @@ nm_activeHoney(){
 			} else {
 				return 0
 			}
-		}	
+		}
 	} else {
 		return 0
 	}
@@ -17158,7 +17203,7 @@ nm_Feed(food){
 	;feed
 	nm_OpenMenu("itemmenu")
 	nm_InventorySearch(food)
-hwnd := GetRobloxHWND()
+	hwnd := GetRobloxHWND()
 	offsetY := GetYOffset(hwnd)
 	Loop, 10
 	{
@@ -18529,13 +18574,13 @@ nm_cannonTo(location){
 nm_BlenderRotation() {
 	global BlenderRot, BlenderItem1, BlenderItem2, BlenderItem3, BlenderIndex1, BlenderIndex2, BlenderIndex3, BlenderCheck
 	loop {
-		if ((BlenderIndex%BlenderRot% = "Infinite" || BlenderIndex%BlenderRot% = "∞" || BlenderIndex%BlenderRot% > 0) && (BlenderItem%BlenderRot% != "None" && BlenderItem%BlenderRot% != "")) {
+		if ((BlenderIndex%BlenderRot% = "Infinite" || BlenderIndex%BlenderRot% > 0) && (BlenderItem%BlenderRot% != "None" && BlenderItem%BlenderRot% != "")) {
 			BlenderCheck := 1
 			IniWrite, %BlenderCheck%, settings\nm_config.ini, blender, BlenderCheck
-			return
+			break
 		} else {
 			BlenderRot := Mod(BlenderRot, 3) + 1
-			if (A_Index = 5) {
+			if (A_Index = 4) {
 				if (BlenderCheck) {
 					BlenderCheck := 0
 					IniWrite, %BlenderCheck%, settings\nm_config.ini, blender, BlenderCheck
@@ -18549,15 +18594,13 @@ nm_BlenderRotation() {
 nm_ShrineRotation() {
     global ShrineRot, ShrineItem1, ShrineItem2, ShrineCheck, ShrineIndex1, ShrineIndex2
 	loop {
-		if ((ShrineItem%ShrineRot% != "None" && ShrineItem%ShrineRot% != "") && (ShrineIndex%ShrineRot% = "Infinite" || ShrineIndex%ShrineRot% = "∞" ||  ShrineIndex%ShrineRot% > 0)) {
-			ShrineCheck := 1
+		if ((ShrineItem%ShrineRot% != "None" && ShrineItem%ShrineRot% != "") && (ShrineIndex%ShrineRot% = "Infinite" || ShrineIndex%ShrineRot% > 0)) {
 			IniWrite, 1, settings\nm_config.ini, Shrine, ShrineCheck
-			return
+			break
 		} else {
 			ShrineRot := Mod(ShrineRot, 2) + 1
-			if (A_Index = 4) {
+			if (A_Index = 3) {
 				if (ShrineCheck) {
-					ShrinerCheck := 0
 					IniWrite, 0, settings\nm_config.ini, Shrine, ShrineCheck
 					nm_setStatus("Confirmed", "No more items to rotate through. Turning shrine off")
 				}
@@ -18766,7 +18809,7 @@ nm_gotoQuestgiver(giver){
 				Sleep, 100
 				sendinput {%SC_E% up}
 				sleep, 2000
-hwnd := GetRobloxHWND()
+				hwnd := GetRobloxHWND()
 				offsetY := GetYOffset(hwnd)
 				Loop, 500
 				{
@@ -19734,8 +19777,10 @@ ba_GetNectarPercent(var){
 			: (var="satisfying") ? nectarColor:=0xA798B3
 			: (var="refreshing") ? nectarColor:=0x75B378
 			: (var="invigorating") ? nectarColor:=0x5159B3
-			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
-			PixelSearch, bx2, by2, windowX, windowY+30, windowX+860, windowY+150, %nectarColor%,0, Fast
+			hwnd := GetRobloxHWND()
+			offsetY := GetYOffset(hwnd)
+			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " hwnd)
+			PixelSearch, bx2, by2, windowX, windowY+offsetY+30, windowX+860, windowY+offsetY+150, %nectarColor%,0, Fast
 			If (ErrorLevel=0) {
 				nexty:=by2+1
 				pixels:=1
@@ -20155,7 +20200,7 @@ ba_harvestPlanter(planterNum){
 		Sleep, 100
 		sendinput {%SC_E% up}
 
-hwnd := GetRobloxHWND()
+		hwnd := GetRobloxHWND()
 		offsetY := GetYOffset(hwnd)
 		Loop, 50
 		{

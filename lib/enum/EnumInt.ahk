@@ -241,7 +241,7 @@
 	, "BlenderTime3"
 	, "MemoryMatchNormalCheck"
 	, "MemoryMatchMegaCheck"
-    , "MemoryMatchExtremeCheck"
+	, "MemoryMatchExtremeCheck"
 	, "LastMemoryMatchNormal"
 	, "LastMemoryMatchMega"
 	, "LastMemoryMatchExtreme"]
