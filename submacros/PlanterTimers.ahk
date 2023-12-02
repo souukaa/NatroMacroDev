@@ -138,7 +138,9 @@ Loop {
 		GuiControl,, % hClear%i%, % ((PlanterName%i% = "None") ? "Add" : "Clear")
 		GuiControl, +Redraw, % hClear%i%
 		
-		p%i%timer := PlanterHarvestTime%i%-nowUnix(), VarSetCapacity(p%i%timerstring,256), DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",p%i%timer*10000000,"wstr",(p%i%timer > 360000) ? "'No Planter'" : (p%i%timer > 0) ? (((p%i%timer >= 3600) ? "h'h' m" : "") . ((p%i%timer >= 60) ? "m'm' s" : "") . "s's'") : "'Ready'","str",p%i%timerstring,"int",256)
+		IniRead, MPlanterHold%i%, Settings/nm_config.ini, Planters, MPlanterHold%i%
+		IniRead, MPlanterSmoking%i%, Settings/nm_config.ini, Planters, MPlanterSmoking%i%
+		p%i%timer := PlanterHarvestTime%i%-nowUnix(), VarSetCapacity(p%i%timerstring,256), DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",p%i%timer*10000000,"wstr",(p%i%timer > 360000) ? "'No Planter'" : (p%i%timer > 0) ? (((p%i%timer >= 3600) ? "h'h' m" : "") . ((p%i%timer >= 60) ? "m'm' s" : "") . "s's'") : (MPlanterSmoking%i%) ? "'Smoking'" : (MPlanterHold%i%) ? "'Holding'" : "'Ready'","str",p%i%timerstring,"int",256)
 		GuiControl,ptimers:-Redraw, p%i%timer
 		GuiControl,ptimers:,p%i%timer,% p%i%timerstring
 		GuiControl,ptimers:+Redraw, p%i%timer
@@ -245,6 +247,10 @@ ba_setPlanterData(hCtrl){
 	global hClear1, hClear2, hClear3
 	Loop, 3 {
 		if (hCtrl = hClear%A_Index%) {
+			;resets hold/release/smoking planter to 0, if user presses clear/add button
+			IniWrite, % 0, Settings/nm_config.ini, Planters, MPlanterHold%A_Index%
+			IniWrite, % 0, Settings/nm_config.ini, Planters, MPlanterRelease%A_Index%
+			IniWrite, % 0, Settings/nm_config.ini, Planters, MPlanterSmoking%A_Index%
 			IniRead, PlanterName%A_Index%, settings\nm_config.ini, Planters, PlanterName%A_Index%
 			if (PlanterName%A_Index% = "None") {
 				ba_addPlanterData(A_Index)

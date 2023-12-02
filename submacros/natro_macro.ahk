@@ -666,6 +666,23 @@ config["Planters"] := {"LastComfortingField":"None"
 	, "LastSatisfyingField":"None"
 	, "LastMotivatingField":"None"
 	, "LastInvigoratingField":"None"
+	, "MPlanterGatherA":0
+	, "MPlanterGather1":0
+	, "MPlanterGather2":0
+	, "MPlanterGather3":0
+	, "MPlanterHold1":0
+	, "MPlanterHold2":0
+	, "MPlanterHold3":0
+	, "MPlanterRelease1":0
+	, "MPlanterRelease2":0
+	, "MPlanterRelease3":0
+	, "MPlanterSmoking1":0
+	, "MPlanterSmoking2":0
+	, "MPlanterSmoking3":0
+	, "MPuffModeA":0
+	, "MPuffMode1":0
+	, "MPuffMode2":0
+	, "MPuffMode3":0
 	, "PlanterName1":"None"
 	, "PlanterName2":"None"
 	, "PlanterName3":"None"
@@ -1504,7 +1521,8 @@ FileAppend, %ini%, %A_WorkingDir%\settings\field_config.ini
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ManualPlanters := {}
 
-ManualPlanters["General"] := {"MHarvestInterval":"Every 2 Hours"}
+ManualPlanters["General"] := {"MHarvestInterval":"2 hours"
+	, "LastPlanterGatherSlot":3}
 
 ManualPlanters["Slot 1"] := {"MSlot1Cycle1Planter":""
 	, "MSlot1Cycle2Planter":""
@@ -2593,6 +2611,7 @@ Gui, Add, Text, % "x354 y196 w144 h36 0x7 vTextBox1" ((PlanterMode = 2) ? "" : "
 Gui, Add, Checkbox, % "x358 y200 w138 h13 vConvertFullBagHarvest gba_saveConfig_ Disabled Checked" ConvertFullBagHarvest ((PlanterMode = 2) ? "" : " Hidden"), Convert Full Bag Harvest
 Gui, Add, Checkbox, % "x358 y216 w138 h13 vGatherPlanterLoot gba_saveConfig_ Disabled Checked" GatherPlanterLoot ((PlanterMode = 2) ? "" : " Hidden"), Gather Planter Loot
 SetLoadingProgress(38)
+
 ;Manual Planters Start
 
 MPlanterListText := "|Plastic|Candy|Blue Clay|Red Clay|Tacky|Pesticide|Heat Treated|Hydroponic|Petal|Planter of Plenty|Paper|Ticket|"
@@ -2616,28 +2635,51 @@ Loop, 3 {
     Gui, Add, Text, % "xs ys+20 +Center Section vMSlot" i "FieldText" (PlanterMode == 1 ? "" : " Hidden"), S%i% Fields:
     Gui, Add, Text, % "xs ys+20 +Center Section vMSlot" i "SettingsText" (PlanterMode == 1 ? "" : " Hidden"), S%i% Settings:
     if (i < 3)
-        Gui, Add, Text, % "xs ys+22 w" ((i = 1) ? "350" : "500") " h1 0x7 vMSlot" i "SeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
+        Gui, Add, Text, % "xs ys+22 w" ((i = 1) ? "350" : "350") " h1 0x7 vMSlot" i "SeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
 }
 
+Gui, Add, Text, % "x378 y62 w200 +BackgroundTrans Section vMCurrentCycle" (PlanterMode == 1 ? "" : " Hidden"), Current planter cycle
 Loop, 3 {
-	Gui, Add, Text, % ((A_Index = 1) ? "x360 y63" : "xs ys+35") "w200 +BackgroundTrans Section vMSlot" A_Index "CycleText" (PlanterMode == 1 ? "" : " Hidden"), % "Slot " A_Index " currently at cycle #" PlanterManualCycle%A_Index%
-	Gui, Add, Button, % "xs+25 ys+17 w20 h16 vMSlot" A_Index "Left gmp_Slot" A_Index "ChangeLeft Disabled" (PlanterMode == 1 ? "" : " Hidden"), <
-	Gui, Add, Text, % "x+4 yp+1 h16 vMSlot" A_Index "ChangeText" (PlanterMode == 1 ? "" : " Hidden"), Change
-	Gui, Add, Button, % "x+4 yp-1 w20 h16 vMSlot" A_Index "Right gmp_Slot" A_Index "ChangeRight Disabled" (PlanterMode == 1 ? "" : " Hidden"), >
+	Gui, Add, Text, % ((A_Index = 1) ? "x361 y76" : "xs ys+16") "w200 +BackgroundTrans Section vMSlot" A_Index "CycleText" (PlanterMode == 1 ? "" : " Hidden"), % "Slot " A_Index ": Cycle " PlanterManualCycle%A_Index%
+	Gui, Add, Button, % "x461 ys-2 w15 h16 +Center vMSlot" A_Index "Left gmp_Slot" A_Index "ChangeLeft Disabled" (PlanterMode == 1 ? "" : " Hidden"), —
+	Gui, Add, Button, % "x+2 ys-2 w15 h16 +Center vMSlot" A_Index "Right gmp_Slot" A_Index "ChangeRight Disabled" (PlanterMode == 1 ? "" : " Hidden"), +
 }
 
 Gui, Add, Text, % "x355 y23 h215 w1 0x7 vMSectionSeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
 Gui, Add, Text, % "x355 y58 h1 w150 0x7 vMSliderSeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
 
-;; check plants button
-Gui, Add, Text, % "xs ys+50 +Center vMHarvestText Section" (PlanterMode == 1 ? "" : " Hidden"), Harvest
-Gui, Add, DropdownList, % "xp+41 yp-3 w94 vMHarvestInterval gmp_SaveConfig Disabled" (PlanterMode == 1 ? "" : " Hidden"), % StrReplace("Every 30 Minutes|Every Hour|Every 2 Hours|Every 3 Hours|Every 4 Hours|Every 5 Hours|Every 6 Hours|", MHarvestInterval, MHarvestInterval "|")
+; disable automatic harvest
+Gui, Add, Text, % "x355 y128 h1 w150 0x7 Section vMPuffModeSeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
+Gui, Add, Checkbox, % "xs+5 ys+4 w150 h16 +BackgroundTrans vMPuffModeA gmp_MPuffMode Section Disabled Checked" MPuffModeA ((PlanterMode = 1) ? "" : " Hidden"), Disable auto harvest
+Gui, Add, Text, % "xs+16 ys+16 vMPuffModeText " (PlanterMode == 1 ? "" : " Hidden"), Slots:
+Gui, Add, Checkbox, % "xs+46 yp-1 w24 h16 +BackgroundTrans vMPuffMode1 gmp_SaveConfig Disabled Checked" MPuffMode1 ((PlanterMode = 1) ? "" : " Hidden"), 1
+Gui, Add, Checkbox, % "xs+70 yp w24 h16 +BackgroundTrans vMPuffMode2 gmp_SaveConfig Disabled Checked" MPuffMode2 ((PlanterMode = 1) ? "" : " Hidden"), 2
+Gui, Add, Checkbox, % "xs+95 yp w24 h16 +BackgroundTrans vMPuffMode3 gmp_SaveConfig Disabled Checked" MPuffMode3 ((PlanterMode = 1) ? "" : " Hidden"), 3
+Gui, Add, Button, % "x481 yp+1 w12 h14 gnm_MPuffModeHelp vMPuffModeHelp Disabled" ((PlanterMode = 1) ? "" : " Hidden"), ?
+
+; gather in planter field and slots
+Gui, Add, Text, % "x355 y165 h1 w156 0x7 Section vMGatherSeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
+Gui, Add, Checkbox, % "xs+5 ys+4 w150 h16 +BackgroundTrans vMPlanterGatherA gmp_MPlanterGatherSwitch_ Section Disabled Checked" MPlanterGatherA ((PlanterMode = 1) ? "" : " Hidden"), Gather in planter fields
+Gui, Add, Text, % "xs+16 ys+16 vMPlanterGatherText " (PlanterMode == 1 ? "" : " Hidden"), Slots:
+Gui, Add, Checkbox, % "xs+46 yp-1 w24 h16 +BackgroundTrans vMPlanterGather1 gmp_SaveConfig Disabled Checked" MPlanterGather1 ((PlanterMode = 1) ? "" : " Hidden"), 1
+Gui, Add, Checkbox, % "xs+70 yp w24 h16 +BackgroundTrans vMPlanterGather2 gmp_SaveConfig Disabled Checked" MPlanterGather2 ((PlanterMode = 1) ? "" : " Hidden"), 2
+Gui, Add, Checkbox, % "xs+95 yp w24 h16 +BackgroundTrans vMPlanterGather3 gmp_SaveConfig Disabled Checked" MPlanterGather3 ((PlanterMode = 1) ? "" : " Hidden"), 3
+Gui, Add, Button, % "x481 yp+1 w12 h14 gnm_MPlanterGatherHelp vMPlanterGatherHelp Disabled" ((PlanterMode = 1) ? "" : " Hidden"), ?
+
+; harvest every interval
+Gui, Add, Text, % "x355 y202 h1 w150 0x7 Section vMPageSeparatorLine" (PlanterMode == 1 ? "" : " Hidden")
+Gui, Add, Text, % "xs+8 ys+3 vMHarvestText Section" (PlanterMode == 1 ? "" : " Hidden"), Harvest every
+Gui, Add, Text, % "x374 ys+15 w48 vMHarvestInterval +Center +BackgroundTrans " ((PlanterMode = 1) ? "" : " Hidden"),%MHarvestInterval%
+Gui, Add, Button, % "x361 ys+15 w15 h16 gnm_MHarvestInterval hwndhMHILeft Disabled" ((PlanterMode = 1) ? "" : " Hidden"), <
+Gui, Add, Button, % "x418 ys+15 w15 h16 gnm_MHarvestInterval hwndhMHIRight Disabled" ((PlanterMode = 1) ? "" : " Hidden"), >
+;Gui, Add, DropdownList, % "x374 ys+12 w60 vMHarvestInterval gmp_SaveConfig Disabled" (PlanterMode == 1 ? "" : " Hidden"), % StrReplace("30 min|Hour|2 hours|3 hours|4 hours|5 hours|6 hours|", MHarvestInterval, MHarvestInterval "|")
+
 SetLoadingProgress(99)
 
 ; page movement
-Gui, Add, Button, % "xs+25 ys+24 w20 h20 hwndMPageLeftHWND vMPageLeft gmp_UpdatePage Disabled" (PlanterMode == 1 ? "" : " Hidden"), <
-Gui, Add, Text, % "x+4 yp+3 +Center vMPageNumberText" (PlanterMode == 1 ? "" : " Hidden"), % "Page: " (MPageIndex := 1)
-Gui, Add, Button, % "x+4 yp-3 w20 h20 hwndMPageRightHWND vMPageRight gmp_UpdatePage Disabled" (PlanterMode == 1 ? "" : " Hidden"), >
+Gui, Add, Text, % "x461 ys vMPageNumberText" (PlanterMode == 1 ? "" : " Hidden"), % "Page " (MPageIndex := 1) ;
+Gui, Add, Button, % "x461 ys+15 w15 h16 hwndMPageLeftHWND vMPageLeft gmp_UpdatePage Disabled" (PlanterMode == 1 ? "" : " Hidden"), <
+Gui, Add, Button, % "x+2 ys+15 w15 h16 hwndMPageRightHWND vMPageRight gmp_UpdatePage Disabled" (PlanterMode == 1 ? "" : " Hidden"), >
 
 mp_UpdatePage(hwnd:=0)
 {
@@ -2650,7 +2692,7 @@ mp_UpdatePage(hwnd:=0)
 	GuiControl, % ((MPageIndex == 3) ? "Disable" : "Enable"), % MPageRightHWND
 
 	If hwnd {
-		GuiControl, Text, MPageNumberText, Page: %MPageIndex%
+		GuiControl, Text, MPageNumberText, Page %MPageIndex%
 
 		Loop, 3 {
 			GuiControl, Text, MHeader%A_Index%Text, % "Cycle #" ((MPageIndex - 1) * 3 + A_Index)
@@ -2696,7 +2738,16 @@ mp_UpdateControls() {
 			GuiControl, % (MSlot%j%Cycle1Field ? "Enable" : "Disable"), MSlot%i%Cycle1Planter
 	}
 
+	GuiControl, % (MPlanterGatherA ? "Enable" : "Disable"), MPlanterGather1
+	GuiControl, % (MPlanterGatherA ? "Enable" : "Disable"), MPlanterGather2
+	GuiControl, % (MPlanterGatherA ? "Enable" : "Disable"), MPlanterGather3
+
+	GuiControl, % (MPuffModeA ? "Enable" : "Disable"), MPuffMode1
+	GuiControl, % (MPuffModeA ? "Enable" : "Disable"), MPuffMode2
+	GuiControl, % (MPuffModeA ? "Enable" : "Disable"), MPuffMode3
+
 	mp_UpdateCycles()
+
 }
 
 mp_SaveConfig() {
@@ -2713,7 +2764,15 @@ mp_SaveConfig() {
 		}
 	}
 
-	GuiControlGet, MHarvestInterval
+	GuiControlGet, MPuffMode1
+	GuiControlGet, MPuffMode2
+	GuiControlGet, MPuffMode3
+
+	GuiControlGet, MPuffModeA
+	GuiControlGet, MPlanterGatherA
+	GuiControlGet, MPlanterGather1
+	GuiControlGet, MPlanterGather2
+	GuiControlGet, MPlanterGather3
 
 	Loop, 3 {
 		i := A_Index
@@ -2740,9 +2799,17 @@ mp_SaveConfig() {
 		}
 	}
 
-	IniWrite, % MHarvestInterval, Settings\manual_planters.ini, General, MHarvestInterval
-
+	IniWrite, %MPuffModeA%, settings\nm_config.ini, Planters, MPuffModeA
+	IniWrite, %MPuffMode1%, settings\nm_config.ini, Planters, MPuffMode1
+	IniWrite, %MPuffMode2%, settings\nm_config.ini, Planters, MPuffMode2
+	IniWrite, %MPuffMode3%, settings\nm_config.ini, Planters, MPuffMode3
+	IniWrite, %MPlanterGatherA%, settings\nm_config.ini, Planters, MPlanterGatherA
+	IniWrite, %MPlanterGather1%, settings\nm_config.ini, Planters, MPlanterGather1
+	IniWrite, %MPlanterGather2%, settings\nm_config.ini, Planters, MPlanterGather2
+	IniWrite, %MPlanterGather3%, settings\nm_config.ini, Planters, MPlanterGather3
+	
 	mp_UpdateControls()
+
 }
 
 mp_UpdateCycles() {
@@ -2763,7 +2830,7 @@ mp_UpdateCycles() {
 
 		GuiControl, % (PlanterManualCycle%i% != 1 ? "Enable" : "Disable"), MSlot%i%Left
 		GuiControl, % (PlanterManualCycle%i% < MSlot%i%MaxCycle ? "Enable" : "Disable"), MSlot%i%Right
-		GuiControl,, MSlot%i%CycleText, % "Slot " i " currently at cycle #" PlanterManualCycle%i%
+		GuiControl,, MSlot%i%CycleText, % "Slot " i ": Cycle " PlanterManualCycle%i%
 	}
 }
 
@@ -2823,9 +2890,19 @@ mp_Planter() {
 		Loop, 3 {
 			If (!MSlot%A_Index%Cycle1Field)
 				Continue
+			IniRead, PlanterField%A_Index%, settings\nm_config.ini, planters, PlanterField%A_Index%
+			IniRead, MPlanterRelease%A_Index%, settings\nm_config.ini, planters, MPlanterRelease%A_Index%
+			IniRead, MPlanterSmoking%A_Index%, settings\nm_config.ini, planters, MPlanterSmoking%A_Index%
+			; reset Hold and Smoking variables to 0 if disable auto harvest no longer selected, planter field empty, or user has set to Release with remote control
+			If ((!MPuffModeA) || (!MPuffMode%A_Index%) || (PlanterField%A_Index% = "None")  || (MPlanterRelease%A_Index%)) {
+				MPlanterHold%A_Index% := 0
+				IniWrite, % MPlanterHold%A_Index%, Settings/nm_config.ini, Planters, MPlanterHold%A_Index%
+				MPlanterSmoking%A_Index% := 0
+				IniWrite, % MPlanterSmoking%A_Index%, Settings/nm_config.ini, Planters, MPlanterSmoking%A_Index%
+			}
 			If (PlanterHarvestTime%A_Index% > 2**31) {
 				mp_PlantPlanter(A_Index)
-			} Else {
+			} Else if (!MPlanterHold%A_Index%) {
 				If (nowUnix() >= PlanterHarvestTime%A_Index%)
 					mp_HarvestPlanter(A_Index)
 				If (PlanterHarvestFull%A_Index% == "Full" && (nowUnix() - LastGlitter >= 900) && PlanterGlitterC%A_Index% && !PlanterGlitter%A_Index%) {
@@ -2848,13 +2925,13 @@ mp_Planter() {
 mp_PlantPlanter(PlanterIndex) {
 	Global
 	Local CycleIndex, MFieldName, MPlanterName, planterPos, pBMScreen, imgPos, field, k, v, hwnd, windowX, windowY, windowWidth, windowHeight, offsetY
-	Static MHarvestIntervalValue := {"Every 30 Minutes":0.5
-		, "Every Hour":1
-		, "Every 2 Hours":2
-		, "Every 3 Hours":3
-		, "Every 4 Hours":4
-		, "Every 5 Hours":5
-		, "Every 6 Hours":6}
+	Static MHarvestIntervalValue := {"30 mins":0.5
+		, "1 hour":1
+		, "2 hours":2
+		, "3 hours":3
+		, "4 hours":4
+		, "5 hours":5
+		, "6 hours":6}
 	, MFieldNectars := {"Dandelion":"Comforting"
 		, "Bamboo":"Comforting"
 		, "Pine Tree":"Comforting"
@@ -3131,8 +3208,10 @@ mp_HarvestPlanter(PlanterIndex) {
 
 	nm_setStatus("Traveling", MPlanterName . " (" . MFieldName . ")")
 	nm_gotoPlanter(MFieldName)
-	nm_setStatus("Collecting", (MPlanterName . " (" . MFieldName . ")"))
-
+	if ((!MPuffModeA) || (!MPuffMode%PlanterIndex%) || (MPlanterRelease%PlanterIndex%))
+		nm_setStatus("Collecting", (MPlanterName . " (" . MFieldName . ")"))
+	if ((MPuffModeA) && (MPuffMode%PlanterIndex%) && (!MPlanterRelease%PlanterIndex%))
+		nm_setStatus("Checking", (MPlanterName . " (" . MFieldName . ")"))
 	while ((A_Index <= 5) && !(findPlanter := (nm_imgSearch("e_button.png",10)[1] = 0)))
 		Sleep, 200
 	if (findPlanter = 0) {
@@ -3173,6 +3252,14 @@ mp_HarvestPlanter(PlanterIndex) {
 			IniWrite, % PlanterHarvestTime%PlanterIndex%, Settings/nm_config.ini, Planters, PlanterHarvestTime%PlanterIndex%
 		}
 
+		return 1
+	}
+	else if ((MPuffModeA = 1) && (MPuffMode%PlanterIndex% = 1) && (MPlanterRelease%PlanterIndex% != 1)) {
+		; screenshot and set to hold instead of harvest, if auto harvest is disabled for the slot, and the user hasn't selected to release it by remote control
+		Sleep, 100 ; wait for game to update frame
+		nm_setStatus("Holding", (MPlanterName . " (" . MFieldName . ")"))
+		MPlanterHold%PlanterIndex% := 1
+		IniWrite, % MPlanterHold%PlanterIndex%, Settings/nm_config.ini, Planters, MPlanterHold%PlanterIndex%
 		return 1
 	}
 	else {
@@ -3231,6 +3318,11 @@ mp_HarvestPlanter(PlanterIndex) {
 				Gdip_DisposeImage(pBMScreen)
 			}
 		}
+		
+		MPlanterRelease%PlanterIndex% := 0
+		IniWrite, % MPlanterRelease%PlanterIndex%, Settings/nm_config.ini, Planters, MPlanterRelease%PlanterIndex%
+		MPlanterSmoking%PlanterIndex% := 0
+		IniWrite, % MPlanterSmoking%PlanterIndex%, Settings/nm_config.ini, Planters, MPlanterSmoking%PlanterIndex%
 
 		;reset values
 		CycleIndex := PlanterManualCycle%PlanterIndex%
@@ -7610,6 +7702,12 @@ nm_MonsterRespawnTimeHelp(){ ; monster respawn time information
 nm_BossConfigHelp(){ ; monster respawn time information
 	msgbox, 0x40000, Boss configuration, DESCRIPTION:`nThe Bosses menu allows for you to customize whether to wait for baby love, to keep your old amulet or keep it on the screen for manual input and to configure the health and time interval for Snail and chick.`n`nBaby Love`n- The baby love option will allow for the macro to wait a certain amount of time to try to get a baby love token to increase loot luck. This option is only for king beetle and tunnel bear.`n`nBoss Amulet options`n- Enabling the checkbox will allow for the macro to automatically keep your old amulet so that you don't lose your perfect amulet. Unchecking this box will allow for the amulet prompt to stay on screen for manual input whether to keep or replace. The only bosses with this feature are Stump Snail and King beetle`n`nBoss health/time settings`n- Enter the boss's health in the text box. The health needs to be written in wihtout commas seperating the health and it will automatically be converted into a percentage. As for the time, the time options are in 5,10,15 minutes with another option being the kill option. The Kill option will basically attack the boss until the boss dies or if you die. The only bosses with this feature are Stump Snail and Commando Chick.
 }
+nm_MPlanterGatherHelp(){ ; gather in planter field information for manual planters
+	msgbox, 0x40000, Gather in planter field, DESCRIPTION:`n`nGather in planter field will enable you to gather only in the fields where planters are placed, instead of the fields selected in your gather tab. You can choose which planter slots you wish to gather in. If you choose more than one planter slot to gather in, the macro will rotate between each selected slot. If there are no slots available for planter gather (none selected, none with planters, or all 'holding' if 'disable auto harvest' mode is also selected), the macro will revert to gathering in the fields specified in the gather tab.
+}
+nm_MPuffModeHelp(){ ; disable auto harvest information for manual planters
+	msgbox, 0x40000, Disable auto harvest, DESCRIPTION:`n`nThis option is designed for users trying to grow smoking planters for puffshroom runs. Enabling it for a planter slot will cause the macro NOT to harvest the planter. Instead, it will 'hold' the planter until you harvest and clear it either manually or through remote control. This allows you to check whether it is smoking before harvesting.`n`nTo use this feature:`n- Choose which slots to disable auto harvest for. You can choose one, two, or all, depending on how many of your planters you wish to use for puffshrooms versus loot or nectar. `n- If you want to receive a ping and screenshot of the planter when full grown, select the 'planter progress' option in your Natro status tab > discord integration pop up options.`n- When pinged, users can a) harvest manually in game, clear the planter slot in the F5 pop-up, and move to next cycle by pressing + in the planter tab, b) instruct the macro to harvest the planter and move to next cycle by sending ?set MPlanterRelease1/2/3 via remote control, or c) do nothing if the planter is smoking and you wish to keep holding it. If the planter is smoking, you can also set this status by sending ?set MPlanterSmoking1/2/3 via remote control. `n`nNote: `nIf you have enabled both 'gather in planter field' and 'disable auto harvest', the macro will stop gathering in a planter field once that planter is full grown. It will still gather in any other available 'gather in planter fields' you have enabled, or if none return to the field/s in gather tab.
+}
 nm_ReconnectTimeHelp(){
 	global ReconnectHour, ReconnectMin, ReconnectInterval
 	Gui +OwnDialogs
@@ -7991,7 +8089,10 @@ nm_TabPlantersLock(){
 	GuiControl, disable, CoconutFieldCheck
 	GuiControl, disable, PepperFieldCheck
 	;manual
-	Static ManualPlantersControls := ["MHarvestInterval", "MPageLeft", "MPageRight", "MSlot1Left", "MSlot1Right", "MSlot2Left", "MSlot2Right", "MSlot3Left", "MSlot3Right"
+	GuiControl, disable, % hMHILeft
+	GuiControl, disable, % hMHIRight
+	Static ManualPlantersControls := ["MPageLeft", "MPageRight", "MSlot1Left", "MSlot1Right", "MSlot2Left", "MSlot2Right", "MSlot3Left", "MSlot3Right"
+	, "MPuffModeA", "MPuffMode1", "MPuffMode2", "MPuffMode3", "MPuffModeHelp", "MPlanterGatherA", "MPlanterGather1", "MPlanterGather2", "MPlanterGather3", "MPlanterGatherHelp"
 	, "MSlot1Cycle1Planter", "MSlot1Cycle2Planter", "MSlot1Cycle3Planter", "MSlot1Cycle4Planter", "MSlot1Cycle5Planter", "MSlot1Cycle6Planter", "MSlot1Cycle7Planter", "MSlot1Cycle8Planter", "MSlot1Cycle9Planter"
 	, "MSlot1Cycle1Field", "MSlot1Cycle2Field", "MSlot1Cycle3Field", "MSlot1Cycle4Field", "MSlot1Cycle5Field", "MSlot1Cycle6Field", "MSlot1Cycle7Field", "MSlot1Cycle8Field", "MSlot1Cycle9Field"
 	, "MSlot1Cycle1Glitter", "MSlot1Cycle2Glitter", "MSlot1Cycle3Glitter", "MSlot1Cycle4Glitter", "MSlot1Cycle5Glitter", "MSlot1Cycle6Glitter", "MSlot1Cycle7Glitter", "MSlot1Cycle8Glitter", "MSlot1Cycle9Glitter"
@@ -8061,8 +8162,19 @@ nm_TabPlantersUnLock(){
 	GuiControl, enable, CoconutFieldCheck
 	GuiControl, enable, PepperFieldCheck
 	;manual
-	GuiControl, enable, MHarvestInterval
+	GuiControl, enable, % hMHILeft
+	GuiControl, enable, % hMHIRight
 	GuiControl, enable, MSlot1Cycle1Planter
+	GuiControl, enable, MPuffModeA
+	GuiControl, enable, MPuffMode1
+	GuiControl, enable, MPuffMode2
+	GuiControl, enable, MPuffMode3
+	GuiControl, enable, MPuffModeHelp
+	GuiControl, enable, MPlanterGatherA
+	GuiControl, enable, MPlanterGather1
+	GuiControl, enable, MPlanterGather2
+	GuiControl, enable, MPlanterGather3
+	GuiControl, enable, MPlanterGatherHelp
 	mp_UpdatePage()
 	mp_UpdateControls()
 }
@@ -12344,7 +12456,7 @@ nm_GoGather(){
 	global FieldName2, FieldPattern2, FieldPatternSize2, FieldPatternReps2, FieldPatternShift2, FieldPatternInvertFB2, FieldPatternInvertLR2, FieldUntilMins2, FieldUntilPack2, FieldReturnType2, FieldSprinklerLoc2, FieldSprinklerDist2, FieldRotateDirection2, FieldRotateTimes2, FieldDriftCheck2
 	global FieldName3, FieldPattern3, FieldPatternSize3, FieldPatternReps3, FieldPatternShift3, FieldPatternInvertFB3, FieldPatternInvertLR3, FieldUntilMins3, FieldUntilPack3, FieldReturnType3, FieldSprinklerLoc3, FieldSprinklerDist3, FieldRotateDirection3, FieldRotateTimes3, FieldDriftCheck3
 	global MondoBuffCheck, MondoAction, LastMondoBuff
-	global PlanterMode, gotoPlanterField
+	global PlanterMode, gotoPlanterField, MPlanterGatherA, MPlanterGather1, MPlanterGather2, MPlanterGather3, LastPlanterGatherSlot
 	global QuestLadybugs, QuestRhinoBeetles, QuestSpider, QuestMantis, QuestScorpions, QuestWerewolf
 	global PolarQuestGatherInterruptCheck, BuckoQuestGatherInterruptCheck, RileyQuestGatherInterruptCheck, BugrunInterruptCheck, LastBugrunLadybugs, LastBugrunRhinoBeetles, LastBugrunSpider, LastBugrunMantis, LastBugrunScorpions, LastBugrunWerewolf, BlackQuestCheck, BlackQuestComplete, QuestGatherField, BuckoQuestCheck, BuckoQuestComplete, RileyQuestCheck, RileyQuestComplete, PolarQuestCheck, PolarQuestComplete, RotateQuest, QuestGatherMins, QuestGatherReturnBy, BuckoRhinoBeetles, BuckoMantis, RileyLadybugs, RileyScorpions, RileyAll, GameFrozenCounter, HiveSlot, BugrunLadybugsCheck, BugrunRhinoBeetlesCheck, BugrunSpiderCheck, BugrunMantisCheck, BugrunScorpionsCheck, BugrunWerewolfCheck, MonsterRespawnTime
 	global beesmasActive, BeesmasGatherInterruptCheck, StockingsCheck, LastStockings, FeastCheck, LastFeast, RBPDelevelCheck, LastRBPDelevel, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon
@@ -12478,8 +12590,92 @@ nm_GoGather(){
 			}
 			break
 		}
-		;Gather in planter field override
-		if(gotoPlanterField && (PlanterMode = 2)){
+		;Gather in manual planters field override
+
+		if((MPlanterGatherA) && (PlanterMode = 1)) {
+
+			Loop 3 { 
+				IniRead, PlanterField%A_Index%, settings\nm_config.ini, planters, PlanterField%A_Index%
+				IniRead, MPlanterHold%A_Index%, settings\nm_config.ini, planters, MPlanterHold%A_Index%
+				}			
+				IniRead, LastPlanterGatherSlot, Settings\manual_planters.ini, General, LastPlanterGatherSlot
+							
+			; define available planter gather slots/fields: selected by user for planter gather, with planter in field, and not 'holding at full grown' 
+			eligible := []
+			Loop 3 
+				{
+				if((MPlanterGather%A_Index%) && (PlanterField%A_Index% != "None") && (!MPlanterHold%A_Index%)) 
+					eligible[A_Index] := planterField%A_Index%
+				}   
+						
+			LastPlanterGatherSlot := ("") ? 3 : LastPlanterGatherSlot
+
+			; if at least one slot is available for planter gather, proceed, else revert to gather tab
+			if ((eligible.1) || (eligible.2) || (eligible.3)) {
+
+				; find next eligible field and slot
+				if 		((eligible.1) && (((LastPlanterGatherSlot=1) && (!eligible.2) && (!eligible.3)) || ((LastPlanterGatherSlot=2) && (!eligible.3)) || (LastPlanterGatherSlot=3)))
+						{
+						slot:= 1
+						field := PlanterField1
+						}
+				else if ((eligible.2) && (((LastPlanterGatherSlot=2) && (!eligible.3) && (!eligible.1)) || ((LastPlanterGatherSlot=3) && (!eligible.1)) || (LastPlanterGatherSlot=1)))
+						{
+						slot:= 2
+						field := PlanterField2
+						}
+				else if ((eligible.3) && (((LastPlanterGatherSlot=3) && (!eligible.1) && (!eligible.2)) || ((LastPlanterGatherSlot=1) && (!eligible.2)) || (LastPlanterGatherSlot=2)))
+						{
+						slot:= 3
+						field := PlanterField3
+						}
+
+				; set gather field and settings
+				fieldOverrideReason:="Planter"
+				FieldName:=field
+				FieldPattern:=FieldDefault[FieldName]["pattern"]
+				FieldPatternSize:=FieldDefault[FieldName]["size"]
+				FieldPatternReps:=FieldDefault[FieldName]["width"]
+				FieldPatternShift:=FieldDefault[FieldName]["shiftlock"]
+				FieldPatternInvertFB:=FieldDefault[FieldName]["invertFB"]
+				FieldPatternInvertLR:=FieldDefault[FieldName]["invertLR"]
+				FieldUntilMins:=FieldDefault[FieldName]["gathertime"]
+				FieldUntilPack:=FieldDefault[FieldName]["percent"]
+				FieldReturnType:=FieldDefault[FieldName]["convert"]
+				FieldSprinklerLoc:=FieldDefault[FieldName]["sprinkler"]
+				FieldSprinklerDist:=FieldDefault[FieldName]["distance"]
+				FieldRotateDirection:=FieldDefault[FieldName]["camera"]
+				FieldRotateTimes:=FieldDefault[FieldName]["turns"]
+				FieldDriftCheck:=FieldDefault[FieldName]["drift"]
+
+				; write currentfield to file as LastPlanterGatherSlot, to read on next loop
+				IniWrite, % slot, Settings\manual_planters.ini, General, LastPlanterGatherSlot
+
+			} else  { ; if (!include)
+				FieldName:=FieldName%CurrentFieldNum%
+				FieldPattern:=FieldPattern%CurrentFieldNum%
+				FieldPatternSize:=FieldPatternSize%CurrentFieldNum%
+				FieldPatternReps:=FieldPatternReps%CurrentFieldNum%
+				FieldPatternShift:=FieldPatternShift%CurrentFieldNum%
+				FieldPatternInvertFB:=FieldPatternInvertFB%CurrentFieldNum%
+				FieldPatternInvertLR:=FieldPatternInvertLR%CurrentFieldNum%
+				FieldUntilMins:=FieldUntilMins%CurrentFieldNum%
+				FieldUntilPack:=FieldUntilPack%CurrentFieldNum%
+				FieldReturnType:=FieldReturnType%CurrentFieldNum%
+				FieldSprinklerLoc:=FieldSprinklerLoc%CurrentFieldNum%
+				FieldSprinklerDist:=FieldSprinklerDist%CurrentFieldNum%
+				FieldRotateDirection:=FieldRotateDirection%CurrentFieldNum%
+				FieldRotateTimes:=FieldRotateTimes%CurrentFieldNum%
+				FieldDriftCheck:=FieldDriftCheck%CurrentFieldNum%
+				
+			}
+
+			break 
+
+		}
+
+		;Gather in planters+ field override
+		if((gotoPlanterField) && (PlanterMode = 2)){
 			loop, 3{
 				inverseIndex:=(4-A_Index)
 				IniRead, PlanterField%inverseIndex%, settings\nm_config.ini, planters, PlanterField%inverseIndex%
@@ -18142,7 +18338,8 @@ ba_planterSwitch(){
 	global
 	static PlantersPlusControls := ["N1Priority","N2Priority","N3Priority","N4Priority","N5Priority","N1MinPercent","N2MinPercent","N3MinPercent","N4MinPercent","N5MinPercent","N1MinPercentUpDown","N2MinPercentUpDown","N3MinPercentUpDown","N4MinPercentUpDown","N5MinPercentUpDown","DandelionFieldCheck","SunflowerFieldCheck","MushroomFieldCheck","BlueFlowerFieldCheck","CloverFieldCheck","SpiderFieldCheck","StrawberryFieldCheck","BambooFieldCheck","PineappleFieldCheck","StumpFieldCheck","PumpkinFieldCheck","PineTreeFieldCheck","RoseFieldCheck","MountainTopFieldCheck","CactusFieldCheck","CoconutFieldCheck","PepperFieldCheck","Text1","Text2","Text3","Text4","Text5","TextLine1","TextLine2","TextLine3","TextLine4","TextLine5","TextLine6","TextLine7","TextZone1","TextZone2","TextZone3","TextZone4","TextZone5","TextZone6","NPreset","TextPresets","TextNp","TextMin","PlasticPlanterCheck","CandyPlanterCheck","BlueClayPlanterCheck","RedClayPlanterCheck","TackyPlanterCheck","PesticidePlanterCheck","HeatTreatedPlanterCheck","HydroponicPlanterCheck","PetalPlanterCheck","PlanterOfPlentyCheck","PaperPlanterCheck","TicketPlanterCheck","TextHarvest","HarvestFullGrown","gotoPlanterField","gatherFieldSipping","TextHours","TextMax","MaxAllowedPlanters","MaxAllowedPlantersEdit","TextAllowedPlanters","TextAllowedFields","TimersButton","AutomaticHarvestInterval","ConvertFullBagHarvest","GatherPlanterLoot","TextBox1"]
 	, PlantersPlusControlsH := ["hNPLeft","hNPRight","hNP1Left","hNP1Right","hNP2Left","hNP2Right","hNP3Left","hNP3Right","hNP4Left","hNP4Right","hNP5Left","hNP5Right"]
-	, ManualPlantersControls := ["MHeader1Text","MHeader2Text","MHeader3Text","MSlot1PlanterText","MSlot1FieldText","MSlot1SettingsText","MSlot1SeparatorLine","MSlot2PlanterText","MSlot2FieldText","MSlot2SettingsText","MSlot2SeparatorLine","MSlot3PlanterText","MSlot3FieldText","MSlot3SettingsText","MSectionSeparatorLine","MSliderSeparatorLine","MSlot1CycleText","MSlot1LocationText","MSlot1Left","MSlot1ChangeText","MSlot1Right","MSlot2CycleText","MSlot2LocationText","MSlot2Left","MSlot2ChangeText","MSlot2Right","MSlot3CycleText","MSlot3LocationText","MSlot3Left","MSlot3ChangeText","MSlot3Right","MHarvestText","MHarvestInterval","MPageLeft","MPageNumberText","MPageRight"]
+	, ManualPlantersControls := ["MHeader1Text","MHeader2Text","MHeader3Text","MSlot1PlanterText","MSlot1FieldText","MSlot1SettingsText","MSlot1SeparatorLine","MSlot2PlanterText","MSlot2FieldText","MSlot2SettingsText","MSlot2SeparatorLine","MSlot3PlanterText","MSlot3FieldText","MSlot3SettingsText","MSectionSeparatorLine","MSliderSeparatorLine","MSlot1CycleText","MSlot1LocationText","MSlot1Left","MSlot1ChangeText","MSlot1Right","MSlot2CycleText","MSlot2LocationText","MSlot2Left","MSlot2ChangeText","MSlot2Right","MSlot3CycleText","MSlot3LocationText","MSlot3Left","MSlot3ChangeText","MSlot3Right","MCurrentCycle","MHarvestText","MHarvestInterval","MPageSeparatorLine","MPageLeft","MPageNumberText","MPageRight", "MPuffModeSeparatorLine", "MPuffModeHelp", "MPuffModeText", "MPuffModeA", "MPuffMode1", "MPuffMode2", "MPuffMode3", "MGatherSeparatorLine", "MPlanterGatherHelp", "MPlanterGatherText", "MPlanterGatherA", "MPlanterGather1", "MPlanterGather2", "MPlanterGather3"]
+	, ManualPlantersControlsH := ["hMHILeft","hMHIRight"]
 	, ManualPlantersOptions := ["Planter","Field","Glitter","AutoFull"]
 	local i, c, k, v, Prev_DetectHiddenWindows, Prev_TitleMatchMode
 
@@ -18164,6 +18361,8 @@ ba_planterSwitch(){
 		{
 			for k,v in ManualPlantersControls
 				GuiControl, %c%, %v%
+			for k,v in ManualPlantersControlsH
+				GuiControl, %c%, % %v%
 			Loop, 3
 			{
 				i := A_Index
@@ -18252,6 +18451,61 @@ ba_gotoPlanterFieldSwitch_(){
 		}
 	}
 	ba_saveConfig_()
+}
+mp_MPlanterGatherSwitch_(){
+	global MPlanterGatherA
+	GuiControlGet, MPlanterGatherA
+	if(MPlanterGatherA) {
+		Guicontrol,,MPlanterGatherA,0
+		msgbox, 1, WARNING!,You have selected to "Gather only in planter field".`n`nSeleting this option will cause the macro to IGNORE the gathering fields specified in the Gather tab, and gather ONLY in planter fields for the slots you select using this option instead.`n`nThis option can result in faster planter growth depending on your polar power, but will also result in less pollen/honey collection overall. More information on how to use this feature is available in the 'Gather in planter field' ? Help button.`n`nDo you wish to proceed with gathering in planter field?
+		IfMsgBox Ok
+			{
+				Guicontrol,,MPlanterGatherA,1
+			} else {
+				Guicontrol,,MPlanterGatherA,0
+			}
+		}
+	mp_SaveConfig()
+}
+mp_MPuffMode(){
+	global  
+	GuiControlGet, MPuffModeA
+	if(MPuffModeA) {
+		Guicontrol,,MPuffModeA,0
+		msgbox, 1, WARNING!,Enabling 'Disable auto harvest' will cause the macro NOT to harvest the planter when ready.`n`nInstead, it will 'hold' the full-grown planter until you harvest it either manually or through remote control. This option is designed for users trying to grow smoking planters for puffshroom runs, and allows you to check before harvesting. More information on how to use this feature is available in the 'Disable auto harvest' ? Help button.`n`nDo you wish to proceed with disabling auto harvest?
+		IfMsgBox Ok
+			{
+				Guicontrol,,MPuffModeA,1
+			} else {
+				Guicontrol,,MPuffModeA,0
+			}
+			}	
+	mp_SaveConfig()
+}
+nm_MHarvestInterval(hCtrl){
+	global MHarvestInterval, hMHILeft, hMHIRight
+	static val := ["30 mins", "1 hour", "2 hours", "3 hours", "4 hours", "5 hours", "6 hours"], l := val.Length()
+
+	switch % MHarvestInterval
+	{
+		case "30 mins":
+		i := 1
+		case "1 hour":
+		i := 2
+		default:
+		i := 3
+		case "3 hours":
+		i := 4
+		case "4 hours":
+		i := 5
+		case "5 hours":
+		i := 6
+		case "6 hours":
+		i := 7
+	}
+	
+	GuiControl, , MHarvestInterval, % (MHarvestInterval := val[(hCtrl = hMHIRight) ? (Mod(i, l) + 1) : (Mod(l + i - 2, l) + 1)])
+	IniWrite, % MHarvestInterval, Settings\manual_planters.ini, General, MHarvestInterval
 }
 ba_gatherFieldSippingSwitch_(){
 	global GatherFieldSipping
