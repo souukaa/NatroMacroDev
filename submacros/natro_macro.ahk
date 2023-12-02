@@ -2538,7 +2538,7 @@ Gui, Font, w700 underline
 Gui, Add, Text, x327 y130 w80 vshrinetitle1 Hidden, Add Item
 Gui, Font, s8 cDefault Norm, Tahoma
 Gui, Add, Text, x302 y146 w103 h1 vShrineline1 Hidden 0x7
-Gui, Add, Text, x404 y108 w1 h130 vShrineline2 Hidden 0x7
+Gui, Add, Text, x404 y104 w1 h130 vShrineline2 Hidden 0x7
 Gui, Add, Text, x405 y136 w83 h1 vShrineline3 Hidden 0x7
 Gui, Add, Text, x405 y193 w83 h1 vShrineline4 Hidden 0x7
 Gui, Add, Text, x426 y158 w41 h16 +Center +0x200 vShrineIndexNum Hidden
