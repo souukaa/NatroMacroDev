@@ -590,8 +590,8 @@ config["Collect"] := {"ClockCheck":1
 
 config["Shrine"] := {"ShrineCheck":0
 	, "LastShrine":1
-	, "ShrineAmount1":1
-	, "ShrineAmount2":1
+	, "ShrineAmount1":0
+	, "ShrineAmount2":0
 	, "ShrineItem1":"None"
 	, "ShrineItem2":"None"
 	, "ShrineIndex1":1
