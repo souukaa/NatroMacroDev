@@ -227,14 +227,13 @@ Loop {
             }
         }
 
-        IniRead, MPlanterHold%i%, Settings/nm_config.ini, Planters, MPlanterHold%i%
-        IniRead, MPlanterSmoking%i%, Settings/nm_config.ini, Planters, MPlanterSmoking%i%
-        p%i%timer := PlanterHarvestTime%i%-nowUnix(), VarSetCapacity(p%i%timerstring,256), DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",p%i%timer*10000000,"wstr",(p%i%timer > 360000) ? "'No Planter'" : (p%i%timer > 0) ? (((p%i%timer >= 3600) ? "h'h' m" : "") . ((p%i%timer >= 60) ? "m'm' s" : "") . "s's'") : (MPlanterSmoking%i%) ? "'Smoking'" : (MPlanterHold%i%) ? "'Holding'" : "'Ready'","str",p%i%timerstring,"int",256)
         GuiControl, -Redraw, % hClear%i%
         GuiControl,, % hClear%i%, % ((PlanterName%i% = "None") ? "Add" : "Clear")
         GuiControl, +Redraw, % hClear%i%
 
-        p%i%timer := PlanterHarvestTime%i%-nowUnix(), VarSetCapacity(p%i%timerstring,256), DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",p%i%timer*10000000,"wstr",(p%i%timer > 360000) ? "'No Planter'" : (p%i%timer > 0) ? (((p%i%timer >= 3600) ? "h'h' m" : "") . ((p%i%timer >= 60) ? "m'm' s" : "") . "s's'") : "'Ready'","str",p%i%timerstring,"int",256)
+        IniRead, MPlanterHold%i%, Settings/nm_config.ini, Planters, MPlanterHold%i%
+        IniRead, MPlanterSmoking%i%, Settings/nm_config.ini, Planters, MPlanterSmoking%i%
+        p%i%timer := PlanterHarvestTime%i%-nowUnix(), VarSetCapacity(p%i%timerstring,256), DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",p%i%timer*10000000,"wstr",(p%i%timer > 360000) ? "'No Planter'" : (p%i%timer > 0) ? (((p%i%timer >= 3600) ? "h'h' m" : "") . ((p%i%timer >= 60) ? "m'm' s" : "") . "s's'") : (MPlanterSmoking%i%) ? "'Smoking'" : (MPlanterHold%i%) ? "'Holding'" : "'Ready'","str",p%i%timerstring,"int",256)
         GuiControl,ptimers:-Redraw, p%i%timer
         GuiControl,ptimers:,p%i%timer,% p%i%timerstring
         GuiControl,ptimers:+Redraw, p%i%timer
