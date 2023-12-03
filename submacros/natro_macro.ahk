@@ -9460,6 +9460,10 @@ nm_shrine(){
     if ((nowUnix()-GatherFieldBoostedStart<900) || (nowUnix()-LastGlitter<900) || nm_boostBypassCheck())
         return
 
+	hwnd := GetRobloxHWND()
+	offsetY := GetYOffset(hwnd)
+	WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " hwnd)
+
     if(CurrentAction!="Shrine") {
         PreviousAction:=CurrentAction
         CurrentAction:="Shrine"
@@ -9467,7 +9471,7 @@ nm_shrine(){
     nm_ShrineRotation() ; make sure ShrineRot hasnt changed
     if (ShrineCheck && (nowUnix()-LastShrine)>3600) { ;1 hour
         loop, 2 {
-            ClickNum := 0, z := A_Index
+            z := A_Index
             nm_Reset()
             nm_setStatus("Traveling", "Wind Shrine" ((A_Index > 1) ? " (Attempt 2)" : ""))
 
@@ -9479,13 +9483,12 @@ nm_shrine(){
                 Sleep, 100
                 sendinput {%SC_E% up}
                 Sleep, 2000
-            	WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
+
                 MouseMove, WindowX+Windowwidth//2, WindowY+WindowHeight//1.35 - 5
                 sleep, 150
                 Click
                 sleep, 300
-                SearchX := WindowX+Windowwidth//2 + 20
-                SearchY := WindowY+WindowHeight//2 - 100
+                SearchX := WindowX+Windowwidth//2 + 20, SearchY := WindowY+WindowHeight//2 - 100
                 Loop
                 {
                     sleep, 150
@@ -9498,68 +9501,61 @@ nm_shrine(){
 						sleep, 200
                         MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 + 65 ; Add more items
                         sleep, 150
-						Test := % ShrineAmount%ShrineRot%
-                        While (Test > 1) {
-                            Test--
+                        While (A_index < ShrineAmount%ShrineRot%) {
                             Click
-                            sleep, 20
+                            sleep, 30
                         }
-                        Break
+                        sleep, 300
+						MouseMove, WindowX+WindowWidth//2 - 70, WindowY+WindowHeight//2 + 130 ; click donate/confirm
+						sleep, 150
+						Click
+						sleep, 150
+						MouseMove, WindowX+WindowWidth//2, WindowY+WindowHeight//1.35 - 5 ; move mouse onto gui box
+						loop, 10 {
+							sleep, 200
+							Click
+						}
+						sleep 200
+						send {raw}{..} ; change to rot right
+						sleep 800
+						gatherloot := "
+						(LTrim Join`r`n
+						" nm_Walk(10.5, RightKey, BackKey) "
+						" nm_Walk(3, LeftKey) "
+						loop, 4 {
+							" nm_Walk(15, FwdKey) "
+							" nm_Walk(1.5, LeftKey) "
+							" nm_Walk(15, BackKey) "
+							" nm_Walk(1.5, LeftKey) "
+						}
+						)"
+						nm_createWalk(gatherloot) ; maybe improve gather pattern ?
+						KeyWait, F14, D T5 L
+						KeyWait, F14, T60 L
+						nm_endWalk()
+						nm_SetStatus("Collected", "Wind Shrine")
+						
+						if (ShrineIndex%ShrineRot% != "Infinite")  {
+							ShrineIndex%shrineRot%-- ;subtract from shrineindex for looping only if its a number
+							GuiControl,, ShrineData%ShrineRot%, % "(" ShrineAmount%ShrineRot% ") [" ((ShrineIndex%ShrineRot% = "Infinite") ? "∞" : ShrineIndex%ShrineRot%) "]"
+							IniWrite, % ShrineIndex%ShrineRot%, settings\nm_config.ini, Shrine, ShrineIndex%ShrineRot%
+						}
+						ShrineRot := Mod(ShrineRot, 2) + 1 ; determine Shrinerot
+						nm_ShrineRotation()
+
+						break 2
                     } else {
 						Gdip_DisposeImage(ShrineSS)
                         MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 - 20 ; go to next item
                         sleep, 50
                         Click
-                        ClickNum++
-                        if (ClickNum = 60) {
+                        if (A_Index = 60) {
                             if (z = 2)
                                 nm_setStatus("Failed", "Wind shrine")	
                             break
                         }
 						sleep, 100
                     }
-                }
-                if (ClickNum < 60) {
-					;nm_SetStatus("Collected", "Wind Shrine") ;Temp for testing
-                    sleep, 300
-                    MouseMove, WindowX+WindowWidth//2 - 70, WindowY+WindowHeight//2 + 130 ; click donate/confirm
-                    sleep, 150
-                    Click
-                    sleep, 150
-                    MouseMove, WindowX+WindowWidth//2, WindowY+WindowHeight//1.35 - 5 ; move mouse onto gui box
-                    loop, 10 {
-                        sleep, 200
-                        Click
-                    }
-                    sleep 200
-                    send {raw}{..} ; change to rot right
-                    sleep 800
-                    gatherloot := "
-                    (LTrim Join`r`n
-                    " nm_Walk(10.5, RightKey, BackKey) "
-                    " nm_Walk(3, LeftKey) "
-                    loop, 4 {
-                        " nm_Walk(15, FwdKey) "
-                        " nm_Walk(1.5, LeftKey) "
-                        " nm_Walk(15, BackKey) "
-                        " nm_Walk(1.5, LeftKey) "
-                    }
-                    )"
-                    nm_createWalk(gatherloot) ; maybe improve gather pattern ?
-                    KeyWait, F14, D T5 L
-                    KeyWait, F14, T60 L
-                    nm_endWalk()
-                    nm_SetStatus("Collected", "Wind Shrine")
-					
-					if (ShrineIndex%ShrineRot% != "Infinite")  {
-                    	ShrineIndex%shrineRot%-- ;subtract from shrineindex for looping only if its a number
-						GuiControl,, ShrineData%ShrineRot%, % "(" ShrineAmount%ShrineRot% ") [" ((ShrineIndex%ShrineRot% = "Infinite") ? "∞" : ShrineIndex%ShrineRot%) "]"
-						IniWrite, % ShrineIndex%ShrineRot%, settings\nm_config.ini, Shrine, ShrineIndex%ShrineRot%
-					}
-                    ShrineRot := Mod(ShrineRot, 2) + 1 ; determine Shrinerot
-                    nm_ShrineRotation()
-
-                    break
                 }
             }
         }
@@ -9677,7 +9673,7 @@ nm_Collect(){
 
 	if (BlenderCheck && (nowUnix() - TimeForBlender) > TimerInterval) {
 		loop, 2 {
-			z := A_Index, ClickNum := 0 ;Set variable for fail safe
+			z := A_Index ;Set variable for fail safe
 			nm_Reset()
 			nm_setStatus("Traveling", "Blender" ((A_Index > 1) ? " (Attempt 2)" : ""))
 			nm_gotoCollect("Blender")
@@ -9688,7 +9684,6 @@ nm_Collect(){
 				Sleep, 100
 				sendinput {%SC_E% up}
 				Sleep, 500
-				WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
 
 				SearchX := windowX+Windowwidth//2 - 277, SearchY := windowY+WindowHeight//2 - 243, BlenderSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|553|400")
 
@@ -9706,7 +9701,7 @@ nm_Collect(){
 					Click
 					break
 				} else if (BlenderEnd && Gdip_ImageSearch(BlenderSS, bitmaps["EndCraftR"], , , , , , 3, , 6) > 0) {
-					Iniwrite, 0, settings\nm_config.ini, Blender, BlenderEnd ; might not need iniwrite
+					Iniwrite, 0, settings\nm_config.ini, Blender, BlenderEnd
 					BlenderEnd := 0
 					MouseMove, windowX+WindowWidth//2 - 60, windowY+WindowHeight//2 + 120 ; close red craft button
 					sleep, 150
@@ -9720,13 +9715,15 @@ nm_Collect(){
 				}
 				gdip_disposeimage(BlenderSS)
 				sleep, 800
-				loop {
+				loop 
+				{
 					BlenderSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|170|245")
 
 					Blender := % "BlenderItem" BlenderRot
 					BlenderIMG := % %Blender% "B"
 
-					if (Gdip_ImageSearch(BlenderSS, bitmaps[BlenderIMG], , , , , , 2, , 4) > 0) {
+					if (Gdip_ImageSearch(BlenderSS, bitmaps[BlenderIMG], , , , , , 2, , 4) > 0) 
+					{
 						gdip_disposeimage(BlenderSS)  ; Dispose of the bitmap
 						MouseMove, windowX+Windowwidth//2 + 80, windowY+WindowHeight//2 + 100 ;Open item menu
 						sleep, 150
@@ -9734,22 +9731,60 @@ nm_Collect(){
 						sleep, 150
 						MouseMove, windowX+WindowWidth//2 - 60, windowY+WindowHeight//2 + 120 ;Add more of x item
 						sleep, 150
-						Temp := % BlenderAmount%BlenderRot%
-						While (Temp > 1) {
-							Temp--
+						While (A_Index < BlenderAmount%BlenderRot%) {
 							Click
-							sleep, 20
+							sleep, 30
 						}
 						sleep, 200
-						break
-					} else {
-						sleep, 50
-						MouseMove, windowX+WindowWidth//2 + 230, windowY+WindowHeight//2 + 90 ;not found go next item
+						IniWrite, 0, settings\nm_config.ini, blender, BlenderCount%LastBlenderRot% ; reset GUI counter
+
+						nm_setStatus("Collected", "Blender")
+
+						BlenderTime%BlenderRot% := BlenderAmount%BlenderRot% * 300 ;calculate first time variable
+						BlenderTimeTemp := % BlenderTime%BlenderRot% ;set up a temporary varible to hold time
+						TempBlenderRot := BlenderRot ; save a temporary rotation holder
+
+						BlenderTime%TempBlenderRot% := BlenderTime%TempBlenderRot% + nowUnix() ;add nowunix for time after temporoary varible has been created
+						IniWrite, % BlenderTime%TempBlenderRot%, settings\nm_config.ini, blender, BlenderTime%TempBlenderRot% ; save timer to config
+
+						loop {
+							TempBlenderRot := Mod(TempBlenderRot, 3) + 1
+							if (TempBlenderRot = BlenderRot) ;makes sure it doesnt do the already calculated time again
+								break
+
+							if ((BlenderIndex%TempBlenderRot% = "Infinite" || BlenderIndex%TempBlenderRot% > 0) && (BlenderItem%TempBlenderRot% != "None" && BlenderItem%TempBlenderRot% != "")) { ;start time calculation process
+								BlenderTime%TempBlenderRot% := (BlenderAmount%TempBlenderRot% * 300) + BlenderTimeTemp ;add previous time to this one after to show time until its done
+								BlenderTimeTemp := % BlenderTime%TempBlenderRot% ;create a new temp for next
+								BlenderTime%TempBlenderRot% := % BlenderTime%TempBlenderRot% + nowUnix() ;add now unix to it for the counter
+								IniWrite, % BlenderTime%TempBlenderRot%, settings\nm_config.ini, blender, BlenderTime%TempBlenderRot% ;save the value to the config for GUI use and Remote control
+							}
+						}
+						TimerInterval := BlenderAmount%BlenderRot% * 300 ;set up time
+						IniWrite, %BlenderRot%, settings\nm_config.ini, blender, LastBlenderRot ; define this for GUI and to reset counter as used above 
+
+						BlenderRot := Mod(BlenderRot, 3) + 1
+						nm_BlenderRotation()
+						if (BlenderIndex%BlenderRot% != "Infinite") {
+							BlenderIndex%BlenderRot%-- ;subtract from blenderindex for looping only if its a number
+							GuiControl,, BlenderData%BlenderRot%, % "(" BlenderAmount%BlenderRot% ") [" ((BlenderIndex%BlenderRot% = "Infinite") ? "∞" : BlenderIndex%BlenderRot%) "]"
+							IniWrite, % BlenderIndex%BlenderRot%, settings\nm_config.ini, blender, BlenderIndex%BlenderRot%
+						}
+						sleep, 100
+						MouseMove, windowX+Windowwidth//2 + 80, windowY+WindowHeight//2 + 100 ;Click Confirm
 						sleep, 150
 						Click
 						sleep, 100
-						ClickNum++
-						if (ClickNum = 60) {
+						MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210 ;Close GUI
+						sleep, 150
+						Click
+						break 2
+					} else {
+						sleep, 50
+						MouseMove, windowX+WindowWidth//2 + 230, windowY+WindowHeight//2 + 140 ;not found go next item
+						sleep, 150
+						Click
+						sleep, 100
+						if (A_Index = 60) {
 							if (z = 2) {
 								nm_setStatus("Failed", "Blender")
 								MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210 ;Close GUI
@@ -9779,51 +9814,6 @@ nm_Collect(){
 							break
 						}
 					}	
-				}
-				if (ClickNum < 60) {
-					IniWrite, 0, settings\nm_config.ini, blender, BlenderCount%LastBlenderRot% ; reset GUI counter
-
-					nm_setStatus("Collected", "Blender")
-
-					BlenderTime%BlenderRot% := BlenderAmount%BlenderRot% * 300 ;calculate first time variable
-					BlenderTimeTemp := % BlenderTime%BlenderRot% ;set up a temporary varible to hold time
-					TempBlenderRot := BlenderRot ; save a temporary rotation holder
-
-					BlenderTime%TempBlenderRot% := BlenderTime%TempBlenderRot% + nowUnix() ;add nowunix for time after temporoary varible has been created
-					IniWrite, % BlenderTime%TempBlenderRot%, settings\nm_config.ini, blender, BlenderTime%TempBlenderRot% ; save timer to config
-
-					loop {
-						TempBlenderRot := Mod(TempBlenderRot, 3) + 1
-						if (TempBlenderRot = BlenderRot) ;makes sure it doesnt do the already calculated time again
-							break
-
-						if ((BlenderIndex%TempBlenderRot% = "Infinite" || BlenderIndex%TempBlenderRot% > 0) && (BlenderItem%TempBlenderRot% != "None" && BlenderItem%TempBlenderRot% != "")) { ;start time calculation process
-							BlenderTime%TempBlenderRot% := (BlenderAmount%TempBlenderRot% * 300) + BlenderTimeTemp ;add previous time to this one after to show time until its done
-							BlenderTimeTemp := % BlenderTime%TempBlenderRot% ;create a new temp for next
-							BlenderTime%TempBlenderRot% := % BlenderTime%TempBlenderRot% + nowUnix() ;add now unix to it for the counter
-							IniWrite, % BlenderTime%TempBlenderRot%, settings\nm_config.ini, blender, BlenderTime%TempBlenderRot% ;save the value to the config for GUI use and Remote control
-						}
-					}
-					TimerInterval := BlenderAmount%BlenderRot% * 300 ;set up time
-					IniWrite, %BlenderRot%, settings\nm_config.ini, blender, LastBlenderRot ; define this for GUI and to reset counter as used above 
-
-					BlenderRot := Mod(BlenderRot, 3) + 1
-					nm_BlenderRotation()
-					if (BlenderIndex%BlenderRot% != "Infinite") {
-						BlenderIndex%BlenderRot%-- ;subtract from blenderindex for looping only if its a number
-						GuiControl,, BlenderData%BlenderRot%, % "(" BlenderAmount%BlenderRot% ") [" ((BlenderIndex%BlenderRot% = "Infinite") ? "∞" : BlenderIndex%BlenderRot%) "]"
-						IniWrite, % BlenderIndex%BlenderRot%, settings\nm_config.ini, blender, BlenderIndex%BlenderRot%
-					}
-					
-					sleep, 100
-					MouseMove, windowX+Windowwidth//2 + 80, windowY+WindowHeight//2 + 100 ;Click Confirm
-					sleep, 150
-					Click
-					sleep, 100
-					MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210 ;Close GUI
-					sleep, 150
-					Click
-					break
 				}
 			}
 		}
