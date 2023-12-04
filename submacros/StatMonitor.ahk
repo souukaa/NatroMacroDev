@@ -1458,7 +1458,9 @@ SendHourlyReport()
 			x := SubStr(pos, 1, InStr(pos, "|", , , 1)-1)+SubStr(pos, InStr(pos, "|", , , 2)+1, InStr(pos, "|", , , 3)-InStr(pos, "|", , , 2)-1)
 			Gdip_DrawImage(G, bitmaps["pBM" ((PlanterNectar%A_Index% = "None") ? "Unknown" : PlanterNectar%A_Index%)], x+6, stat_regions["planters"][2]+348, 60, 60)
 			
-			VarSetCapacity(duration,256),DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",(PlanterHarvestTime%A_Index%-unix_now)*10000000,"wstr",(PlanterHarvestTime%A_Index%-unix_now > 360000) ? "N/A" : (PlanterHarvestTime%A_Index% > unix_now) ? (((PlanterHarvestTime%A_Index%-unix_now >= 3600) ? "h'h' m" : "") . ((PlanterHarvestTime%A_Index%-unix_now >= 60) ? "m'm' s" : "") . "s's'") : "'Ready'","str",duration,"int",256)
+			IniRead, MPlanterHold%i%, Settings/nm_config.ini, Planters, MPlanterHold%i%
+			IniRead, MPlanterSmoking%i%, Settings/nm_config.ini, Planters, MPlanterSmoking%i%		
+			VarSetCapacity(duration,256),DllCall("GetDurationFormatEx","str","!x-sys-default-locale","uint",0,"ptr",0,"int64",(PlanterHarvestTime%A_Index%-unix_now)*10000000,"wstr",(PlanterHarvestTime%A_Index%-unix_now > 360000) ? "N/A" : (PlanterHarvestTime%A_Index% > unix_now) ? (((PlanterHarvestTime%A_Index%-unix_now >= 3600) ? "h'h' m" : "") . ((PlanterHarvestTime%A_Index%-unix_now >= 60) ? "m'm' s" : "") . "s's'") : (MPlanterSmoking%A_Index%) ? "'Smoking'" : (MPlanterHold%A_Index%) ? "'Holding'" :  "'Ready'","str",duration,"int",256)
 			pos := Gdip_TextToGraphics(G, duration, "s46 Center Bold ccfffffff x" stat_regions["planters"][1]+stat_regions["planters"][3]//2-(110+220*(planters-1))+(i-1)*440+130 " y" stat_regions["planters"][2]+406, "Segoe UI")
 			x := SubStr(pos, 1, InStr(pos, "|", , , 1)-1)
 			Gdip_DrawImage(G, bitmaps["pBMTimer"], x-60, stat_regions["planters"][2]+410, 56, 56, , , , , 0.811765)
