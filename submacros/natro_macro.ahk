@@ -8757,6 +8757,7 @@ nm_PlanterTimeUpdate(FieldName, SetStatus := 1)
 						PlanterHarvestTime%i% := nowUnix() + Round((1 - PlanterBarProgress) * PlanterGrowTime * 3600)
 						IniWrite, % PlanterHarvestTime%i%, settings\nm_config.ini, Planters, PlanterHarvestTime%i%
 						SetStatus ? nm_setStatus("Detected", PlanterName%i% "`nField: " FieldName " - Est. Progress: " Round(PlanterBarProgress*100) "%")
+						;NewPlanterBarProgress := PlanterBarProgress  ; variable only needed here for testing status update
 						;SetStatus ? nm_setStatus("Detected", PlanterName%i% " Attempt 1 `nCurrentPlanterBarProgress: " CurrentPlanterBarProgress "`nNewPlanterBarProgress: " NewPlanterBarProgress "`nVerifiedPlanterBarProgress: " VerifiedPlanterBarProgress "`nField: " FieldName " - Est. Progress: " Round(PlanterBarProgress*100) "%")
 						break
 					}
@@ -8767,10 +8768,8 @@ nm_PlanterTimeUpdate(FieldName, SetStatus := 1)
 						sleep 2000	
 
 						sendinput {%RotRight% 2}
-						sendinput {%ZoomIn%}
 						sleep 100
 						PlanterBarProgress := nm_PlanterDetection()
-						sendinput {%ZoomOut%}
 						sendinput {%RotLeft% 2}
 						sleep 100
 
@@ -8783,7 +8782,7 @@ nm_PlanterTimeUpdate(FieldName, SetStatus := 1)
 							PlanterHarvestTime%i% := nowUnix() + Round((1 - PlanterBarProgress) * PlanterGrowTime * 3600)
 							IniWrite, % PlanterHarvestTime%i%, settings\nm_config.ini, Planters, PlanterHarvestTime%i%
 							SetStatus ? nm_setStatus("Detected", PlanterName%i% "`nField: " FieldName " - Est. Progress: " Round(PlanterBarProgress*100) "%")
-							;SetStatus ? nm_setStatus("Detected", PlanterName%i% " Attempt 1 `nCurrentPlanterBarProgress: " CurrentPlanterBarProgress "`nNewPlanterBarProgress: " NewPlanterBarProgress "`nVerifiedPlanterBarProgress: " VerifiedPlanterBarProgress "`nField: " FieldName " - Est. Progress: " Round(PlanterBarProgress*100) "%")
+							;SetStatus ? nm_setStatus("Detected", PlanterName%i% " Attempt 2 `nCurrentPlanterBarProgress: " CurrentPlanterBarProgress "`nNewPlanterBarProgress: " NewPlanterBarProgress "`nVerifiedPlanterBarProgress: " VerifiedPlanterBarProgress "`nField: " FieldName " - Est. Progress: " Round(PlanterBarProgress*100) "%")
 							break
 						}						
 					}
