@@ -240,12 +240,6 @@
 	, "BlenderTime2"
 	, "BlenderTime3"
 	, "MondoSecs"
-	, "MemoryMatchNormalCheck"
-	, "MemoryMatchMegaCheck"
-	, "MemoryMatchExtremeCheck"
-	, "LastMemoryMatchNormal"
-	, "LastMemoryMatchMega"
-	, "LastMemoryMatchExtreme"
 	, "MPlanterGatherA"
 	, "MPlanterGather1"
 	, "MPlanterGather2"
@@ -253,8 +247,8 @@
 	, "MPuffModeA"
 	, "MPuffMode1"
 	, "MPuffMode2"]
-arr2 := arr.Push("MPuffMode3" ; 256
-	, "MPlanterRelease1" ; 257
+arr2 := arr.Push("MPuffMode3" ; 250
+	, "MPlanterRelease1" ; 251
 	, "MPlanterRelease2"
 	, "MPlanterRelease3"
 	, "MPlanterSmoking1"

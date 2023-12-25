@@ -3573,8 +3573,6 @@ nm_Start(){
 		nm_Collect()
 		;quests
 		nm_QuestRotate()
-		;shrine
-		nm_Shrine()
 		;booster
 		nm_ToAnyBooster()
 		;gather
@@ -9060,20 +9058,6 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 			click
 		}
 		Gdip_DisposeImage(BlenderSS)
-		;check to make sure theres no memory match tiles on screen
-		loop 18 {
-			PBmScreen := Gdip_BitmapFromScreen(WindowX "|" windowY "|" WindowWidth "|" WindowHeight)
-			if (Gdip_ImageSearch(PBmScreen, bitmaps["MemoryMatchNTile"], , , , , , 5) > 0) {
-				MouseMove, windowX+SubStr(pos, 1, InStr(pos, ",")-1), windowY+SubStr(pos, InStr(pos, ",")+1)
-				sleep, 150 
-				click
-				sleep, 200
-			} else {
-				Gdip_DisposeImage(PBmScreen)
-				break
-			}
-			Gdip_DisposeImage(PBmScreen)
-		}
 		;check to make sure you are not in shop before reset
 		searchRet := nm_imgSearch("e_button.png",30,"high")
 		If (searchRet[1] = 0) {
@@ -9482,6 +9466,7 @@ nm_toAnyBooster(){
 	global VBState
 	global objective, CurrentAction, PreviousAction
 	global MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff
+	global LastShrine, ShrineCheck, ShrineItem1, ShrineItem2, ShrineAmount1, ShrineAmount2, ShrineRot, Shrine, bitmaps
 	static blueBoosterFields:=["Pine Tree", "Bamboo", "Blue Flower"], redBoosterFields:=["Rose", "Strawberry", "Mushroom"], mountainBoosterfields:=["Cactus", "Pumpkin", "Pineapple", "Spider", "Clover", "Dandelion", "Sunflower"]
 	if(VBState=1)
 		return
@@ -9490,7 +9475,124 @@ nm_toAnyBooster(){
 		return
 	if (QuestGatherField!="None" && QuestGatherField)
 		return
-		loop 3 {
+	nm_ShrineRotation() ; make sure ShrineRot hasnt changed
+	if (ShrineCheck && (nowUnix()-LastShrine)>3600) { ;1 hour
+		loop, 2 {
+			z := A_Index
+			nm_Reset()
+			nm_setStatus("Traveling", "Wind Shrine" ((A_Index > 1) ? " (Attempt 2)" : ""))
+
+			nm_gotoCollect("WindShrine")
+
+			searchRet := nm_imgSearch("e_button.png",30,"high")
+			If (searchRet[1] = 0) {
+				sendinput {%SC_E% down}
+				Sleep, 100
+				sendinput {%SC_E% up}
+				Sleep, (2000+KeyDelay)
+
+				MouseMove, WindowX+Windowwidth//2, WindowY+WindowHeight//1.35 - 5
+				sleep, 150
+				Click
+				sleep, 300
+				SearchX := WindowX+Windowwidth//2 + 20, SearchY := WindowY+WindowHeight//2 - 100
+				Loop {
+					sleep, 150
+					ShrineSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|170|245")
+					Donation := % "ShrineItem" ShrineRot
+					DonationIMG := % %Donation%
+					
+					if (Gdip_ImageSearch(ShrineSS, Shrine[DonationIMG], , , , , , 2, , 4) > 0) {
+						Gdip_DisposeImage(ShrineSS)
+						sleep, 200
+						MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 + 65 ; Add more items
+						sleep, 150
+						While (A_index < ShrineAmount%ShrineRot%) {
+							Click
+							sleep, 35
+						}
+						sleep, 300
+						MouseMove, WindowX+WindowWidth//2 - 70, WindowY+WindowHeight//2 + 145 ; click donate/confirm
+						sleep, 150
+						Click
+						sleep, 150
+						Loop, 500 {
+							WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " hwnd)
+							pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-50 "|" windowY+2*windowHeight//3 "|100|" windowHeight//3)
+							if (Gdip_ImageSearch(pBMScreen, bitmaps["dialog"], pos, , , , , 10, , 3) = 0) {
+								Gdip_DisposeImage(pBMScreen)
+								break
+							}
+							Gdip_DisposeImage(pBMScreen)
+							MouseMove, windowX+windowWidth//2, windowY+2*windowHeight//3+SubStr(pos, InStr(pos, ",")+1)-15
+							Click
+							sleep, 150
+						}
+						sleep, 500
+						gatherloot := "
+							(LTrim Join`r`n
+							" nm_Walk(7, RightKey, FwdKey) "
+							" nm_Walk(10, FwdKey) "
+							" nm_Walk(10, FwdKey, RightKey) "
+							" nm_Walk(7, BackKey) "
+							" nm_Walk(2, RightKey) "
+							" nm_Walk(3.75, BackKey) "
+							" nm_Walk(3, LeftKey)"
+							loop, 4 {
+							" nm_Walk(5, LeftKey) "
+							" nm_Walk(1.5, BackKey) "
+							" nm_Walk(5, RightKey)"
+							" nm_Walk(1.5, BackKey) "
+							}
+							loop, 2 {
+							" nm_Walk(15, LeftKey) "
+							" nm_Walk(1, FwdKey) "
+							" nm_Walk(15, RightKey) "
+							" nm_Walk(1, FwdKey) "
+							}
+							" nm_Walk(15, LeftKey) "
+							loop, 4 {
+							" nm_Walk(1.5, FwdKey) "
+							" nm_Walk(5, RightKey) "
+							" nm_Walk(1.5, FwdKey) "
+							" nm_Walk(5, LeftKey)"
+							}
+						)"
+						nm_createWalk(gatherloot)
+						KeyWait, F14, D T5 L
+						KeyWait, F14, T60 L
+						nm_endWalk()
+						nm_SetStatus("Collected", "Wind Shrine")
+						
+						if (ShrineIndex%ShrineRot% != "Infinite")  {
+							ShrineIndex%shrineRot%-- ;subtract from shrineindex for looping only if its a number
+							GuiControl,, ShrineData%ShrineRot%, % "(" ShrineAmount%ShrineRot% ") [" ((ShrineIndex%ShrineRot% = "Infinite") ? "∞" : ShrineIndex%ShrineRot%) "]"
+							IniWrite, % ShrineIndex%ShrineRot%, settings\nm_config.ini, Shrine, ShrineIndex%ShrineRot%
+						}
+						ShrineRot := Mod(ShrineRot, 2) + 1 ; determine Shrinerot
+						nm_ShrineRotation()
+		
+						break 2
+					} else {
+						Gdip_DisposeImage(ShrineSS)
+						MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 - 20 ; go to next item
+						sleep, 50
+						Click
+						if (A_Index = 60) {
+							if (z = 2)
+								nm_setStatus("Failed", "Wind shrine")	
+							break
+						}
+						sleep, 100
+					}
+				}
+			}
+		}
+		LastShrine := nowUnix()
+		IniWrite, %LastShrine%, settings\nm_config.ini, Shrine, LastShrine
+		IniWrite, %ShrineRot%, settings\nm_config.ini, Shrine, ShrineRot
+	}
+	loop 3 {
 		if(FieldBooster%A_Index%="none" && QuestBlueBoost=0 && QuestRedBoost=0)
 			break
 		LastBooster:=max(LastBlueBoost, LastRedBoost, LastMountainBoost)
@@ -9519,136 +9621,6 @@ nm_toAnyBooster(){
 			nm_toBooster("mountain")
 		}
 	}
-}
-nm_shrine(){
-    global FwdKey, BackKey, LeftKey, RightKey, RotLeft, RotRight, KeyDelay, objective, CurrentAction, PreviousAction, MoveSpeedNum, GatherFieldBoostedStart, LastGlitter, MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff, VBState, LastShrine, ShrineCheck, ShrineItem1, ShrineItem2, ShrineAmount1, ShrineAmount2, ShrineRot, resetTime, Shrine, SC_E, SC_Space, SC_1
-    if(VBState=1)
-        return
-    FormatTime, utc_min, %A_NowUTC%, m
-    if((MondoBuffCheck && utc_min>=0 && utc_min<14 && (nowUnix()-LastMondoBuff)>960 && (MondoAction="Buff" || MondoAction="Kill")) || (MondoBuffCheck && utc_min>=0 && utc_min<12 && (nowUnix()-LastGuid)<60 && PMondoGuid && MondoAction="Guid") || (MondoBuffCheck && (utc_min>=0 && utc_min<=8) && (nowUnix()-LastMondoBuff)>960 && PMondoGuid && MondoAction="Tag"))
-        return
-    if ((nowUnix()-GatherFieldBoostedStart<900) || (nowUnix()-LastGlitter<900) || nm_boostBypassCheck())
-        return
-
-	hwnd := GetRobloxHWND()
-	offsetY := GetYOffset(hwnd)
-	WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " hwnd)
-
-    if(CurrentAction!="Shrine") {
-        PreviousAction:=CurrentAction
-        CurrentAction:="Shrine"
-    }
-    nm_ShrineRotation() ; make sure ShrineRot hasnt changed
-    if (ShrineCheck && (nowUnix()-LastShrine)>3600) { ;1 hour
-        loop, 2 {
-            z := A_Index
-            nm_Reset()
-            nm_setStatus("Traveling", "Wind Shrine" ((A_Index > 1) ? " (Attempt 2)" : ""))
-
-            nm_gotoCollect("WindShrine")
-
-            searchRet := nm_imgSearch("e_button.png",30,"high")
-            If (searchRet[1] = 0) {
-                sendinput {%SC_E% down}
-                Sleep, 100
-                sendinput {%SC_E% up}
-                Sleep, 2000
-
-                MouseMove, WindowX+Windowwidth//2, WindowY+WindowHeight//1.35 - 5
-                sleep, 150
-                Click
-                sleep, 300
-                SearchX := WindowX+Windowwidth//2 + 20, SearchY := WindowY+WindowHeight//2 - 100
-                Loop
-                {
-                    sleep, 150
-					ShrineSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|170|245")
-                    Donation := % "ShrineItem" ShrineRot
-					DonationIMG := % %Donation%
-					
-                    if (Gdip_ImageSearch(ShrineSS, Shrine[DonationIMG], , , , , , 2, , 4) > 0) {
-						Gdip_DisposeImage(ShrineSS)
-						sleep, 200
-                        MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 + 65 ; Add more items
-                        sleep, 150
-                        While (A_index < ShrineAmount%ShrineRot%) {
-                            Click
-                            sleep, 30
-                        }
-                        sleep, 300
-						MouseMove, WindowX+WindowWidth//2 - 70, WindowY+WindowHeight//2 + 130 ; click donate/confirm
-						sleep, 150
-						Click
-						sleep, 150
-						MouseMove, WindowX+WindowWidth//2, WindowY+WindowHeight//1.35 - 5 ; move mouse onto gui box
-						loop, 10 {
-							sleep, 200
-							Click
-						}
-						sleep, 500
-						gatherloot := "
-						    (LTrim Join`r`n
-						    " nm_Walk(7, RightKey, FwdKey) "
-						    " nm_Walk(10, FwdKey) "
-						    " nm_Walk(10, FwdKey, RightKey) "
-						    " nm_Walk(7, BackKey) "
-						    " nm_Walk(2, RightKey) "
-						    " nm_Walk(3.75, BackKey) "
-						    " nm_Walk(3, LeftKey)"
-						    loop, 4 {
-						        " nm_Walk(5, LeftKey) "
-						        " nm_Walk(1.5, BackKey) "
-						        " nm_Walk(5, RightKey)"
-						        " nm_Walk(1.5, BackKey) "
-						    }
-						    loop, 2 {
-						        " nm_Walk(15, LeftKey) "
-						        " nm_Walk(1, FwdKey) "
-						        " nm_Walk(15, RightKey) "
-						        " nm_Walk(1, FwdKey) "
-						    }
-						    " nm_Walk(15, LeftKey) "
-						    loop, 4 {
-						        " nm_Walk(1.5, FwdKey) "
-						        " nm_Walk(5, RightKey) "
-						        " nm_Walk(1.5, FwdKey) "
-						        " nm_Walk(5, LeftKey)"
-						    }
-						)"
-						nm_createWalk(gatherloot)
-						KeyWait, F14, D T5 L
-						KeyWait, F14, T60 L
-						nm_endWalk()
-						nm_SetStatus("Collected", "Wind Shrine")
-						
-						if (ShrineIndex%ShrineRot% != "Infinite")  {
-							ShrineIndex%shrineRot%-- ;subtract from shrineindex for looping only if its a number
-							GuiControl,, ShrineData%ShrineRot%, % "(" ShrineAmount%ShrineRot% ") [" ((ShrineIndex%ShrineRot% = "Infinite") ? "∞" : ShrineIndex%ShrineRot%) "]"
-							IniWrite, % ShrineIndex%ShrineRot%, settings\nm_config.ini, Shrine, ShrineIndex%ShrineRot%
-						}
-						ShrineRot := Mod(ShrineRot, 2) + 1 ; determine Shrinerot
-						nm_ShrineRotation()
-
-						break 2
-                    } else {
-						Gdip_DisposeImage(ShrineSS)
-                        MouseMove, WindowX+WindowWidth//2 + 165, WindowY+WindowHeight//2 - 20 ; go to next item
-                        sleep, 50
-                        Click
-                        if (A_Index = 60) {
-                            if (z = 2)
-                                nm_setStatus("Failed", "Wind shrine")	
-                            break
-                        }
-						sleep, 100
-                    }
-                }
-            }
-        }
-        LastShrine := nowUnix()
-        IniWrite, %LastShrine%, settings\nm_config.ini, collect, LastShrine
-        IniWrite, %ShrineRot%, settings\nm_config.ini, collect, ShrineRot
-    }
 }
 nm_Collect(){
 	global FwdKey, BackKey, LeftKey, RightKey, RotLeft, RotRight, KeyDelay, objective, CurrentAction, PreviousAction, MoveSpeedNum, GatherFieldBoostedStart, LastGlitter, MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff, VBState, ClockCheck, LastClock, AntPassCheck, AntPassAction, QuestAnt, LastAntPass, HoneyDisCheck, LastHoneyDis, TreatDisCheck, LastTreatDis, BlueberryDisCheck, LastBlueberryDis, StrawberryDisCheck, LastStrawberryDis, CoconutDisCheck, LastCoconutDis, GlueDisCheck, LastGlueDis, RoboPassCheck, LastRoboPass, HoneystormCheck, LastHoneystorm, RoyalJellyDisCheck, LastRoyalJellyDis, StockingsCheck, LastStockings, FeastCheck, RBPDelevelCheck, LastRBPDelevel, LastFeast, GingerbreadCheck, LastGingerbread, SnowMachineCheck, LastSnowMachine, CandlesCheck, LastCandles, SamovarCheck, LastSamovar, LidArtCheck, LastLidArt, GummyBeaconCheck, LastGummyBeacon, beesmasActive, HoneySSCheck, resetTime, bitmaps, SC_E, SC_Space, SC_1, BlenderRot, LastBlenderRot, BlenderEnd, TimerInterval, BlenderIndex1, BlenderIndex2, BlenderIndex3, BlenderItem1, BlenderItem2, BlenderItem3, BlenderTime1, BlenderTime2, BlenderTime3, BlenderAmount1, BlenderAmount2, BlenderAmount3, Blendercheck
