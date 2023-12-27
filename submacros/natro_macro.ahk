@@ -4215,7 +4215,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 
 	nm_gotoramp()
 	{
-		"" nm_Walk(6, FwdKey) ""
+		"" nm_Walk(5, FwdKey) ""
 		"" nm_Walk(8.35*HiveSlot+1, RightKey) ""
 	}
 	nm_gotocannon()
@@ -4226,18 +4226,15 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 		{
 			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, """"ahk_id """" GetRobloxHWND())
 			MouseMove, windowX+350, windowY+offsetY+100
-			Sleep, 500
-			Send {"" SC_Space "" down}
-			Sleep, 50
-			Send {"" SC_Space "" up}
-			" nm_Walk(8, RightKey) "
-			Sleep, 500
-			Send {"" SC_Space "" down}
-			Sleep, 50
-			Send {"" SC_Space "" up}{"" RightKey "" down}
-
 			DllCall(""""GetSystemTimeAsFileTime"""",""""int64p"""",s)
-			n := s, f := s+100000000, success := 0
+			n := s, f := s+200000000, success := 0
+			Send {"" SC_Space "" down}{"" RightKey "" down}
+			Sleep, 100
+			Send {"" SC_Space "" up}
+			Walk(2)
+			Send {"" FwdKey "" down}
+			Walk(1.8)
+			Send {"" FwdKey "" up}
 			while (n < f)
 			{
 				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-200 """"|"""" windowY """"|400|125"""")
@@ -9266,7 +9263,7 @@ nm_gotoRamp(){
 
 	movement := "
 	(LTrim Join`r`n
-	" nm_Walk(6, FwdKey) "
+	" nm_Walk(5, FwdKey) "
 	" nm_Walk(8.35*HiveSlot+1, RightKey) "
 	)"
 
@@ -9288,24 +9285,20 @@ nm_gotoCannon(){
 	success := 0
 	Loop, 10
 	{
-		Sleep, 500
-		Send {%SC_Space% down}
-		Sleep, 50
-		Send {%SC_Space% up}
 		movement := "
 		(LTrim Join`r`n
-		" nm_Walk(8, RightKey) "
-		" nm_Walk(8, FwdKey) "
-		" nm_Walk(4, RightKey) "
+		Send {" SC_Space " down}{" RightKey " down}
+		Sleep, 100
+		Send {" SC_Space " up}
+		Walk(2)
+		Send {" FwdKey " down}
+		Walk(1.8)
+		Send {" FwdKey " up}
 		)"
 		nm_createWalk(movement)
 		KeyWait, F14, D T5 L
-		KeyWait, F14, T5 L
-		nm_endWalk()
-		Sleep, 500
-		SendInput {%BackKey% down}
 		DllCall("GetSystemTimeAsFileTime","int64p",s)
-		n := s, f := s+100000000
+		n := s, f := s+200000000
 		while (n < f)
 		{
 			pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-200 "|" windowY+offsetY "|400|125")
@@ -9317,7 +9310,7 @@ nm_gotoCannon(){
 			Gdip_DisposeImage(pBMScreen)
 			DllCall("GetSystemTimeAsFileTime","int64p",n)
 		}
-		SendInput {%BackKey% up}
+		nm_endWalk()
 
 		if (success = 1) ; check that cannon was not overrun, at the expense of a small delay
 		{
