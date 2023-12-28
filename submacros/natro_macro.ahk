@@ -4283,9 +4283,8 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 	nm_reset()
 	{
 		global offsetY
-		pBMH1 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH1), Gdip_GraphicsClear(G,0xff867018), Gdip_DeleteGraphics(G)
-		pBMH2 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH2), Gdip_GraphicsClear(G,0xff937d2d), Gdip_DeleteGraphics(G)
-		pBMH3 := Gdip_CreateBitmap(240,3), G := Gdip_GraphicsFromImage(pBMH3), Gdip_GraphicsClear(G,0xff8e7d4d), Gdip_DeleteGraphics(G)
+		pBMHive := Gdip_CreateBitmap(25,11), G := Gdip_GraphicsFromImage(pBMHive), Gdip_GraphicsClear(G,0xff50440A), Gdip_DeleteGraphics(G)
+		pBMHiveEH := Gdip_CreateBitmap(30,30), G := Gdip_GraphicsFromImage(pBMHiveEH), Gdip_GraphicsClear(G,0xff7C6815), Gdip_DeleteGraphics(G)
 		pBMR := Gdip_BitmapFromBase64(""""iVBORw0KGgoAAAANSUhEUgAAACgAAAAGCAAAAACUM4P3AAAAAnRSTlMAAHaTzTgAAAAXdEVYdFNvZnR3YXJlAFBob3RvRGVtb24gOS4wzRzYMQAAAyZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+Cjx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J0ltYWdlOjpFeGlmVG9vbCAxMi40NCc+CjxyZGY6UkRGIHhtbG5zOnJkZj0naHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyc+CgogPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycKICB4bWxuczpleGlmPSdodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyc+CiAgPGV4aWY6UGl4ZWxYRGltZW5zaW9uPjQwPC9leGlmOlBpeGVsWERpbWVuc2lvbj4KICA8ZXhpZjpQaXhlbFlEaW1lbnNpb24+NjwvZXhpZjpQaXhlbFlEaW1lbnNpb24+CiA8L3JkZjpEZXNjcmlwdGlvbj4KCiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0nJwogIHhtbG5zOnRpZmY9J2h0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvJz4KICA8dGlmZjpJbWFnZUxlbmd0aD42PC90aWZmOkltYWdlTGVuZ3RoPgogIDx0aWZmOkltYWdlV2lkdGg+NDA8L3RpZmY6SW1hZ2VXaWR0aD4KICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogIDx0aWZmOlJlc29sdXRpb25Vbml0PjI8L3RpZmY6UmVzb2x1dGlvblVuaXQ+CiAgPHRpZmY6WFJlc29sdXRpb24+OTYvMTwvdGlmZjpYUmVzb2x1dGlvbj4KICA8dGlmZjpZUmVzb2x1dGlvbj45Ni8xPC90aWZmOllSZXNvbHV0aW9uPgogPC9yZGY6RGVzY3JpcHRpb24+CjwvcmRmOlJERj4KPC94OnhtcG1ldGE+Cjw/eHBhY2tldCBlbmQ9J3InPz77yGiWAAAAI0lEQVR42mNUYyAOMDJggOUMDAyRmAqXMxAHmBiobjWxngEAj7gC+wwAe1AAAAAASUVORK5CYII="""")
 		success := 0
 		WinGetClientPos(windowX, windowY, windowWidth, windowHeight, """"ahk_id """" GetRobloxHWND())
@@ -4293,6 +4292,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 		Loop, 10
 		{
 			WinActivate, Roblox
+			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, """"ahk_id """" GetRobloxHWND())
 			SetKeyDelay, 250+"" KeyDelay ""
 			SendEvent {"" SC_Esc ""}{"" SC_R ""}{"" SC_Enter ""}
 			SetKeyDelay, 100+"" KeyDelay ""
@@ -4300,31 +4300,30 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 			while ((n < 2) && (A_Index <= 200))
 			{
 				Sleep, 100
-				WinGetClientPos(windowX, windowY, windowWidth, windowHeight, """"ahk_id """" GetRobloxHWND())
 				pBMScreen := Gdip_BitmapFromScreen(windowX """"|"""" windowY """"|"""" windowWidth """"|50"""")
 				n += (Gdip_ImageSearch(pBMScreen, pBMR, , , , , , 10) = (n = 0))
 				Gdip_DisposeImage(pBMScreen)
 			}
 			Sleep, 1000
-			Send {"" RotUp "" 4}
-			SendEvent {"" ZoomOut "" 8}
-			SetKeyDelay, 10
-			Sleep, 500
-			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, """"ahk_id """" GetRobloxHWND())
+			Send {"" RotRight "" 3}
+			SendEvent {"" ZoomOut "" 2}
 			Loop, 4
 			{
-				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//4 """"|"""" windowY+3*windowHeight//4 """"|"""" windowWidth//2 """"|"""" windowHeight//4)
-				if ((Gdip_ImageSearch(pBMScreen, pBMH1, , , , , , 20) = 1) || (Gdip_ImageSearch(pBMScreen, pBMH2, , , , , , 20) = 1) || (Gdip_ImageSearch(pBMScreen, pBMH3, , , , , , 20) = 1))
+				Sleep, 250
+				pBMScreen := Gdip_BitmapFromScreen(WindowX+WindowWidth//6-200 """"|"""" WindowY+windowHeight//2-50 """"|400|250"""")
+				if ((Gdip_ImageSearch(pBMScreen, pBMHive, , , , , , 5) = 1) || (Gdip_ImageSearch(pBMScreen, pBMHiveEH) = 1))
 				{
-					Send {"" RotRight "" 4}{"" RotDown "" 4}
-					success := 1
+					Gdip_DisposeImage(pBMScreen)
+					Send {"" RotLeft "" 3}
+					SendEvent {"" ZoomOut "" 3}
+					success:=1
 					break 2
 				}
+				Gdip_DisposeImage(pBMScreen)
 				Send {"" RotRight "" 4}
-				Sleep, 250
 			}
 		}
-		Gdip_DisposeImage(pBMH1), Gdip_DisposeImage(pBMH2), Gdip_DisposeImage(pBMH3)
+		Gdip_DisposeImage(pBMHive), Gdip_DisposeImage(pBMHiveEH)
 		if (success = 0)
 		{
 			msgbox, 0x40034, Test Paths/Patterns, Reset Failed!````r````nTest has been aborted.
@@ -8936,10 +8935,10 @@ nm_imgSearch(fileName,v,aim := "full", trans:="none"){
     ;yi := 0
 	;ww := windowWidth
 	;wh := windowHeight
-	xi:=(aim="actionbar") ? windowWidth/4 : (aim="highright") ? windowWidth/2 : (aim="right") ? windowWidth/2 : (aim="center") ? windowWidth/4 : (aim="lowright") ? windowWidth/2 : 0
-	yi:=(aim="low") ? windowHeight/2 : (aim="actionbar") ? (windowHeight/4)*3 : (aim="center") ? windowHeight/4 : (aim="lowright") ? windowHeight/2 : (aim="quest") ? 150 : 0
-	ww:=(aim="actionbar") ? xi*3 : (aim="highleft") ? windowWidth/2 : (aim="left") ? windowWidth/2 : (aim="center") ? xi*3 : (aim="quest") ? 310 : windowWidth
-	wh:=(aim="high") ? windowHeight/2 : (aim="highright") ? windowHeight/2 : (aim="highleft") ? windowHeight/2 : (aim="buff") ? 150 : (aim="abovebuff") ? 30 : (aim="center") ? yi*3 : (aim="quest") ? Max(560, windowHeight-100) : windowHeight
+	xi:=(aim="actionbar") ? windowWidth//4 : (aim="highright") ? windowWidth//2 : (aim="right") ? windowWidth//2 : (aim="center") ? windowWidth//4 : (aim="lowright") ? windowWidth//2 : 0
+	yi:=(aim="low") ? windowHeight//2 : (aim="actionbar") ? (windowHeight//4)*3 : (aim="center") ? windowHeight//4 : (aim="lowright") ? windowHeight//2 : (aim="quest") ? 150 : 0
+	ww:=(aim="actionbar") ? xi*3 : (aim="highleft") ? windowWidth//2 : (aim="left") ? windowWidth//2 : (aim="center") ? xi*3 : (aim="quest") ? 310 : windowWidth
+	wh:=(aim="high") ? windowHeight//2 : (aim="highright") ? windowHeight//2 : (aim="highleft") ? windowHeight//2 : (aim="buff") ? 150 : (aim="abovebuff") ? 30 : (aim="center") ? yi*3 : (aim="quest") ? Max(560, windowHeight-100) : windowHeight
 	IfExist, %A_WorkingDir%\nm_image_assets\
 	{
 		if(trans!="none")
@@ -9117,12 +9116,12 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 			SetTitleMatchMode %Prev_TitleMatchMode%
 			;reset
 			WinActivate, Roblox
+			WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " hwnd)
 			send {%SC_Esc%}{%SC_R%}{%SC_Enter%}
 			n := 0
 			while ((n < 2) && (A_Index <= 200))
 			{
 				Sleep, 100
-				WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " GetRobloxHWND())
 				pBMScreen := Gdip_BitmapFromScreen(windowX "|" windowY "|" windowWidth "|50")
 				n += (Gdip_ImageSearch(pBMScreen, bitmaps["emptyhealth"], , , , , , 10) = (n = 0))
 				Gdip_DisposeImage(pBMScreen)
@@ -9132,19 +9131,18 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		SetKeyDelay, PrevKeyDelay
 		sendinput {%RotRight% 3}
 		send {%ZoomOut% 2}
-		sleep, 500
-
 		loop, 4 {
-			pBMScreen := Gdip_BitmapFromScreen(WindowX+WindowWidth/6-200 "|" WindowY+windowHeight/2-50 "|400|250")
-			if (Gdip_ImageSearch(pBMScreen, bitmaps["pBMHive"], , , , , , 5) > 0 || Gdip_ImageSearch(pBMScreen, bitmaps["pBMHiveEH"]) > 0) {
+			sleep (250+KeyDelay)
+			pBMScreen := Gdip_BitmapFromScreen(WindowX+WindowWidth//6-200 "|" WindowY+windowHeight//2-50 "|400|250")
+			if (Gdip_ImageSearch(pBMScreen, bitmaps["pBMHive"], , , , , , 5) = 1 || Gdip_ImageSearch(pBMScreen, bitmaps["pBMHiveEH"]) = 1) {
 				Gdip_DisposeImage(pBMScreen)
 				sendinput {%RotLeft% 3}
+				send {%ZoomOut% 3}
 				HiveConfirmed:=1
 				break
 			}
-			sendinput {%RotRight% 4}
-			sleep (250+KeyDelay)
 			Gdip_DisposeImage(pBMScreen)
+			sendinput {%RotRight% 4}
 		}
 	}
 	;convert
@@ -10211,7 +10209,7 @@ nm_Collect(){
 			KeyWait, F14, T120 L
 			nm_endWalk()
 
-			MouseClickDrag, Left, windowX+gumdropPos[1], windowY+gumdropPos[2], windowX+(windowWidth/2), windowY+(windowHeight/2), 5
+			MouseClickDrag, Left, windowX+gumdropPos[1], windowY+gumdropPos[2], windowX+(windowWidth//2), windowY+(windowHeight//2), 5
 			;close inventory
 			nm_OpenMenu()
 			Sleep, 500
