@@ -21171,15 +21171,15 @@ nm_UpdateGUIVar(var)
 
 		case "FieldName1":
 		GuiControl, , %k%, % StrReplace(fieldnamelist, "|" %k% "|", "|" %k% "||")
-		nm_FieldSelect1()
+		nm_FieldSelect1(1)
 
 		case "FieldName2":
 		GuiControl, , %k%, % StrReplace(fieldnamelist, "|" %k% "|", "|" %k% "||")
-		nm_FieldSelect2()
+		nm_FieldSelect2(1)
 
 		case "FieldName3":
 		GuiControl, , %k%, % StrReplace(fieldnamelist, "|" %k% "|", "|" %k% "||")
-		nm_FieldSelect3()
+		nm_FieldSelect3(1)
 
 		case "FieldPattern1", "FieldPattern2", "FieldPattern3":
 		GuiControl, , %k%, % StrReplace(patternlist "Stationary|", "|" %k% "|", "|" %k% "||")
