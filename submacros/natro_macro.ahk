@@ -9007,7 +9007,7 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		WinActivate, Roblox
 		nm_setShiftLock(0)
 		nm_OpenMenu()
-		
+
 		hwnd := GetRobloxHWND()
 		offsetY := GetYOffset(hwnd)
 		;check that performance stats is disabled
@@ -9985,8 +9985,8 @@ nm_Collect(){
 			QuestAnt:=0
 			movement := "
 			(LTrim Join`r`n
-			" nm_Walk(13, FwdKey, RightKey) "
-			" nm_Walk(5, FwdKey) "
+			" nm_Walk(12, FwdKey, RightKey) "
+			" nm_Walk(4, FwdKey) "
 			)"
 			nm_createWalk(movement)
 			KeyWait, F14, D T5 L
@@ -12569,9 +12569,9 @@ nm_Bugrun(){
 				{
 					movement := "
 					(LTrim Join`r`n
-					" nm_Walk(47.25, BackKey, LeftKey) "
-					" nm_Walk(40.5, LeftKey) "
-					" nm_Walk(8.1, BackKey) "
+					" nm_Walk(44.75, BackKey, LeftKey) "
+					" nm_Walk(42.5, LeftKey) "
+					" nm_Walk(8.5, BackKey) "
 					" nm_Walk(22.5, LeftKey) "
 					send {" RotLeft " 2}
 					" nm_Walk(27, FwdKey) "
