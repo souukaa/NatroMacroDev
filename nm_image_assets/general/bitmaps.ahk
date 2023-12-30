@@ -69,5 +69,5 @@ Shrine["Leftarrow"] := Gdip_BitmapFromBase64("iVBORw0KGgoAAAANSUhEUgAAABoAAAAbCA
 
 bitmaps["pBMHive"] := Gdip_CreateBitmap(25,11), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHive"]), Gdip_GraphicsClear(pGraphics, 0xff50440A), Gdip_DeleteGraphics(pGraphics)
 bitmaps["pBMHiveEH"] := Gdip_CreateBitmap(30, 30), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHiveEH"]), Gdip_GraphicsClear(pGraphics, 0xff7C6815), Gdip_DeleteGraphics(pGraphics)
-bitmaps["pBMHiveDNT"] := Gdip_CreateBitmap(25,11), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHiveDNT"]), Gdip_GraphicsClear(pGraphics, 0xff9E831D), Gdip_DeleteGraphics(pGraphics)
-bitmaps["pBMHiveNNT"] := Gdip_CreateBitmap(25,11), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHiveNNT"]), Gdip_GraphicsClear(pGraphics, 0xff7A6615), Gdip_DeleteGraphics(pGraphics)
+bitmaps["pBMHiveDNT"] := Gdip_CreateBitmap(20,200), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHiveDNT"]), Gdip_GraphicsClear(pGraphics, 0xff9E831D), Gdip_DeleteGraphics(pGraphics)
+bitmaps["pBMHiveNNT"] := Gdip_CreateBitmap(20,200), pGraphics := Gdip_GraphicsFromImage(bitmaps["pBMHiveNNT"]), Gdip_GraphicsClear(pGraphics, 0xff7A6615), Gdip_DeleteGraphics(pGraphics)
