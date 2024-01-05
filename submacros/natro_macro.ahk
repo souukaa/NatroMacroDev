@@ -1,6 +1,6 @@
 ﻿/*
 Natro Macro (https://github.com/NatroTeam/NatroMacro)
-Copyright © 2022-2024 Natro Team (https://github.com/NatroTeam)
+Copyright © Natro Team (https://github.com/NatroTeam)
 
 This file is part of Natro Macro. Our source code will always be open and available.
 
@@ -15,7 +15,7 @@ You should have received a copy of the license along with Natro Macro. If not, p
 ;@Ahk2Exe-SetName Natro Macro
 ;@Ahk2Exe-SetDescription Natro Macro
 ;@Ahk2Exe-SetCompanyName Natro Team
-;@Ahk2Exe-SetCopyright Copyright © 2022-2023 Natro Team
+;@Ahk2Exe-SetCopyright Copyright © Natro Team
 ;@Ahk2Exe-SetOrigFilename natro_macro.exe
 
 #NoEnv
