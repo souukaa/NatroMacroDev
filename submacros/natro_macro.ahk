@@ -9895,7 +9895,7 @@ nm_Collect(){
 							break
 						}
 						gdip_disposeimage(BlenderSS)
-						MouseMove, windowX+Widowwidth//2 - 15, windowY+WindowHeight//2 + 110 ;Open item menu
+						MouseMove, windowX+Windowwidth//2 - 15, windowY+WindowHeight//2 + 110 ;Open item menu
 						sleep, 150
 						click
 						sleep, 150
