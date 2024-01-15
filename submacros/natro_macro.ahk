@@ -9138,9 +9138,9 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 			MouseMove, windowX+350, windowY+offsetY+100
 		}
 		;check to make sure you are not in blender screen
-		BlenderSS := Gdip_BitmapFromScreen(WindowX+Windowwidth//2 - 280 "|" windowY+WindowHeight//2 - 245 "|553|400")
+		BlenderSS := Gdip_BitmapFromScreen(windowX+windowWidth//2 - 275 "|" windowY+Floor(0.48*windowHeight) - 220 "|550|400")
 		if (Gdip_ImageSearch(BlenderSS, bitmaps["CloseGUI"], , , , , , 5) > 0) {
-			MouseMove, WindowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210
+			MouseMove, windowX+windowWidth//2 - 250, windowY+Floor(0.48*windowHeight) - 200
 			sleep, 150 
 			click
 		}
@@ -9591,26 +9591,26 @@ nm_toAnyBooster(){
 				Sleep, (2000+KeyDelay)
 
 				WinGetClientPos(windowX, windowY, windowWidth, windowHeight, "ahk_id " (hwnd := GetRobloxHWND()))
-				MouseMove, WindowX+Windowwidth//2, WindowY+WindowHeight//1.35 - 5 ;dialog
+				MouseMove, windowX+windowWidth//2, windowY+Floor(0.74*windowHeight) - 5 ;dialog
 				sleep, 150
 				Click
 				sleep, 300
 				Loop {
 					sleep, 150
-					pBMScreen := Gdip_BitmapFromScreen(WindowX+WindowWidth//2-250 "|" WindowY+windowHeight//2-100 "|500|300")
+					pBMScreen := Gdip_BitmapFromScreen(WindowX+Floor(0.515*windowWidth)-250 "|" windowY+Floor(0.535*windowHeight)-100 "|500|300")
 					Donation := % "ShrineItem" ShrineRot
 					DonationIMG := % %Donation%
 					
 					if (Gdip_ImageSearch(pBMScreen, Shrine[DonationIMG], , , , , , 2, , 4) > 0) {
 						sleep, 200
-						MouseMove, windowX+windowWidth//2+60, WindowY+windowHeight//2+160 ; add more of x item
+						MouseMove, windowX+Floor(0.515*windowWidth)+157, windowY+Floor(0.535*windowHeight)+40 ; add more of x item
 						sleep, 150
 						While (A_index < ShrineAmount%ShrineRot%) {
 							Click
 							sleep, 35
 						}
 						sleep, 300
-						MouseMove, windowX+windowWidth//2-70, WindowY+windowHeight//2+130 ; donate button
+						MouseMove, windowX+Floor(0.515*windowWidth)-72, windowY+Floor(0.535*windowHeight)+116 ; donate button
 						Gdip_DisposeBitmap(pBMScreen)
 						sleep, 150
 						Click
@@ -9673,7 +9673,7 @@ nm_toAnyBooster(){
 		
 						break 2
 					} else {
-						MouseMove, windowX+windowWidth//2+30, WindowY+windowHeight//2-25
+						MouseMove, windowX+Floor(0.515*windowWidth)+157, WindowY+Floor(0.535*windowHeight)-45
 						sleep 150
 						click
 						Gdip_DisposeImage(pBMScreen)
@@ -9842,10 +9842,10 @@ nm_Collect(){
 				sendinput {%SC_E% up}
 				Sleep, 500
 
-				SearchX := windowX+Windowwidth//2 - 280, SearchY := windowY+WindowHeight//2 - 245, BlenderSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|553|400")
+				SearchX := windowX+windowWidth//2 - 275, SearchY := windowY+Floor(0.48*windowHeight) - 220, BlenderSS := Gdip_BitmapFromScreen(SearchX "|" SearchY "|550|400")
 
 				if (Gdip_ImageSearch(BlenderSS, bitmaps["CancelCraft"], , , , , , 2, , 7) > 0) {
-					MouseMove, windowX+WindowWidth//2 + 230, windowY+WindowHeight//2 + 115 ; click cancel button
+					MouseMove, windowX+windowWidth//2 + 230, windowY+Floor(0.48*windowHeight) + 130 ; click cancel button
 					sleep, 150
 					Click
 				}
@@ -9853,20 +9853,21 @@ nm_Collect(){
 				if (!BlenderEnd && Gdip_ImageSearch(BlenderSS, bitmaps["EndCraftR"], , , , , , 3, , 6) > 0)
 				{
 					nm_setStatus("Confirmed", "Blender is already in use")
-					MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210, Gdip_disposeimage(BlenderSS) ;Close GUI and dispose of bitmap
+					MouseMove, windowX+windowwidth//2 - 250, windowY+Floor(0.48*windowHeight) - 200
+					Gdip_disposeimage(BlenderSS) ;Close GUI and dispose of bitmap
 					sleep, 150
 					Click
 					break
 				} else if (BlenderEnd && Gdip_ImageSearch(BlenderSS, bitmaps["EndCraftR"], , , , , , 3, , 6) > 0) {
 					Iniwrite, 0, settings\nm_config.ini, Blender, BlenderEnd
 					BlenderEnd := 0
-					MouseMove, windowX+WindowWidth//2 - 120, windowY+WindowHeight//2 + 100 ; close red craft button
+					MouseMove, windowX+windowWidth//2 - 120, windowY+Floor(0.48*windowHeight) + 120 ; close red craft button
 					sleep, 150
 					Click
 				}
 
 				if (Gdip_ImageSearch(BlenderSS, bitmaps["EndCraftG"], , , , , , 4, , 6) > 0) {
-					MouseMove, windowX+WindowWidth//2 - 120, windowY+WindowHeight//2 + 100 ; close green craft button
+					MouseMove, windowX+WindowWidth//2 - 120, windowY+Floor(0.48*windowHeight) + 120 ; close green craft button
 					sleep, 150
 					Click
 				}
@@ -9901,11 +9902,11 @@ nm_Collect(){
 							break
 						}
 						gdip_disposeimage(BlenderSS)
-						MouseMove, windowX+Windowwidth//2 - 15, windowY+WindowHeight//2 + 110 ;Open item menu
+						MouseMove, windowX+windowWidth//2, windowY+Floor(0.48*windowHeight) + 130 ;Open item menu
 						sleep, 150
 						click
 						sleep, 150
-						MouseMove, windowX+WindowWidth//2 - 60, windowY+WindowHeight//2 + 130 ;Add more of x item
+						MouseMove, windowX+windowWidth//2 - 60, windowY+Floor(0.48*windowHeight) + 140 ;Add more of x item
 						sleep, 150
 						While (A_Index < BlenderAmount%BlenderRot%) {
 							Click
@@ -9946,24 +9947,24 @@ nm_Collect(){
 							IniWrite, % BlenderIndex%BlenderRot%, settings\nm_config.ini, blender, BlenderIndex%BlenderRot%
 						}
 						sleep, 100
-						MouseMove, windowX+Windowwidth//2 + 70, windowY+WindowHeight//2 + 110 ;Click Confirm
+						MouseMove, windowX+windowWidth//2 + 70, windowY+Floor(0.48*windowHeight) + 130 ;Click Confirm
 						sleep, 150
 						Click
 						sleep, 100
-						MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210 ;Close GUI
+						MouseMove, windowX+windowWidth//2 - 250, windowY+Floor(0.48*windowHeight) - 200 ;Close GUI
 						sleep, 150
 						Click
 						break 2
 					} else {
 						sleep, 50
-						MouseMove, windowX+WindowWidth//2 + 230, windowY+WindowHeight//2 + 115 ;not found go next item
+						MouseMove, windowX+windowWidth//2 + 230, windowY+Floor(0.48*windowHeight) + 110 ;not found go next item
 						sleep, 150
 						Click
 						sleep, 100
 						if (A_Index = 60) {
 							if (z = 2) {
 								nm_setStatus("Failed", "Blender")
-								MouseMove, windowX+Windowwidth//2 - 250, windowY+WindowHeight//2 - 210 ;Close GUI
+								MouseMove, windowX+windowWidth//2 - 250, windowY+Floor(0.48*windowHeight) - 200 ;Close GUI
 								sleep, 150
 								Click
 
