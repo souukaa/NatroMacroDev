@@ -18515,6 +18515,20 @@ nm_BrownQuestProg(){
 				break
 			}
 
+			Qfound:=nm_imgSearch("brown_bear3.png",50,"quest")
+			if (Qfound[1]=0) {
+				if (A_Index > 1)
+					Gdip_DisposeImage(pBMLog)
+				break
+			}
+
+			Qfound:=nm_imgSearch("brown_bear4.png",50,"quest")
+			if (Qfound[1]=0) {
+				if (A_Index > 1)
+					Gdip_DisposeImage(pBMLog)
+				break
+			}
+
 			WinActivate, Roblox
 			switch A_Index
 			{
