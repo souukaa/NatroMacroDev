@@ -4312,7 +4312,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 		bitmaps[""""day""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""day""""]), Gdip_GraphicsClear(G, 0xffda9400), Gdip_DeleteGraphics(G)
 		bitmaps[""""night""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""night""""]), Gdip_GraphicsClear(G, 0xffd18e00), Gdip_DeleteGraphics(G)
 		bitmaps[""""honeystorm""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""honeystorm""""]), Gdip_GraphicsClear(G, 0xffdc9e29), Gdip_DeleteGraphics(G)
-		bitmaps[""""untextured""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""untextured""""]), Gdip_GraphicsClear(G, 0xff7d5700), Gdip_DeleteGraphics(G)
+		bitmaps[""""untextured-day""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""untextured-day""""]), Gdip_GraphicsClear(G, 0xff7d5700), Gdip_DeleteGraphics(G)
 		bitmaps[""""untextured-night""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""untextured-night""""]), Gdip_GraphicsClear(G, 0xff684900), Gdip_DeleteGraphics(G)
 		bitmaps[""""untextured-honeystorm""""] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps[""""untextured-honeystorm""""]), Gdip_GraphicsClear(G, 0xff8e6d29), Gdip_DeleteGraphics(G)
 
@@ -4339,13 +4339,13 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 
 			hiveWidth := 5*windowHeight//9
 			region := windowX+windowWidth//2-hiveWidth//2 """"|"""" windowY """"|"""" hiveWidth """"|"""" windowHeight//2
-			sconf := hiveWidth**2//400
+			sconf := hiveWidth**2//200
 			loop, 4 {
 				sleep 250
 				pBMScreen := Gdip_BitmapFromScreen(region), s := 0
-				for i, k in [""""day"""", """"night"""", """"honeystorm"""", """"untextured"""", """"untextured-night"""", """"untextured-honeystorm""""] {
-					s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps[k], , , , , , 6, , , 0))
-					if (s > sconf) {
+				for i, k in [""""day"""", """"night"""", """"honeystorm"""", """"untextured-day"""", """"untextured-night"""", """"untextured-honeystorm""""] {
+					s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps[k], , , , , , 8, , , 0))
+					if (s > (sconf * (InStr(k, """"untextured"""") ? 2 : 1))) {
 						Gdip_DisposeImage(pBMScreen)
 						success := 1
 						SendEvent {"" ZoomOut "" 5}
@@ -9212,13 +9212,13 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		; hive check
 		hiveWidth := 5*windowHeight//9
 		region := windowX+windowWidth//2-hiveWidth//2 "|" windowY "|" hiveWidth "|" windowHeight//2
-		sconf := hiveWidth**2//400
+		sconf := hiveWidth**2//200
 		loop, 4 {
 			sleep (250+KeyDelay)
 			pBMScreen := Gdip_BitmapFromScreen(region), s := 0
-			for i, k in ["day", "night", "honeystorm", "untextured", "untextured-night", "untextured-honeystorm"] {
-				s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps["hive"][k], , , , , , 6, , , 0))
-				if (s > sconf) {
+			for i, k in ["day", "night", "honeystorm", "untextured-day", "untextured-night", "untextured-honeystorm"] {
+				s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps["hive"][k], , , , , , 8, , , 0))
+				if (s > (sconf * (InStr(k, "untextured") ? 2 : 1))) {
 					Gdip_DisposeImage(pBMScreen)
 					HiveConfirmed := 1
 					Send {%ZoomOut% 5}

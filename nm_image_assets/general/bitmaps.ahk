@@ -70,6 +70,6 @@ bitmaps["hive"] := {}
 bitmaps["hive"]["day"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["day"]), Gdip_GraphicsClear(G, 0xffda9400), Gdip_DeleteGraphics(G)
 bitmaps["hive"]["night"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["night"]), Gdip_GraphicsClear(G, 0xffd18e00), Gdip_DeleteGraphics(G)
 bitmaps["hive"]["honeystorm"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["honeystorm"]), Gdip_GraphicsClear(G, 0xffdc9e29), Gdip_DeleteGraphics(G)
-bitmaps["hive"]["untextured"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["untextured"]), Gdip_GraphicsClear(G, 0xff7d5700), Gdip_DeleteGraphics(G)
+bitmaps["hive"]["untextured-day"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["untextured-day"]), Gdip_GraphicsClear(G, 0xff7d5700), Gdip_DeleteGraphics(G)
 bitmaps["hive"]["untextured-night"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["untextured-night"]), Gdip_GraphicsClear(G, 0xff684900), Gdip_DeleteGraphics(G)
 bitmaps["hive"]["untextured-honeystorm"] := Gdip_CreateBitmap(1, 4), G := Gdip_GraphicsFromImage(bitmaps["hive"]["untextured-honeystorm"]), Gdip_GraphicsClear(G, 0xff8e6d29), Gdip_DeleteGraphics(G)
