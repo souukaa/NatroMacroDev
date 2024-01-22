@@ -112,7 +112,7 @@ If (!FileExist("settings")) ; make sure the settings folder exists
 	}
 }
 
-VersionID := "0.9.9.2-E"
+VersionID := "0.9.9.2"
 currentWalk := {"pid":"", "name":""} ; stores "pid" (script process ID) and "name" (pattern/movement name)
 
 ;initial load warnings
