@@ -19210,7 +19210,7 @@ nm_BrownQuestProg(){
 	}
 }
 nm_BrownQuest(){
-	global BrownQuestCheck, BrownQuestComplete, LastBrownQuest, RotateQuest, QuestGatherField, CurrentAction, PreviousAction, TotalQuestsComplete, SessionQuestsComplete
+	global BrownQuestCheck, BrownQuestComplete, BrownQuest, LastBrownQuest, RotateQuest, QuestGatherField, CurrentAction, PreviousAction, TotalQuestsComplete, SessionQuestsComplete
 	if(!BrownQuestCheck)
 		return
 	RotateQuest:="Brown"
