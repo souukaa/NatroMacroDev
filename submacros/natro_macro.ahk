@@ -13507,7 +13507,7 @@ nm_Mondo(){
 			return
 		}
 		repeat:=1
-		global FwdKey, LeftKey, BackKey, RightKey, RotLeft, RotRight, SC_E
+		global FwdKey, LeftKey, BackKey, RightKey, RotLeft, RotRight, SC_E, DisableToolUse
 		global KeyDelay
 		global MoveMethod
 		global MoveSpeedNum
@@ -13653,7 +13653,8 @@ nm_Mondo(){
 			                sleep, 1000
 			                FormatTime, utc_min, %A_NowUTC%, m
 			            }
-						if (success != "") {
+						if (success = 1) {
+							repeat := 0
 							;loot mondo after death
 							Random, dir, 0, 1
 							if (dir = 0)
@@ -13673,12 +13674,15 @@ nm_Mondo(){
 							KeyWait, F14, T30 L
 							nm_endWalk()
 
+							if(!DisableToolUse)
+								click, down
 							DllCall("GetSystemTimeAsFileTime","int64p",s)
-							n := s, f := s+600000000 ; 60 seconds loot timeout
+							n := s, f := s+450000000 ; 45 seconds loot timeout
 							while ((n < f) && (A_Index <= 12)) {
 								nm_loot(16, 5, Mod(A_Index, 2) = 1 ? afc : tc)
 								DllCall("GetSystemTimeAsFileTime","int64p",n)
 							}
+							click, up
 						}
 			        }
 			    }
