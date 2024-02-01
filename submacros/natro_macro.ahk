@@ -703,6 +703,7 @@ config["Boost"] := {"FieldBoostStacks":0
 
 config["Quests"] := {"QuestGatherMins":5
 	, "QuestGatherReturnBy":"Walk"
+	, "QuestBoostCheck":0
 	, "PolarQuestCheck":0
 	, "PolarQuestGatherInterruptCheck":1
 	, "PolarQuestProgress":"Unknown"
@@ -2689,14 +2690,15 @@ Gui, Add, Checkbox, x15 y37 vPolarQuestGatherInterruptCheck gnm_savequest Checke
 Gui, Add, Text, x8 y51 w145 h78 vPolarQuestProgress, % StrReplace(PolarQuestProgress, "|", "`n")
 Gui, Add, Checkbox, x80 y131 vHoneyQuestCheck gnm_savequest Checked%HoneyQuestCheck% Disabled, Enable
 Gui, Add, Text, x8 y145 w143 h20 vHoneyQuestProgress, % StrReplace(HoneyQuestProgress, "|", "`n")
-Gui, Add, Text, x8 y184 +BackgroundTrans, Quest Gather Limit:
-Gui, Add, Text, x100 y183 w36 h16 0x201 +Center
+Gui, Add, Text, x8 y184 +BackgroundTrans, Gather Limit:
+Gui, Add, Text, x+4 y183 w36 h16 0x201 +Center
 Gui, Add, UpDown, Range1-999 vQuestGatherMins gnm_savequest Disabled, %QuestGatherMins%
-Gui, Add, Text, x137 y184 +BackgroundTrans, Min
-Gui, Add, Text, x8 y201 +BackgroundTrans, Return to hive by:
-Gui, Add, Text, x110 yp w33 vQuestGatherReturnBy +Center +BackgroundTrans,%QuestGatherReturnBy%
-Gui, Add, Button, x98 yp-1 w12 h16 gnm_QuestGatherReturnBy hwndhQGRBLeft Disabled, <
-Gui, Add, Button, x142 yp w12 h16 gnm_QuestGatherReturnBy hwndhQGRBRight Disabled, >
+Gui, Add, Text, x+4 y184 +BackgroundTrans, Mins
+Gui, Add, Text, x8 y201 +BackgroundTrans, To Hive By:
+Gui, Add, Text, x+18 yp w34 vQuestGatherReturnBy +Center +BackgroundTrans,%QuestGatherReturnBy%
+Gui, Add, Button, xp-12 yp-1 w12 h16 gnm_QuestGatherReturnBy hwndhQGRBLeft Disabled, <
+Gui, Add, Button, xp+45 yp w12 h16 gnm_QuestGatherReturnBy hwndhQGRBRight Disabled, >
+Gui, Add, Checkbox, x8 yp+18 vQuestBoostCheck gnm_savequest Disabled Checked%QuestBoostCheck%, Use Boost Tab for Quests
 Gui, Add, Checkbox, x240 y23 vBlackQuestCheck gnm_BlackQuestCheck Checked%BlackQuestCheck% Disabled, Enable
 Gui, Add, Text, x163 y38 w158 h92 vBlackQuestProgress, % StrReplace(BlackQuestProgress, "|", "`n")
 Gui, Add, Checkbox, x240 y131 vBrownQuestCheck gnm_BrownQuestCheck Checked%BrownQuestCheck% Disabled, Enable
@@ -5809,10 +5811,12 @@ nm_savequest(){
 	GuiControlGet, PolarQuestGatherInterruptCheck
 	GuiControlGet, HoneyQuestCheck
 	GuiControlGet, QuestGatherMins
+	GuiControlGet, QuestBoostCheck
 	IniWrite, %PolarQuestCheck%, settings\nm_config.ini, Quests, PolarQuestCheck
 	IniWrite, %PolarQuestGatherInterruptCheck%, settings\nm_config.ini, Quests, PolarQuestGatherInterruptCheck
 	IniWrite, %HoneyQuestCheck%, settings\nm_config.ini, Quests, HoneyQuestCheck
 	IniWrite, %QuestGatherMins%, settings\nm_config.ini, Quests, QuestGatherMins
+	IniWrite, %QuestBoostCheck%, settings\nm_config.ini, Quests, QuestBoostCheck
 }
 nm_BlackQuestCheck(){
 	global
@@ -5875,6 +5879,7 @@ nm_TabQuestLock(){
 	GuiControl, disable, BlackQuestCheck
 	GuiControl, disable, BrownQuestCheck
 	GuiControl, disable, QuestGatherMins
+	GuiControl, disable, QuestBoostCheck
 	GuiControl, disable, % hQGRBLeft
 	GuiControl, disable, % hQGRBRight
 }
@@ -5890,6 +5895,7 @@ nm_TabQuestUnLock(){
 	GuiControl, enable, BlackQuestCheck
 	GuiControl, enable, BrownQuestCheck
 	GuiControl, enable, QuestGatherMins
+	GuiControl, enable, QuestBoostCheck
 	GuiControl, enable, % hQGRBLeft
 	GuiControl, enable, % hQGRBRight
 }
@@ -9766,7 +9772,7 @@ nm_findHiveSlot(){
 	return HiveConfirmed
 }
 nm_Boost(){
-	global VBState, MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff, QuestGatherField
+	global VBState, MondoBuffCheck, PMondoGuid, LastGuid, MondoAction, LastMondoBuff, QuestGatherField, QuestBoostCheck
 	if(VBState=1)
 		return
 	FormatTime, utc_min, %A_NowUTC%, m
@@ -9776,7 +9782,9 @@ nm_Boost(){
 	nm_StickerPrinter()
 	nm_StickerStack()
 
-	if ((QuestGatherField!="None" && QuestGatherField) || (IsFunc(name := "nm_PBoost") && (%name%() = 1)))
+	if ((QuestBoostCheck = 0) && QuestGatherField && (QuestGatherField != "None"))
+		return
+	if (IsFunc(name := "nm_PBoost") && (%name%() = 1))
 		return
 	nm_shrine()
 	nm_toAnyBooster()
@@ -17358,7 +17366,7 @@ nm_locateVB(){
 nm_hotbar(boost:=0){
 	global state, fieldOverrideReason, GatherStartTime, ActiveHotkeys, bitmaps
 		, HotbarMax2, HotbarMax3, HotbarMax4, HotbarMax5, HotbarMax6, HotbarMax7
-		, beesmasActive
+		, beesmasActive, QuestBoostCheck
 	;whileNames:=["Always", "Attacking", "Gathering", "At Hive"]
 	;ActiveHotkeys.push([val, slot, HBSecs, LastHotkey%slot%])
 	for key, val in ActiveHotkeys {
@@ -17387,7 +17395,7 @@ nm_hotbar(boost:=0){
 			break
 		}
 		;gathering
-		else if(state="Gathering" && fieldOverrideReason="None" && ActiveHotkeys[key][1]="Gathering" && (nowUnix()-ActiveHotkeys[key][4])>ActiveHotkeys[key][3]) {
+		else if(state="Gathering" && (fieldOverrideReason="None" || (QuestBoostCheck = 1 && fieldOverrideReason="Quest")) && ActiveHotkeys[key][1]="Gathering" && (nowUnix()-ActiveHotkeys[key][4])>ActiveHotkeys[key][3]) {
 			HotkeyNum:=ActiveHotkeys[key][2]
 			send % "{sc00" HotkeyNum+1 "}"
 			LastHotkeyN:=nowUnix()
@@ -17396,7 +17404,7 @@ nm_hotbar(boost:=0){
 			break
 		}
 		;GatherStart
-		else if(state="Gathering" && (fieldOverrideReason="None" || fieldOverrideReason="Boost") && (nowUnix()-GatherStartTime)<10 && ActiveHotkeys[key][1]="GatherStart" && (nowUnix()-ActiveHotkeys[key][4])>ActiveHotkeys[key][3]) {
+		else if(state="Gathering" && (fieldOverrideReason="None" || fieldOverrideReason="Boost" || (QuestBoostCheck = 1 && fieldOverrideReason="Quest")) && (nowUnix()-GatherStartTime)<10 && ActiveHotkeys[key][1]="GatherStart" && (nowUnix()-ActiveHotkeys[key][4])>ActiveHotkeys[key][3]) {
 			HotkeyNum:=ActiveHotkeys[key][2]
 			send % "{sc00" HotkeyNum+1 "}"
 			LastHotkeyN:=nowUnix()
