@@ -4350,6 +4350,7 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 	nm_reset()
 	{
 		global offsetY
+		static hivedown := 0
 		
 		bitmaps := {}
 		bitmaps[""""day""""] := Gdip_CreateBitmap(16, 4), G := Gdip_GraphicsFromImage(bitmaps[""""day""""]), Gdip_GraphicsClear(G, 0xffd28f0c), Gdip_DeleteGraphics(G)
@@ -4382,23 +4383,34 @@ nm_testButton(){ ;~~ lines 3464 and 3465 have the same change as 14156
 			}
 			Sleep, 1000
 
+			if hivedown
+				sendinput {"" RotDown ""}
 			region := windowX """"|"""" windowY+3*windowHeight//4 """"|"""" windowWidth """"|"""" windowHeight//4
 			sconf := windowWidth**2//3200
 			loop, 4 {
 				sleep 250
 				pBMScreen := Gdip_BitmapFromScreen(region), s := 0
 				for i, k in [""""day"""", """"night"""", """"day-gifted"""", """"night-gifted"""", """"noshadow-gifted"""", """"noshadow-day"""", """"noshadow-night"""", """"wing""""] {
-					s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps[k], , , , , , 8, , , sconf))
+					s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps[k], , , , , , InStr(k, """"noshadow"""") ? 4 : 8, , , sconf))
 					if (s >= sconf) {
 						Gdip_DisposeImage(pBMScreen)
 						success := 1
 						Send {"" RotRight "" 4}
+						if hivedown
+							Send {"" RotUp ""}
 						SendEvent {"" ZoomOut "" 5}
 						break 3
 					}
 				}
 				Gdip_DisposeImage(pBMScreen)
 				Send {"" RotRight "" 4}
+				if (A_Index = 2)
+				{
+					if hivedown := !hivedown
+						Send {"" RotDown ""}
+					else
+						Send {"" RotUp ""}
+				}
 			}
 		}
 		Gdip_DisposeImage(pBMR)
@@ -9316,13 +9328,14 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 	global youDied
 	global VBState
 	global KeyDelay
-	global SC_E, SC_Esc, SC_R, SC_Enter, RotRight, RotLeft, ZoomOut
+	global SC_E, SC_Esc, SC_R, SC_Enter, RotRight, RotLeft, ZoomOut, RotUp, RotDown
 	global objective
 	global AFBrollingDice
 	global AFBuseGlitter
 	global AFBuseBooster
 	global currentField
 	global HiveConfirmed, GameFrozenCounter, MultiReset, bitmaps
+	static hivedown := 0
 	;check for game frozen conditions
 	if (GameFrozenCounter>=3) { ;3 strikes
 		nm_setStatus("Detected", "Roblox Game Frozen, Restarting")
@@ -9479,23 +9492,25 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		SetKeyDelay, PrevKeyDelay
 
 		; hive check
+		if hivedown
+  			sendinput {%RotDown%}
 		region := windowX "|" windowY+3*windowHeight//4 "|" windowWidth "|" windowHeight//4
 		sconf := windowWidth**2//3200
 		loop, 4 {
 			sleep (250+KeyDelay)
 			pBMScreen := Gdip_BitmapFromScreen(region), s := 0
 			for i, k in ["day", "night", "day-gifted", "night-gifted", "noshadow-gifted", "noshadow-day", "noshadow-night", "wing"] {
-				s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps["hive"][k], , , , , , 8, , , sconf))
+				s := Max(s, Gdip_ImageSearch(pBMScreen, bitmaps["hive"][k], , , , , , InStr(k, "noshadow") ? 4 : 8, , , sconf))
 				if (s >= sconf) {
 					Gdip_DisposeImage(pBMScreen)
 					HiveConfirmed := 1
-					sendinput {%RotRight% 4}
+					sendinput % "{" RotRight " 4}" (hivedown ? ("{" RotUp "}") : "")
 					Send {%ZoomOut% 5}
 					break 2
 				}
 			}
 			Gdip_DisposeImage(pBMScreen)
-			sendinput {%RotRight% 4}
+			sendinput % "{" RotRight " 4}" ((A_Index = 2) ? ("{" ((hivedown := !hivedown) ? RotDown : RotUp) "}") : "")
 		}
 	}
 	;convert
