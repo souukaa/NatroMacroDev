@@ -93,10 +93,9 @@ CloseScripts(hb:=0) {
 }
 DetectHiddenWindows 1
 CloseScripts(1)
-DetectHiddenWindows 0
-
 if !WinExist("Heartbeat.ahk ahk_class AutoHotkey")
 	run '"' exe_path32 '" /script "' A_WorkingDir '\submacros\Heartbeat.ahk"'
+DetectHiddenWindows 0
 
 ; OnMessages
 OnMessage(0x004A, nm_WM_COPYDATA)
@@ -1900,8 +1899,6 @@ CurrentAction:="Startup"
 fieldnamelist := ["Bamboo","Blue Flower","Cactus","Clover","Coconut","Dandelion","Mountain Top","Mushroom","Pepper","Pine Tree","Pineapple","Pumpkin","Rose","Spider","Strawberry","Stump","Sunflower"]
 hotbarwhilelist := ["Never","Always","At Hive","Gathering","Attacking","Microconverter","Whirligig","Enzymes","GatherStart","Snowflake"]
 sprinklerImages := ["saturator"]
-state:="Startup"
-objective:="UI"
 ReconnectDelay:=0
 GatherStartTime := ConvertStartTime := 0
 QuestAnt := 0
@@ -2181,7 +2178,7 @@ MainGui.SetFont("s8 cDefault Norm", "Tahoma")
 MainGui.Add("Button", "x82 y240 w10 h15 vcurrentFieldUp Disabled", "<").OnEvent("Click", nm_currentFieldUp)
 MainGui.Add("Button", "x165 y240 w10 h15 vcurrentFieldDown Disabled", ">").OnEvent("Click", nm_currentFieldDown)
 MainGui.Add("Text", "x92 y240 w73 +center +BackgroundTrans +border vCurrentField", CurrentField:=FieldName%CurrentFieldNum%)
-MainGui.Add("Text", "x220 y240 w275 +BackgroundTrans +border vstate", state ": " objective)
+MainGui.Add("Text", "x220 y240 w275 +BackgroundTrans +border vstate", "Startup: UI")
 
 ; version label and links
 (GuiCtrl := MainGui.Add("Text", "x435 y264 vVersionText", "v" versionID)).OnEvent("Click", nm_showAdvancedSettings), GuiCtrl.Move(494 - (VersionWidth := TextExtent("v" VersionID, GuiCtrl)))
@@ -3113,7 +3110,7 @@ SetLoadingProgress(100)
 
 ;unlock tabs
 nm_LockTabs(0)
-nm_setStatus()
+nm_setStatus("Startup", "UI")
 TabCtrl.Focus()
 MainGui.Title := "Natro Macro"
 MainGui["StartButton"].Enabled := 1
