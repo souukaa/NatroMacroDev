@@ -6004,7 +6004,7 @@ nm_MPuffModeHelp(*){ ; disable auto harvest information for manual planters
 	Advanced options:
 	If you have set up remote control, after receiving a ping you can also optionally set your planter to smoking to help you keep track, or release from hold and plant next using these commands:
 	- ?planter smoking [1][2][3]
-	- ?planter harvestnow [1][2][3]
+	- ?planter harvest [1][2][3]
 	See these planter commands and your planter status using ?planter
 
 	See our Discord server for more details on how to set up and use webhook or remote control!
@@ -19713,7 +19713,7 @@ mp_Planter() { ;//todo: merge these manual planter functions as much as possible
 				MPlanterSmoking%A_Index% := 0
 				IniWrite MPlanterSmoking%A_Index%, "settings\nm_config.ini", "Planters", "MPlanterSmoking" A_Index
 			}
-			If (PlanterHarvestTime%A_Index% > 2**31) {
+			If (PlanterHarvestTime%A_Index% > 2147483646 ) {
 				mp_PlantPlanter(A_Index)
 			} Else if (!MPlanterHold%A_Index% && (PlanterName%A_Index%!="None") && (PlanterField%A_Index%!="None")) {
 				If (nowUnix() >= PlanterHarvestTime%A_Index%)

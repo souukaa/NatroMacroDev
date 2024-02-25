@@ -1132,22 +1132,7 @@ nm_command(command)
 
 		switch params[2], 0
 		{
-			case "harvest":
-			if ((params[3] = 1) || (params[3] = 2) || (params[3] = 3))
-			{
-				n := params[3]
-				if (vars["PlanterName" n] && (vars["PlanterName" n] != "None"))
-				{
-					UpdateInt("PlanterHarvestTime" n, nowUnix()-1, "Planters")
-					discord.SendEmbed("Set remaining planter time in Slot " n " to 0!", 5066239, , , , id)
-				}
-				else
-					discord.SendEmbed("There is no planter in Slot " n "!", 16711731, , , , id)
-			}
-			else
-				discord.SendEmbed((StrLen(params[3]) = 0) ? "You must specify a Planter Slot to harvest!" : ("Planter Slot must be 1, 2, or 3!\nYou entered " params[3] "."), 16711731, , , , id)
-
-			case "harvestnow":
+			case "harvest","release":
 			if ((params[3] = 1) || (params[3] = 2) || (params[3] = 3))
 			{
 				n := params[3]
@@ -1306,7 +1291,7 @@ nm_command(command)
 					"description": "The macro`'s currently placed planters are shown below.\nYou can use these commands to edit the timers:",
 					"fields": [{
 						"name": "' commandPrefix 'planter harvest [``n``]",
-						"value": "Sets remaining time for planter in Slot ``n`` to 0",
+						"value": "Harvests planter in Slot ``n`` and moves to the next Slot, even if the planter is not ready or is held/smoking",
 						"inline": true
 					},
 					{
@@ -1330,8 +1315,8 @@ nm_command(command)
 						"inline": true
 					},
 					{
-						"name": "' commandPrefix 'planter harvestnow [``n``]",
-						"value": "Harvests planter in Slot ``n`` and moves to the next Slot, even if the planter is not ready or is held/smoking",
+						"name": "' commandPrefix 'planter screenshot [``n``]",
+						"value": "Takes a screenshot of planter in Slot ``n``",
 						"inline": true
 					}]
 				}
