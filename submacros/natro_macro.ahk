@@ -18011,7 +18011,7 @@ nm_BrownQuestProg(){
 		} else {
 			completeness:="Unknown"
 		}
-		BrownQuest .= "-" . objectiveList[obj]
+		BrownQuest .= "-" . ((obj = "unknown") ? "Unknown" : objectiveList[obj])
 		brownProgress .= newline . action . " " . where . ": " . completeness
 	}
 	brownProgress := (BrownQuest := LTrim(BrownQuest, "-")) . brownProgress
