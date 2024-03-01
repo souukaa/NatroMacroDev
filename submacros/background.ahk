@@ -420,8 +420,8 @@ nm_dailyReconnect(){
 	static LastDailyReconnect := 0
 	if ((ReconnectHour = "") || (ReconnectMin = "") || (ReconnectInterval = "") || (nowUnix() - LastDailyReconnect < 60))
 		return
-	RChourUTC := FormatTime(A_NowUTC, "HH")
-	RCminUTC := FormatTime(A_NowUTC, "mm")
+	RChourUTC := Number(FormatTime(A_NowUTC, "HH"))
+	RCminUTC := Number(FormatTime(A_NowUTC, "mm"))
 	HourReady:=0
 	Loop 24//ReconnectInterval
 	{
