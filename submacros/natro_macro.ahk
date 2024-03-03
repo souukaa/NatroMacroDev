@@ -238,7 +238,7 @@ nm_importPaths()
 		"gtb", ["blue", "mountain", "red"], ; go to (field) booster
 		"gtc", ["clock", "antpass", "robopass", "honeydis", "treatdis", "blueberrydis", "strawberrydis", "coconutdis", "gluedis", "royaljellydis", "blender", "windshrine", ; go to collect (machine)
 				"stockings", "wreath", "feast", "gingerbread", "snowmachine", "candles", "samovar", "lidart", "gummybeacon", "rbpdelevel", ; beesmas
-				"honeylb", "honeystorm", "stickerstack", "stickerprinter", "normalmm", "megamm", "extrememm"], ; other
+				"honeylb", "honeystorm", "stickerstack", "stickerprinter", "normalmm", "megamm", "nightmm", "extrememm"], ; other
 		"gtf", ["bamboo", "blueflower", "cactus", "clover", "coconut", "dandelion", "mountaintop", "mushroom", "pepper", "pinetree", "pineapple", "pumpkin",
 				"rose", "spider", "strawberry", "stump", "sunflower"], ; go to field
 		"gtp", ["bamboo", "blueflower", "cactus", "clover", "coconut", "dandelion", "mountaintop", "mushroom", "pepper", "pinetree", "pineapple", "pumpkin",
@@ -2640,7 +2640,7 @@ MainGui.SetFont("w700")
 MainGui.Add("GroupBox", "x5 y168 w125 h68 vMemoryMatchGroupBox", "Memory Match")
 MainGui.SetFont("s8 cDefault Norm", "Tahoma")
 (GuiCtrl := MainGui.Add("CheckBox", "x10 yp+15 w58 vNormalMemoryMatchCheck Disabled Checked" NormalMemoryMatchCheck, "Normal")).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
-(GuiCtrl := MainGui.Add("CheckBox", "xp yp+18 wp vNightMemoryMatchCheck Disabled Checked" NightMemoryMatchCheck, "Night")).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
+MainGui.Add("CheckBox", "xp yp+18 wp vNightMemoryMatchCheck Disabled Checked" NightMemoryMatchCheck, "Night").OnEvent("Click", nm_NightMemoryMatchCheck)
 (GuiCtrl := MainGui.Add("CheckBox", "xp+58 yp-18 wp vMegaMemoryMatchCheck Disabled Checked" MegaMemoryMatchCheck, "Mega")).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
 (GuiCtrl := MainGui.Add("CheckBox", "xp yp+18 wp vExtremeMemoryMatchCheck Disabled Checked" ExtremeMemoryMatchCheck, "Extreme")).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
 MainGui.Add("Button", "x43 yp+16 w49 h16 vMemoryMatchOptions Disabled", "Options").OnEvent("Click", nm_MemoryMatchOptions)
@@ -3454,6 +3454,7 @@ nm_TabCollectLock(){
 	MainGui["GummyBeaconCheck"].Enabled := 0
 	MainGui["NormalMemoryMatchCheck"].Enabled := 0
 	MainGui["MegaMemoryMatchCheck"].Enabled := 0
+	MainGui["NightMemoryMatchCheck"].Enabled := 0
 	MainGui["ExtremeMemoryMatchCheck"].Enabled := 0
 	MainGui["MemoryMatchOptions"].Enabled := 0
 	;kill
@@ -3546,6 +3547,7 @@ nm_TabCollectUnLock(){
 	}
 	MainGui["NormalMemoryMatchCheck"].Enabled := 1
 	MainGui["MegaMemoryMatchCheck"].Enabled := 1
+	MainGui["NightMemoryMatchCheck"].Enabled := 1
 	MainGui["ExtremeMemoryMatchCheck"].Enabled := 1
 	MainGui["MemoryMatchOptions"].Enabled := 1
 	;kill
@@ -4806,6 +4808,11 @@ nm_BeesmasHandler(req)
 }
 BeesmasActiveFail(*){
 	MsgBox "Could not fetch Beesmas data from GitHub!`r`nTo use Beesmas features, make sure you have a working internet connection and then reload the macro!", "Error", 0x1030 " Owner" MainGui.Hwnd
+}
+nm_NightMemoryMatchCheck(*){
+	global NightMemoryMatchCheck
+	PostSubmacroMessage("background", 0x5554, 7, NightMemoryMatchCheck := MainGui["NightMemoryMatchCheck"].Value)
+	IniWrite NightMemoryMatchCheck, "settings\nm_config.ini", "Collect", "NightMemoryMatchCheck"
 }
 nm_MemoryMatchOptions(*){
 	static vars := Map(
@@ -8709,8 +8716,8 @@ nm_Start(){
 	global serverStart := nowUnix()
 	Loop {
 		DisconnectCheck()
-		;vicious/stingers
-		nm_locateVB()
+		;night
+		nm_Night()
 		;mondo
 		nm_Mondo()
 		;planters
@@ -10719,13 +10726,19 @@ nm_MemoryMatch(MemoryMatchGame) {
 	if !(%MemoryMatchGame%MemoryMatchCheck && (nowUnix()-Last%MemoryMatchGame%MemoryMatch)>cooldowns[MemoryMatchGame])
 		return
 
+	success := deaths := 0
 	loop 2 {
-		nm_reset()
+		nm_reset(0, 0, 0)
 		nm_SetStatus("Traveling", MemoryMatchGame " Memory Match" ((A_Index > 1) ? " (Attempt 2)" : "" ))
-		nm_GoToCollect(MemoryMatchGame "mm")
+		nm_GoToCollect(MemoryMatchGame "mm", 0)
+		loop 720 { ; 3 min timeout
+			Sleep 250
+			if ((!GetKeyState("F14") && success := 1) || (youDied && ++deaths))
+				break
+		}
+		nm_endWalk()
 
-		searchRet := nm_imgSearch("e_button.png",30,"high")
-		If (searchRet[1] = 0) {
+		If ((success = 1) && nm_imgSearch("e_button.png",30,"high")[1] = 0) {
 			nm_setStatus("Found", MemoryMatchGame " Memory Match")
 			sendinput "{" SC_E " down}"
 			Sleep 100
@@ -10734,7 +10747,7 @@ nm_MemoryMatch(MemoryMatchGame) {
 			sleep 1500
 			Break
 		} else if (A_Index = 2) {
-			UpdateConfig()
+			(deaths = 0) && UpdateConfig()
 			return
 		}
 	} ;  close Try twice to find MM
@@ -10822,7 +10835,7 @@ nm_SolveMemoryMatch(MemoryMatchGame:="", PriorityItemOAC:=0) { ; PriorityItem ca
 							continue ; Skip self-comparison
 
 						; Check if either variable is Null or Priority
-						if(StoreitemOAC[i] = 0 || StoreitemOAC[j] = 0 || StoreitemOAC[i] = "" || StoreitemOAC[j] = "")						
+						if(StoreitemOAC[i] = 0 || StoreitemOAC[j] = 0 || StoreitemOAC[i] = "" || StoreitemOAC[j] = "")
 							continue ; Skip the comparison if either Item is Null or Not Priority
 
 						; Check if variables have the same value
@@ -16312,12 +16325,49 @@ nm_ViciousCheck(){
 	}
 	return killed
 }
+nm_Night(){
+	nm_NightMemoryMatch()
+	nm_locateVB()
+}
+nm_confirmNight(){
+	nm_setStatus("Confirming", "Night")
+	nm_Reset(0, 2000, 0)
+	sendinput "{" RotDown " 5}"
+	loop 10 {
+		SendInput "{" ZoomOut "}"
+		Sleep 100
+		if ((findImg := nm_imgSearch("nightsky.png", 50, "abovebuff"))[1] = 0)
+			break
+	}
+	sendinput "{" RotUp " 5}"
+	send "{" ZoomOut " 8}"
+	return (findImg[1]=0)
+}
+nm_NightMemoryMatch(){
+	global VBState, NightLastDetected
+
+	if (!(NightMemoryMatchCheck && (nowUnix()-LastNightMemoryMatch)>28800) || (VBState = 0))
+		return
+
+	if !nm_confirmNight(){
+		;false positive, ABORT!
+		VBState:=0
+		PostSubmacroMessage("background", 0x5554, 3, VBState)
+		NightLastDetected:=nowUnix()-300-1 ;make NightLastDetected older than 5 minutes
+		IniWrite NightLastDetected, "settings\nm_config.ini", "Collect", "NightLastDetected"
+		nm_setStatus("Aborting", "Night Memory Match - Not Night")
+		return
+	}
+
+	nm_MemoryMatch("Night")
+	PostSubmacroMessage("background", 0x5554, 8, LastNightMemoryMatch)
+}
 nm_locateVB(){
 	global VBState, StingerCheck, StingerDailyBonusCheck, StingerPepperCheck, StingerMountainTopCheck, StingerRoseCheck, StingerCactusCheck, StingerSpiderCheck, StingerCloverCheck, NightLastDetected, VBLastKilled, FwdKey, LeftKey, BackKey, RightKey, RotLeft, RotRight, RotDown, RotUp, ZoomOut, MoveMethod, objective, DisableToolUse, dayorNight
 
 	time := nowUnix()
 	; don't run if stinger check Disabled", VB last killed less than 5m ago, night last detected more than 5m ago
-	if ((StingerCheck=0) || (time-VBLastKilled)<300 || ((time-NightLastDetected)>300 || (time-NightLastDetected)<0) || (VBState = 0)) {
+	if ((StingerCheck=0) || (StingerDailyBonusCheck=1 && (time-VBLastKilled)<79200) || (time-VBLastKilled)<300 || ((time-NightLastDetected)>300 || (time-NightLastDetected)<0) || (VBState = 0)) {
 		VBState:=0
 		;send VBState to background.ahk
 		PostSubmacroMessage("background", 0x5554, 3, VBState)
@@ -16368,20 +16418,9 @@ nm_locateVB(){
 
 	; confirm night time
 	if(VBState=1){
-		nm_setStatus("Confirming", "Night")
-		nm_Reset(0, 2000, 0)
-		sendinput "{" RotDown " 5}"
-		loop 10 {
-			SendInput "{" ZoomOut "}"
-			Sleep 100
-			if ((findImg := nm_imgSearch("nightsky.png", 50, "abovebuff"))[1] = 0)
-				break
-		}
-		if(findImg[1]=0){
+		if(nm_confirmNight()){
 			;night confirmed, proceed!
 			nm_setStatus("Starting", "Vicious Bee Cycle")
-			sendinput "{" RotUp " 5}"
-			send "{" ZoomOut " 8}"
 		} else {
 			;false positive, ABORT!
 			VBState:=0
@@ -16389,8 +16428,6 @@ nm_locateVB(){
 			NightLastDetected:=nowUnix()-300-1 ;make NightLastDetected older than 5 minutes
 			IniWrite NightLastDetected, "settings\nm_config.ini", "Collect", "NightLastDetected"
 			nm_setStatus("Aborting", "Vicious Bee - Not Night")
-			sendinput "{" RotUp " 5}"
-			send "{" ZoomOut " 8}"
 			return
 		}
 	}
@@ -20651,7 +20688,7 @@ start(*){
 	try run
 	(
 	'"' exe_path32 '" /script "' A_WorkingDir '\submacros\background.ahk" "' NightLastDetected '" "' VBLastKilled '" "' StingerCheck '" "' StingerDailyBonusCheck '" '
-	'"' AnnounceGuidingStar '" "' ReconnectInterval '" "' ReconnectHour '" "' ReconnectMin '" "' EmergencyBalloonPingCheck '" "' ConvertBalloon '"'
+	'"' AnnounceGuidingStar '" "' ReconnectInterval '" "' ReconnectHour '" "' ReconnectMin '" "' EmergencyBalloonPingCheck '" "' ConvertBalloon '" "' NightMemoryMatchCheck '" "' LastNightMemoryMatch '"'
 	)
 	;(re)start stat monitor
 	global SessionTotalHoney, HoneyAverage
