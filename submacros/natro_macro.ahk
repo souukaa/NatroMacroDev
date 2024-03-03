@@ -617,6 +617,7 @@ nm_importConfig()
 		, "GlueMatchIgnoreCheck", 0
 		, "CloudVialMatchIgnoreCheck", 0
 		, "PineappleMatchIgnoreCheck", 0
+		, "MemoryMatchInterruptCheck", 0
 		, "StickerPrinterCheck", 0
 		, "LastStickerPrinter", 1
 		, "StickerPrinterEgg", "Basic")
@@ -4858,15 +4859,16 @@ nm_MemoryMatchOptions(*){
 	MMGui := Gui("+AlwaysOnTop -MinimizeBox +Owner" MainGui.Hwnd, "Memory Match Options")
 	MMGui.OnEvent("Close", GuiClose)
 	MMGui.SetFont("s8 cDefault Norm", "Tahoma")
-	MMGui.Add("Text", "x6 y2 w360 Center", "
+	(GuiCtrl := MMGui.Add("CheckBox", "x122 y4 vMemoryMatchInterruptCheck Checked" MemoryMatchInterruptCheck, "Allow Gather Interrupt")).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
+	MMGui.Add("Text", "x6 y+4 w360 Center Section", "
 	(
-	Pick the items you do NOT want to match in Memory Match games!
+	Pick the items you do NOT want to match in Memory Match games below!
 	The macro will IGNORE these items and look for every other item.
 	Rare items like Mythic Egg that aren't on this list will always be looked for.
 	)")
 	for var, item in vars
-		(GuiCtrl := MMGui.Add("CheckBox", "x" 16+(A_Index-1)//10*120 " y" 48+Mod(A_Index-1,10)*15 " v" var "MatchIgnoreCheck Checked" %var%MatchIgnoreCheck, item)).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
-	MMGui.Show("w360 h196")
+		(GuiCtrl := MMGui.Add("CheckBox", "xs+" 10+(A_Index-1)//10*120 " ys+" 46+Mod(A_Index-1,10)*15 " v" var "MatchIgnoreCheck Checked" %var%MatchIgnoreCheck, item)).Section := "Collect", GuiCtrl.OnEvent("Click", nm_saveConfig)
+	MMGui.Show("w360 h210")
 }
 ;kill
 nm_BugrunCheck(*){
@@ -8800,6 +8802,16 @@ nm_BugrunInterrupt() {
 			&& ((now-LastBugrunWerewolf)>floor(3600*multiplier))))
 }
 nm_GatherBoostInterrupt() => (now := nowUnix(), ((now-GatherFieldBoostedStart<900) || (now-LastGlitter<900) || nm_boostBypassCheck()))
+nm_MemoryMatchInterrupt() {
+	global MemoryMatchInterruptCheck
+	now := nowUnix()
+	return ((MemoryMatchInterruptCheck = 1)
+		&& ((NormalMemoryMatchCheck && (now-LastNormalMemoryMatch)>7200)
+		|| (MegaMemoryMatchCheck && (now-LastMegaMemoryMatch)>14400)
+		|| (ExtremeMemoryMatchCheck && (now-LastExtremeMemoryMatch)>28800)
+		|| ((beesmasActive = 1) && WinterMemoryMatchCheck && (now-LastWinterMemoryMatch)>14400))
+	)
+}
 
 ;stats/status
 nm_setStats(){
@@ -10973,7 +10985,7 @@ nm_SolveMemoryMatch(MemoryMatchGame:="", PriorityItemOAC:=0) { ; PriorityItem ca
 		IsSet(pBM) && IsInteger(pBM) && (pBM > 0) && Gdip_DisposeImage(pBM)
 
 	MouseMove windowX+350, windowY+GetYOffset()+100
-	Sleep 1000
+	Sleep 1500
 	nm_setStatus("Collected", (MemoryMatchGame ? (MemoryMatchGame " ") : "") "Memory Match")
 
 	; wait for window to close
@@ -11765,7 +11777,7 @@ nm_Bugrun(){
 		, KingBeetleAmuletMode, ShellAmuletMode
 
 	;interrupts
-	if ((VBState=1) || nm_MondoInterrupt() || nm_GatherBoostInterrupt() || nm_BeesmasInterrupt())
+	if ((VBState=1) || nm_MondoInterrupt() || nm_GatherBoostInterrupt() || nm_BeesmasInterrupt() || nm_MemoryMatchInterrupt())
 		return
 
 	nm_setShiftLock(0)
@@ -14139,6 +14151,9 @@ nm_GoGather(){
 		;BEESMAS GatherInterruptCheck
 		if nm_BeesmasInterrupt()
 			return
+		;Memory Match
+		if nm_MemoryMatchInterrupt()
+			return
 	}
 	utc_min := FormatTime(A_NowUTC, "m")
 	if(CurrentField="mountain top" && (utc_min>=0 && utc_min<15)) ;mondo dangerzone! skip over this field if possible
@@ -14604,6 +14619,10 @@ nm_GoGather(){
 				}
 				if nm_BeesmasInterrupt() {
 					interruptReason := "Beesmas Machine"
+					break
+				}
+				if nm_MemoryMatchInterrupt() {
+					interruptReason := "Memory Match"
 					break
 				}
 			}

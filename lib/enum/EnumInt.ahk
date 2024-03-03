@@ -319,6 +319,7 @@
 	, "LastNightMemoryMatch"
 	, "WinterMemoryMatchCheck"
 	, "LastWinterMemoryMatch"
+	, "MemoryMatchInterruptCheck"
 	, "MicroConverterMatchIgnoreCheck"
 	, "SunflowerSeedMatchIgnoreCheck"
 	, "JellyBeanMatchIgnoreCheck"
