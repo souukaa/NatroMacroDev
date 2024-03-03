@@ -8744,11 +8744,11 @@ nm_Start(){
 #Include "nm_InventorySearch.ahk"
 ;interrupts
 nm_MondoInterrupt() => (utc_min := FormatTime(A_NowUTC, "m"), now := nowUnix(),
-	((MondoBuffCheck = 1) && (utc_min<14 && (now-LastMondoBuff)>960 && MondoAction="Kill")
+	((MondoBuffCheck = 1) && ((utc_min<14 && (now-LastMondoBuff)>960 && MondoAction="Kill")
 		|| (!nm_GatherBoostInterrupt()
 			&& ((utc_min<14 && (now-LastMondoBuff)>960 && MondoAction="Buff")
 			|| (utc_min<12 && (now-LastGuid)<60 && PMondoGuid && MondoAction="Guid")
-			|| (utc_min<=8 && (now-LastMondoBuff)>960 && PMondoGuid && MondoAction="Tag"))
+			|| (utc_min<=8 && (now-LastMondoBuff)>960 && PMondoGuid && MondoAction="Tag")))
 		)
 	)
 )
