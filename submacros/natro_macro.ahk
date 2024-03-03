@@ -10760,8 +10760,6 @@ nm_MemoryMatch(MemoryMatchGame) {
 }
 nm_SolveMemoryMatch(MemoryMatchGame:="", PriorityItemOAC:=0) { ; PriorityItem can be set to a numeric value to prioritize certain bitmap. It will ignore all other pairs until it finds and claims PriorityItem if PriorityItem>0.
 
-	global MemoryMatchItems
-	global MicroConverterMatchIgnoreCheck, SunflowerSeedMatchIgnoreCheck, JellyBeanMatchIgnoreCheck, RoyalJellyMatchIgnoreCheck, TicketMatchIgnoreCheck, CyanTrimMatchIgnoreCheck, OilMatchIgnoreCheck, StrawberryMatchIgnoreCheck, CoconutMatchIgnoreCheck, TropicalDrinkMatchIgnoreCheck, RedExtractMatchIgnoreCheck, MagicBeanMatchIgnoreCheck, PineappleMatchIgnoreCheck, StarJellyMatchIgnoreCheck, EnzymeMatchIgnoreCheck, BlueExtractMatchIgnoreCheck, GumdropMatchIgnoreCheck, FieldDiceMatchIgnoreCheck, MoonCharmMatchIgnoreCheck, BlueberryMatchIgnoreCheck, GlitterMatchIgnoreCheck, StingerMatchIgnoreCheck, TreatMatchIgnoreCheck, GlueMatchIgnoreCheck, CloudVialMatchIgnoreCheck, PineappleMatchIgnoreCheck
 	; initialize variables
 	GetRobloxClientPos()
 	middleX := windowX+(windowWidth//2)
@@ -10912,7 +10910,7 @@ nm_SolveMemoryMatch(MemoryMatchGame:="", PriorityItemOAC:=0) { ; PriorityItem ca
 			sleep 100
 			sendinput "{click up}"
 			sleep 100
-			MouseMove middleX, windowY+offsetY+100
+			MouseMove middleX, middleY-190
 			sleep 350
 
 			Loop 20 {
@@ -10972,6 +10970,7 @@ nm_SolveMemoryMatch(MemoryMatchGame:="", PriorityItemOAC:=0) { ; PriorityItem ca
 	for pBM in StoreitemOAC
 		IsSet(pBM) && IsInteger(pBM) && (pBM > 0) && Gdip_DisposeImage(pBM)
 
+	MouseMove windowX+350, windowY+GetYOffset()+100
 	Sleep 1000
 	nm_setStatus("Collected", (MemoryMatchGame ? (MemoryMatchGame " ") : "") "Memory Match")
 
