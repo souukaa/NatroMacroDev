@@ -10931,8 +10931,12 @@ nm_SolveMemoryMatch(MemoryMatchGame:="") {
 			sendinput "{click down}"
 			sleep 100
 			sendinput "{click up}"
+			DllCall("GetSystemTimeAsFileTime", "int64p", &s:=0)
 			sleep 100
 			MouseMove middleX, middleY-190
+			DllCall("GetSystemTimeAsFileTime", "int64p", &f:=s)
+			Sleep Max(500 - (f - s)//10000, -1) ; match previous version's total sleep 500
+
 
 			Loop 500 {
 				pBMScreen := Gdip_BitmapFromScreen(TileXCordOAC-5 "|" TileYCordOAC+10 "|8|20") ; Detect Clicked Item
