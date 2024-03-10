@@ -1869,20 +1869,31 @@ nm_command(command)
 		case "download":
 		if (url := command.url)
 		{
-			if InStr(FileExist(path := Trim(SubStr(command.content, InStr(command.content, name)+StrLen(name)))), "D")
+			path := StrReplace(RTrim(StrReplace(Trim(SubStr(command.content, InStr(command.content, name)+StrLen(name))), "/", "\"), "\"), "\\", "\"), message := ""
+			if (StrLen(path) > 0)
 			{
-				SplitPath url, &filename
-				(pos := InStr(filename, "?")) && (filename := SubStr(filename, 1, pos-1))
-				try
+				if !FileExist(path)
 				{
-					Download url, (path := (RTrim(path, "/\") "\" filename))
-					discord.SendEmbed('Downloaded ``' StrReplace(StrReplace(path, "\", "\\"), '"', '\"') '``', 5066239, , , , id)
+					try
+						DirCreate(path), message .= 'Created folder ``' StrReplace(StrReplace(path, "\", "\\"), '"', '\"') '``\n'
+					catch as e
+						message .= "DirCreate Error:\n" e.Message " " e.What "\n\n"
 				}
-				catch as e
-					discord.SendEmbed("Download Error:\n" e.Message " " e.What, 16711731, , , , id)
+				if InStr(FileExist(path), "D")
+				{
+					SplitPath url, &filename
+					(pos := InStr(filename, "?")) && (filename := SubStr(filename, 1, pos-1))
+					try
+					{
+						Download url, (path .= "\" filename)
+						discord.SendEmbed(message .= 'Downloaded ``' StrReplace(StrReplace(path, "\", "\\"), '"', '\"') '``', 5066239, , , , id)
+					}
+					catch as e
+						discord.SendEmbed(message .= "Download Error:\n" e.Message " " e.What, 16711731, , , , id)
+				}
 			}
 			else
-				discord.SendEmbed("``" (path ? path : "<blank>") "`` is not a valid directory!", 16711731, , , , id)
+				discord.SendEmbed("You must specify a valid directory!", 16711731, , , , id)
 		}
 		else
 			discord.SendEmbed("No attachment found to download!", 16711731, , , , id)
