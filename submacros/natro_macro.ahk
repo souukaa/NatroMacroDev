@@ -258,10 +258,11 @@ nm_importPaths()
 		(paths[k] := Map()).CaseSense := 0
 		for v in list
 		{
-			try
+			try {
 				file := FileOpen(A_WorkingDir "\paths\" k "-" v ".ahk", "r"), paths[k][v] := file.Read(), file.Close()
 				if !!regexMatch(paths[k][v], "im)^paths\[")
     			throw
+			}
 			catch
 				MsgBox
 				(
