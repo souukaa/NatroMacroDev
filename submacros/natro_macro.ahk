@@ -14572,7 +14572,8 @@ nm_GoGather(){
 		nm_setShiftLock(1)
 	}
 	while(((nowUnix()-gatherStart)<(FieldUntilMins*60)) || (PFieldBoosted && (nowUnix()-GatherFieldBoostedStart)<840) || (PFieldBoostExtend && (nowUnix()-GatherFieldBoostedStart)<1800 && (nowUnix()-LastGlitter)<900) || (PFieldGuidExtend && FieldGuidDetected && (nowUnix()-gatherStart)<(FieldUntilMins*60+PFieldGuidExtend*60) && (nowUnix()-GatherFieldBoostedStart)>900 && (nowUnix()-LastGlitter)>900) || (PPopStarExtend && HasPopStar && PopStarActive)){
-		MouseMove windowX+350, windowY+GetYOffset()+100
+		if !fieldPatternShift
+			MouseMove windowX+350, windowY+GetYOffset()+100
 		if(!DisableToolUse)
 			Click "Down"
 		nm_gather(FieldPattern, A_Index, FieldPatternSize, FieldPatternReps, FacingFieldCorner)
