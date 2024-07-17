@@ -1,14 +1,20 @@
 ﻿nm_gotoramp()
-Send "{space down}"
-HyperSleep(300)
+Send "{space down}{" RightKey " down}"
+Sleep 100
 Send "{space up}"
-nm_Walk(36, RightKey)
+Walk(2)
+Send "{" FwdKey " down}"
+Walk(1.8)
+Send "{" FwdKey " up}"
+Walk(30)
 send "{space down}"
 HyperSleep(300)
-send "{space up}"
-nm_Walk(6, RightKey)
-Sleep 500
-send "{" RotRight " 2}"
+send "{space up}{" FwdKey " down}"
+Walk(4)
+send "{" FwdKey " up}"
+Walk(3)
+send "{" RightKey " up}{" RotRight " 2}"
+Sleep 200
 send "{space down}"
 HyperSleep(100)
 send "{space up}"

@@ -29,13 +29,13 @@ else
 	Walk(1.8)
 	Send "{" FwdKey " up}"
 	Walk(30)
-	send "{" RightKey " up}{space down}"
-	HyperSleep(300)
-	send "{space up}"
-	nm_Walk(6, RightKey)
-	HyperSleep(500)
-	send "{" RotRight " 2}"
 	send "{space down}"
+	HyperSleep(300)
+	send "{space up}{" FwdKey " down}"
+	Walk(4)
+	send "{" FwdKey " up}"
+	Walk(3)
+	send "{" RightKey " up}{" RotRight " 2}{space down}"
 	HyperSleep(100)
 	send "{space up}"
 	nm_Walk(3, FwdKey)
