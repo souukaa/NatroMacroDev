@@ -207,6 +207,7 @@ nm_importPatterns()
 			nm_Walk(param1, param2, param3?) => ""
 			Gdip_ImageSearch(*) => ""
 			Gdip_BitmapFromBase64(*) => ""
+			nm_CameraRotation(param1, param2) => ""
 
 			' pattern '
 
@@ -7339,7 +7340,7 @@ nm_ServerLink(GuiCtrl, *){
 	k := GuiCtrl.Name
 	str := GuiCtrl.Value
 
-	RegExMatch(str, "i)((http(s)?):\/\/)?((www|web)\.)?roblox\.com\/games\/1537690962\/?([^\/]*)\?privateServerLinkCode=.{32}(\&[^\/]*)*", &NewPrivServer)
+	RegExMatch(str, "i)((http(s)?):\/\/)?((www|web)\.)?roblox\.com\/([a-z]{2}\/)?games\/1537690962\/?([^\/]*)\?privateServerLinkCode=.{32}(\&[^\/]*)*", &NewPrivServer)
 	if ((StrLen(str) > 0) && !IsObject(NewPrivServer))
 	{
 		GuiCtrl.Value := %k%
@@ -8776,9 +8777,58 @@ nm_testButton(*){
 		FieldName:=FieldPattern:=FieldPatternSize:=FieldReturnType:=FieldSprinklerLoc:=FieldRotateDirection:=""
 		FieldUntilPack:=FieldPatternReps:=FieldPatternShift:=FieldSprinklerDist:=FieldRotateTimes:=FieldDriftCheck:=FieldPatternInvertFB:=FieldPatternInvertLR:=FieldUntilMins:=0
 
+		nm_CameraRotation(Dir, count) {
+			Static LR := 0, UD := 0, init := OnExit((*) => send("{" Rot%(LR > 0 ? "Left" : "Right")% " " Mod(Abs(LR), 8) "}{" Rot%(UD > 0 ? "Up" : "Down")% " " Abs(UD) "}"), -1)
+			send "{" Rot%Dir% " " count "}"
+			Switch Dir,0 {
+				Case "Left": LR -= count
+				Case "Right": LR += count
+				Case "Up": UD -= count
+				Case "Down": UD += count
+			}
+		}
 		' nm_PathVars()
 		)
 	)
+}
+
+copyLogFile(*) {
+	static tempPath := A_Temp "\debug_log.txt", os_version := "Cannot detect OS version", processorName := '', RAMAmount := 0
+	alt := !!GetKeyState("Control")
+	if ((!processorName) || (os_version = "Cannot detect OS version"))
+		winmgmts := ComObjGet("winmgmts:")
+	if (os_version = "Cannot detect OS version") {
+		for objItem in winmgmts.ExecQuery("SELECT * FROM Win32_OperatingSystem")
+			os_version := Trim(StrReplace(StrReplace(StrReplace(StrReplace(objItem.Caption, "Microsoft"), "Майкрософт"), "مايكروسوفت"), "微软"))
+	}
+	if (!processorName){
+		for objItem in winmgmts.ExecQuery("SELECT * FROM Win32_Processor")
+			processorName := Trim(objItem.Name)
+	}
+	if (!RAMAmount) {
+		MEMORYSTATUSEX := Buffer(64,0)
+		NumPut("uint", 64, MEMORYSTATUSEX)
+		DllCall("kernel32\GlobalMemoryStatusEx", "ptr", MEMORYSTATUSEX)
+		RAMAmount := Round(NumGet(MEMORYSTATUSEX, 8, "int64") / 1073741824, 1)
+	}
+	out :=	
+	(
+	'``````md
+	# Info -----------------------------------------------
+	OSVersion: ' os_version ' (' (A_Is64bitOS ? '64-bit' : '32-bit') ')
+	AutoHotkey Version: ' A_AhkVersion '; ' (A_AhkPath = A_WorkingDir '\submacros\AutoHotkey32.exe' ? "Using included AHK" : "Using installed AHK") '
+	Natro Version: ' VersionID '
+	Installation Path: ' StrReplace(A_WorkingDir, A_UserName, '<user>')
+	. (processorName ? '`r`nCPU: ' processorName : '')
+	. (RAMAmount ? '`r`nRAM: ' RAMAmount 'GB' : '')
+	'
+	# Latest Logs ----------------------------------------
+	'
+	)
+	LatestDebuglog := FileRead(".\settings\debug_log.txt")
+	out .= SubStr(LatestDebugLog, InStr(LatestDebuglog, "`n", , ,-(alt ? 40 : 26)) + 1) "``````" ;InStr: retrieve the last 25 lines of the debug log (log is oldest to newest) [Integer] | SubStr: retrieve the content of the last 25 lines
+	A_Clipboard := out
+	MsgBox("Copied Debug stats to your clipboard.", "Copy Debug Logs", 0x40040)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -15005,7 +15055,18 @@ nm_gather(pattern, index, patternsize:="M", reps:=1, facingcorner:=0){
 			FieldSprinklerDist:=' FieldSprinklerDist '
 			FieldRotateDirection:="' FieldRotateDirection '"
 			FieldRotateTimes:=' FieldRotateTimes '
-			FieldDriftCheck:=' FieldDriftCheck
+			FieldDriftCheck:=' FieldDriftCheck '
+			nm_CameraRotation(Dir, count) {
+				Static LR := 0, UD := 0, init := OnExit((*) => send("{" Rot%(LR > 0 ? "Left" : "Right")% " " Mod(Abs(LR), 8) "}{" Rot%(UD > 0 ? "Up" : "Down")% " " Abs(UD) "}"), -1)
+				send "{" Rot%Dir% " " count "}"
+				Switch Dir,0 {
+					Case "Left": LR -= count
+					Case "Right": LR += count
+					Case "Up": UD -= count
+					Case "Down": UD += count
+				}
+			}
+			'
 			)
 		) ; create / replace cycled walk script for this gather session
 	else
@@ -20568,45 +20629,6 @@ mp_HarvestPlanter(PlanterIndex) {
 		}
 		return 1
 	}
-}
-
-copyLogFile(*) {
-	static tempPath := A_Temp "\debug_log.txt", os_version := "Cannot detect OS version", processorName := '', RAMAmount := 0
-	alt := !!GetKeyState("Control")
-	if ((!processorName) || (os_version = "Cannot detect OS version"))
-		winmgmts := ComObjGet("winmgmts:")
-	if (os_version = "Cannot detect OS version") {
-		for objItem in winmgmts.ExecQuery("SELECT * FROM Win32_OperatingSystem")
-			os_version := Trim(StrReplace(StrReplace(StrReplace(StrReplace(objItem.Caption, "Microsoft"), "Майкрософт"), "مايكروسوفت"), "微软"))
-	}
-	if (!processorName){
-		for objItem in winmgmts.ExecQuery("SELECT * FROM Win32_Processor")
-			processorName := Trim(objItem.Name)
-	}
-	if (!RAMAmount) {
-		MEMORYSTATUSEX := Buffer(64,0)
-		NumPut("uint", 64, MEMORYSTATUSEX)
-		DllCall("kernel32\GlobalMemoryStatusEx", "ptr", MEMORYSTATUSEX)
-		RAMAmount := Round(NumGet(MEMORYSTATUSEX, 8, "int64") / 1073741824, 1)
-	}
-	out :=	
-	(
-	'``````md
-	# Info -----------------------------------------------
-	OSVersion: ' os_version ' (' (A_Is64bitOS ? '64-bit' : '32-bit') ')
-	AutoHotkey Version: ' A_AhkVersion '; ' (A_AhkPath = A_WorkingDir '\submacros\AutoHotkey32.exe' ? "Using included AHK" : "Using installed AHK") '
-	Natro Version: ' VersionID '
-	Installation Path: ' StrReplace(A_WorkingDir, A_UserName, '<user>')
-	. (processorName ? '`r`nCPU: ' processorName : '')
-	. (RAMAmount ? '`r`nRAM: ' RAMAmount 'GB' : '')
-	'
-	# Latest Logs ----------------------------------------
-	'
-	)
-	LatestDebuglog := FileRead(".\settings\debug_log.txt")
-	out .= SubStr(LatestDebugLog, InStr(LatestDebuglog, "`n", , ,-(alt ? 40 : 26)) + 1) "``````" ;InStr: retrieve the last 25 lines of the debug log (log is oldest to newest) [Integer] | SubStr: retrieve the content of the last 25 lines
-	A_Clipboard := out
-	MsgBox("Copied Debug stats to your clipboard.", "Copy Debug Logs", 0x40040)
 }
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
