@@ -4844,6 +4844,8 @@ nm_NightMemoryMatchCheck(*){
 	global NightMemoryMatchCheck
 	PostSubmacroMessage("background", 0x5554, 7, NightMemoryMatchCheck := MainGui["NightMemoryMatchCheck"].Value)
 	IniWrite NightMemoryMatchCheck, "settings\nm_config.ini", "Collect", "NightMemoryMatchCheck"
+	if (NightMemoryMatchCheck = 1)
+		MsgBox "The night memory match path is heavily affected by lag and haste! This is because there are no good anchor points to align to. It works best at standard movespeeds and without haste. If it doesn't work for you, we recommend disabling it.", "Night Memory Match", 0x1030 " Owner" MainGui.Hwnd
 }
 nm_MemoryMatchOptions(*){
 	global MMGui, MicroConverterMatchIgnore, SunflowerSeedMatchIgnore, JellyBeanMatchIgnore, RoyalJellyMatchIgnore, TicketMatchIgnore
