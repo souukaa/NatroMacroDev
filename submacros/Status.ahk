@@ -765,7 +765,8 @@ nm_status(status)
 nm_honey()
 {
 	static id := ""
-
+	if !HoneyUpdateSSCheck
+		return id := ""
 	if HoneyUpdate
 	{
 		payload_json := '{"embeds": [{"description": "[' A_Hour ':' A_Min ':' A_Sec '] Current Honey/Pollen", "color": "' HoneyUpdate '", "image": {"url": "attachment://honey.png"}}], "attachments": []}'
