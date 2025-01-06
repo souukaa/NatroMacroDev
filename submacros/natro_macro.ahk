@@ -6775,7 +6775,7 @@ nm_WebhookGUI(*){
 		, "PhantomPingCheck", 20
 		, "UnexpectedDeathPingCheck", 21
 		, "EmergencyBalloonPingCheck", 22
-		, "HoneyUpdateSSCheck", 361)
+		, "HoneyUpdateSSCheck", 363)
 
 	str_enum := Map("webhook", 1
 		, "bottoken", 2

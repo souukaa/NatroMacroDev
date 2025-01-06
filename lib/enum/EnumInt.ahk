@@ -360,4 +360,4 @@
 	, "CoconutBoosterCheck"
 	, "StumpBoosterCheck"
 	, "PepperBoosterCheck"
-  , "HoneyUpdateSSCheck"]
+	, "HoneyUpdateSSCheck"]
