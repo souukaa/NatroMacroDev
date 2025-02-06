@@ -6571,11 +6571,13 @@ ba_gatherFieldSippingSwitch_(*){
 ba_maxAllowedPlantersSwitch(*){
 	global
 	MaxAllowedPlanters := MainGui["MaxAllowedPlanters"].Value
-	if(!MaxAllowedPlanters)
-		MainGui["PlanterMode"].Value:=1, ba_planterSwitch()
-	else
-		MainGui["MaxAllowedPlanters"].Enabled:=0, MainGui["PlanterMode"].Value := 2
-	ba_saveConfig_(), MainGui["MaxAllowedPlanters"].Enabled:=1
+	if(MaxAllowedPlanters=0){
+		MainGui["PlanterMode"].Value := 1
+		ba_planterSwitch()
+	} else {
+		MainGui["PlanterMode"].Value := 2
+	}
+	ba_saveConfig_()
 }
 ba_saveConfig_(*){ ;//todo: needs replacing!
 	global
@@ -19802,7 +19804,7 @@ ba_getNextPlanter(nextfield){
 }
 ba_placePlanter(fieldName, planter, planterNum, atField:=0){
 	global BambooFieldCheck, BlueFlowerFieldCheck, CactusFieldCheck, CloverFieldCheck, CoconutFieldCheck, DandelionFieldCheck, MountainTopFieldCheck, MushroomFieldCheck, PepperFieldCheck, PineTreeFieldCheck, PineappleFieldCheck, PumpkinFieldCheck, RoseFieldCheck, SpiderFieldCheck, StrawberryFieldCheck, StumpFieldCheck, SunflowerFieldCheck, MaxAllowedPlanters, LostPlanters, bitmaps
-	global PlasticPlanterCheck, CandyPlanterCheck, BlueClayPlanterCheck, RedClayPlanterCheck, TackyPlanterCheck, PesticidePlanterCheck, HeatTreatedPlanterCheck, HydroponicPlanterCheck, PetalPlanterCheck, PlanterCheckOfPlenty, PaperPlanterCheck, TicketPlanterCheck
+
 	nm_updateAction("Planters")
 
 	nm_setShiftLock(0)
@@ -19820,10 +19822,8 @@ ba_placePlanter(fieldName, planter, planterNum, atField:=0){
 
 	if (planterPos = 0) ; planter not in inventory
 	{
+		nm_setStatus("Missing", planterName)
 		LostPlanters.=planterName
-		%planterName%Check := 0
-		MainGui[planterName "Check"].Value := 0
-		nm_setStatus("Error", planterName " is not in your inventory! This planter has been deselected.")
 		ba_saveConfig_()
 		return 0
 	}
@@ -19941,7 +19941,7 @@ ba_harvestPlanter(planterNum){
 	nm_setShiftLock(0)
 	nm_Reset(1, ((GatherPlanterLoot = 1) && ((fieldname = "Rose") || (fieldname = "Pine Tree") || (fieldname = "Pumpkin") || (fieldname = "Cactus") || (fieldname = "Spider"))) ? min(20000, (60-HiveBees)*1000) : 0)
 	nm_setStatus("Traveling", planterName . " (" . fieldName . ")")
-	nm_gotoPlanter(fieldName, 1)
+	nm_gotoPlanter(fieldName)
 	nm_setStatus("Collecting", (planterName . " (" . fieldName . ")"))
 	while ((A_Index <= 5) && !(findPlanter := (nm_imgSearch("e_button.png",10)[1] = 0)))
 		Sleep 200
@@ -20556,8 +20556,7 @@ mp_HarvestPlanter(PlanterIndex) {
 	nm_Reset(nm_Reset(1, ((MFieldName = "Rose") || (MFieldName = "Pine Tree") || (MFieldName = "Pumpkin") || (MFieldName = "Cactus") || (MFieldName = "Spider")) ? min(20000, (60-HiveBees)*1000) : 0))
 
 	nm_setStatus("Traveling", MPlanterName . " (" . MFieldName . ")")
-	nm_gotoPlanter(MFieldName, 1)
-
+	nm_gotoPlanter(MFieldName)
 	if ((!MPuffModeA) || (!MPuffMode%PlanterIndex%) || (PlanterHarvestNow%PlanterIndex%))
 		nm_setStatus("Collecting", (MPlanterName . " (" . MFieldName . ")"))
 	else
@@ -20568,8 +20567,8 @@ mp_HarvestPlanter(PlanterIndex) {
 		nm_setStatus("Searching", (MPlanterName . " (" . MFieldName . ")"))
 		findPlanter := nm_searchForE()
 	}
-	;check for phantom planter, if not found
 	if (findPlanter = 0) {
+		;check for phantom planter
 		nm_setStatus("Checking", "Phantom Planter: " . MPlanterName)
 
 		planterPos := nm_InventorySearch(MPlanterName, "up", 4) ;~ new function
@@ -20623,7 +20622,6 @@ mp_HarvestPlanter(PlanterIndex) {
 		return 1
 	}
 	else {
-		; harvest planter
 		sendinput "{" SC_E " down}"
 		Sleep 100
 		sendinput "{" SC_E " up}"
@@ -20668,12 +20666,11 @@ mp_HarvestPlanter(PlanterIndex) {
 			}
 		}
 		else {
-			loop 10 {
-				MouseMove windowX+350, windowY+offsetY+100
+			loop 3 {
 				pBMScreen := Gdip_BitmapFromScreen(windowX+windowWidth//2-250 "|" windowY+windowHeight//2-52 "|500|150")
 				if (Gdip_ImageSearch(pBMScreen, bitmaps["yes"], &pos, , , , , 2, , 2) = 1) {
 					MouseMove windowX+windowWidth//2-250+SubStr(pos, 1, InStr(pos, ",")-1), windowY+windowHeight//2-52+SubStr(pos, InStr(pos, ",")+1)
-					Sleep 200
+					Sleep 150
 					Click
 					sleep 100
 					Gdip_DisposeImage(pBMScreen)
@@ -20718,7 +20715,6 @@ mp_HarvestPlanter(PlanterIndex) {
 		PostSubmacroMessage("StatMonitor", 0x5555, 4, 1)
 		IniWrite TotalPlantersCollected, "settings\nm_config.ini", "Status", "TotalPlantersCollected"
 		IniWrite SessionPlantersCollected, "settings\nm_config.ini", "Status", "SessionPlantersCollected"
-
 		;gather loot
 		if (MGatherPlanterLoot = 1)
 			{
@@ -20737,6 +20733,7 @@ mp_HarvestPlanter(PlanterIndex) {
 					sleep 200
 				}
 			}
+			;nm_setStatus("Holding", "Inside if MConvertFullBagHarvest=1 && BackpackPercent>=95 " (MPlanterName . " (" . MFieldName . ")")) ; //testing
 			nm_walkFrom(MFieldName)
 			DisconnectCheck()
 			nm_findHiveSlot()
