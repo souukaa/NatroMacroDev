@@ -2049,7 +2049,7 @@ hBitmapsSBT := Map(), hBitmapsSBT.CaseSense := 0
 #Include "memorymatch\bitmaps.ahk"
 #include "reset\bitmaps.ahk"
 
-hBitmapsSB := Map()
+(hBitmapsSB := Map()).CaseSense := 0
 for x,y in hBitmapsSBT
 	hBitmapsSB[x] := Gdip_CreateHBITMAPFromBitmap(y), Gdip_DisposeImage(y)
 hBitmapsSB["None"] := 0
