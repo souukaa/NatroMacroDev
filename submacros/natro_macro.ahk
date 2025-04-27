@@ -21711,7 +21711,7 @@ start(*){
 	
 	if !ForceStart {
 		;Auto Field Boost WARNING @ start
-		nm_SetStatus("Debug", "AFB" AutoFieldBoostActive " RC" RemoteStart " Force" ForceStart) 
+		;nm_SetStatus("Debug", "AFB" AutoFieldBoostActive " RC" RemoteStart " Force" ForceStart) 
 		if AutoFieldBoostActive {
 			local futureDice  := (AFBDiceEnable ? (AFBDiceLimitEnable ? (AFBDiceLimit-AFBdiceUsed) : 'All') : 'None')
 			local futureGlitter  := (AFBGlitterEnable ? (AFBGlitterLimitEnable ? (AFBGlitterLimit-AFBglitterUsed) : 'All') : 'None')
