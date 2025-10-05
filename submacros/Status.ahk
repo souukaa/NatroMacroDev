@@ -680,7 +680,7 @@ nm_status(status)
 			color := ((state = "Disconnected") || (state = "You Died") || (state = "Failed") || (state = "Error") || (state = "Aborting") || (state = "Missing") || (state = "Canceling") || InStr(objective, "Phantom") || InStr(objective, "No Balloon Convert")) ? 15085139 ; red - error
 			: (InStr(objective, "Tunnel Bear") || InStr(objective, "King Beetle") || InStr(objective, "Vicious Bee") || InStr(objective, "Snail") || InStr(objective, "Crab") || InStr(objective, "Mondo") || InStr(objective, "Commando")) ? 7036559 ; purple - boss / attacking
 			: (InStr(objective, "Planter") || (state = "Placing") || (state = "Collecting") || (state = "Holding")) ? 48355 ; blue - planters
-			: ((state = "Interupted") || (state = "Reporting") || (state = "Warning")) ? 14408468 ; yellow - alert
+			: ((state = "Interrupted") || (state = "Reporting") || (state = "Warning")) ? 14408468 ; yellow - alert
 			: ((state = "Gathering")) ? 9755247 ; light green - gathering
 			: ((state = "Converting")) ? 8871681 ; yellow-brown - converting
 			: ((state = "Boosted") || (state = "Looting") || (state = "Keeping") || (state = "Claimed") || (state = "Completed") || (state = "Collected") || (state = "Obtained") || InStr(stateString,"confirmed") || InStr(stateString,"found")) ? 48128 ; green - success
