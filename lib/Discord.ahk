@@ -1,7 +1,7 @@
-/**
+/********************************************
 * @Author SP
 * @Description Class to interact with Discord
-**/
+*********************************************/
 
 
 class discord
