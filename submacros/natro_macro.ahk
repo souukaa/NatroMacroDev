@@ -2157,32 +2157,6 @@ nm_DetectRobloxType()
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; DETECT INCORRECT ROBLOX SETTINGS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-RecommendedRobloxSettings := Map(
-	"Correct", Map(
-		"All", Map(
-			'"GraphicsQualityLevel">3', "Set Graphics Quality to LOWEST",
-			'"PreferredTextSize">1', 'Set Text Size to LOWEST'
-		),
-		"UWP Version", Map(),
-		"Web Version", Map(
-			'"ControlMode">1', 'Turn ON Shift Lock'
-		)
-	),
-	"Incorrect", Map(
-		"All", Map(
-			'"CameraYInverted">true', 'Turn OFF Inverted Camera',
-			'"OnScreenProfilerEnabled">true', 'Turn OFF Microprofiler',
-			'"ComputerCameraMovementMode">2', 'Set Camera Mode to CLASSIC',
-			'"ComputerMovementMode">2', 'Set Movement Mode to KEYBOARD',
-			'"GraphicsQualityLevel">0', "Switch to MANUAL Graphics"
-		),
-		"UWP Version", Map(
-			'"Fullscreen">true', 'Turn OFF Fullscreen',
-			'"ControlMode">1', 'Turn OFF Shift Lock'
-		),
-		"Web Version", Map()
-	)
-)
 JoinArray(arr, sep := "`n") {
     out := ""
     for i, val in arr
@@ -2208,6 +2182,38 @@ nm_LocateRobloxSettingsXML(robloxtype)
 nm_MsgBoxIncorrectRobloxSettings()
 {
 	global IgnoreIncorrectRobloxSettings
+	static RecommendedRobloxSettings := Map(
+		"Correct", Map(
+			"All", Map(
+				'"GraphicsQualityLevel">3', "Set Graphics Quality to LOWEST",
+				'"PreferredTextSize">1', 'Set Text Size to LOWEST'
+			),
+			"UWP Version", Map(),
+			"Web Version", Map(
+				'"ControlMode">1', 'Turn ON Shift Lock'
+			)
+		),
+		"Incorrect", Map(
+			"All", Map(
+				'"CameraYInverted">true', 'Turn OFF Inverted Camera',
+				'"OnScreenProfilerEnabled">true', 'Turn OFF Microprofiler',
+				'"ComputerCameraMovementMode">2', 'Set Camera Mode to CLASSIC',
+				'"ComputerMovementMode">2', 'Set Movement Mode to KEYBOARD',
+				'"GraphicsQualityLevel">0', "Switch to MANUAL Graphics"
+			),
+			"UWP Version", Map(
+				'"Fullscreen">true', 'Turn OFF Fullscreen',
+				'"ControlMode">1', 'Turn OFF Shift Lock'
+			),
+			"Web Version", Map()
+		)
+	)
+
+	GuiClose(*){
+		if (IsSet(IncSettingsGui) && IsObject(AFBGIncSettingsGuiui))
+			IncSettingsGui.Destroy(), IncSettingsGui := ""
+	}
+	GuiClose()
 	if IgnoreIncorrectRobloxSettings
 		return
 	robloxtype := nm_DetectRobloxType()
@@ -2231,7 +2237,7 @@ nm_MsgBoxIncorrectRobloxSettings()
 		rectext := JoinArray(recommendations, "`n")
 		IncSettingsGui := Gui("+AlwaysOnTop +Owner" MainGui.Hwnd, "Incorrect Roblox Settings Detected")
 		IncSettingsGui.SetFont("s9", "Tahoma")
-		IncSettingsGui.OnEvent("Close", (*) => gui.Destroy())
+		IncSettingsGui.OnEvent("Close", (*) => GuiClose())
 		IncSettingsGui.SetFont("Bold s10 c" (robloxtype = RobloxTypes.NotFound || robloxtype = RobloxTypes.UWP ? "Red" : "0a7e00"), "Tahoma")
 		IncSettingsGui.Add("Text", "x10 y10 w400 +Center", "Default Roblox Installation: " robloxtype)
 		IncSettingsGui.SetFont("s9 cDefault", "Tahoma")
@@ -2252,7 +2258,9 @@ nm_MsgBoxIncorrectRobloxSettings()
 				: IncSettingsGui.Destroy()
 		))
 		IncSettingsGui.Show("AutoSize Center")
+		return 1
 	}
+	return 0
 }
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; AUTO-UPDATE
@@ -5769,7 +5777,8 @@ nm_BoostChaserCheck(*){
 	}
 }
 nm_BoostedFieldSelectButton(*){
-	global BoostedFieldSelectGui
+	global
+	local GuiCtrl
 	GuiClose(*){
 		if (IsSet(BoostedFieldSelectGui) && IsObject(BoostedFieldSelectGui))
 			BoostedFieldSelectGui.Destroy(), BoostedFieldSelectGui := ""
@@ -9763,7 +9772,7 @@ nm_AdvancedGUI(init:=0){
 }
 DangerInfo(*) => MsgBox("
 	(
-	These settings could case the macro to not function correctly, or for your roblox account to be at risk.
+	These settings could cause the macro to not function correctly, or for your roblox account to be at risk.
 
 	Read each warning CAREFULLY. If you are unsure about any of these settings, it is recommended to leave them off.
 	)")
@@ -10194,6 +10203,7 @@ nm_copyDebugLog(param:="", *) {
 			checkProblem((InStr(EnvGet("SESSIONNAME"), "RDP") && remoteDesktopMinimize != 2), 'Minimizing remote desktop connection will cause Natro Macro to break')
 			checkProblem((DllCall("GetSystemMetrics", "Int", 95) != 0), 'Touchscreen is enabled')
 			checkProblem((robloxtype = RobloxTypes.UWP), 'Using UWP Roblox, it is currently unsupported for this Natro Macro version')
+			checkProblem((HideErrors = 0), 'Error hiding is disabled')
 
 			(problems = 0 ? '`n<None>' : '`n`n> Total: ' problems)
 		)
@@ -10209,6 +10219,7 @@ nm_copyDebugLog(param:="", *) {
 		loop parse latestLogs, '`r`n' {
 			if InStr(A_LoopField, 'Error') || InStr(A_LoopField, 'Warning') || InStr(A_LoopField, 'Failed'){
 				issues .= A_LoopField '`n'
+				totalissues++
 				if totalissues > 10	
 					break
 			}
@@ -22081,6 +22092,7 @@ Background(){
  */
 start(*){
 	global
+	unlockstartbutton() => (MainGui["StartButton"].Enabled := 1, Hotkey(StartHotkey, "On"))
 
 	;//todo: make startup errors an array
 
@@ -22097,19 +22109,21 @@ start(*){
 		robloxtype := nm_DetectRobloxType()
 		if RemoteStart && (robloxtype = RobloxTypes.UWP || robloxtype = RobloxTypes.NotFound) {
 			nm_setStatus("Error","Unable to start macro. Invalid Roblox installation detected. Please install Roblox from https://www.roblox.com/download")
-			return
+			return unlockstartbutton()
 		} else {
 			if robloxtype = RobloxTypes.UWP {
 				MsgBox "UWP Roblox installation is detected, Natro Macro currently does not support it.`nPlease install Roblox from https://www.roblox.com/download", "UWP Roblox Detected", 0x40010 " T60"
-				return
+				return unlockstartbutton()
 			}
 			if robloxtype = RobloxTypes.NotFound {
 				MsgBox "Unable to detect a Roblox installation.`nPlease install Roblox from https://www.roblox.com/download", "Roblox Not Found", 0x40010 " T60"
-				return
+				return unlockstartbutton()
 			}
 		}
 
-		nm_MsgBoxIncorrectRobloxSettings()
+		if !RemoteStart && !ForceStart
+			if nm_MsgBoxIncorrectRobloxSettings()
+				return unlockstartbutton()
 
 		
 		;Auto Field Boost WARNING @ start
