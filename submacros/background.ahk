@@ -178,24 +178,21 @@ nm_popStarCheck(){
 
 nm_CheckNight() { ; 0 = day, 1 = night, 2 = dusk (thank postmessage)
 	static nightConfidence := 0, NightLastDetected := 0
-	local imgDetected := 0, night := 0
+	local night := 0
 
 	if !StingerCheck && !NightMemoryMatchCheck
 		return
 
-	CheckBitmap("day", 6)
-	
-	if !imgDetected {
-		CheckBitmap("night", 4)
-		
-		if imgDetected && nightConfidence < 6
+	if !CheckBitmap("day", 6) {
+		if CheckBitmap("night", 4) && nightConfidence < 6
 			nightConfidence++
 		else if  nightConfidence > 1
 			nightConfidence -= 2
 	}
 
-	if (nightConfidence >= 6 || nowUnix()-NightLastDetected < 300) {
-		night := 1, nightConfidence := 0
+	night := (nightConfidence >= 6 || nowUnix()-NightLastDetected < 300) ? 1 : (nightConfidence > 1 ? 2 : 0)
+	if night = 1 {
+		nightConfidence := 0
 		if (nowUnix()-NightLastDetected > 300 || nowUnix()-NightLastDetected < 0) {
 			NightLastDetected := nowUnix()
 			if WinExist("natro_macro ahk_class AutoHotkey") {
@@ -203,27 +200,23 @@ nm_CheckNight() { ; 0 = day, 1 = night, 2 = dusk (thank postmessage)
 				Send_WM_COPYDATA("Detected: Night", "natro_macro ahk_class AutoHotkey")
 			}
 		}
-	} else if (nightConfidence > 1) {
-		night := 2 ; dusk
-	} else {
-		night := 0
 	}
-	
+
 	if (WinExist("PlanterTimers.ahk ahk_class AutoHotkey"))
 		PostMessage 0x5552, 367, night
 
 	CheckBitmap(time, variation){
 		try {
 			pBMScreen := Gdip_BitmapFromScreen(windowX "|" windowY + windowHeight//2 "|" windowWidth "|" windowHeight//2)
-			for v in bitmaps[time] {
+			for _, v in bitmaps[time] {
 				if (Gdip_ImageSearch(pBMScreen, v,,,,,,4) = 1) {
-					imgDetected := 1
 					Gdip_DisposeImage(pBMScreen)
-					break
+					return 1
 				}
 			}
 			Gdip_DisposeImage(pBMScreen)
 		}
+		return 0
 	}
 }
 
