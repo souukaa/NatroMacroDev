@@ -11053,7 +11053,7 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 		return success
 	}
 }
-nm_HealthBar() {
+nm_HealthBar() { 
 	local detection := 0
 	static isDead(c) =>   ((((c) & 0x00FF0000 >= 0x004D0000) && ((c) & 0x00FF0000 <= 0x00830000)) ; 4D4D4D-blackBG|838383-whiteBG
 						&& (((c) & 0x0000FF00 >= 0x00004D00) && ((c) & 0x0000FF00 <= 0x00008300))
@@ -17806,8 +17806,7 @@ nm_claimHiveSlot(){
 					HiveSlot := preferred
 					MainGui["HiveSlot"].Text := HiveSlot
 					IniWrite HiveSlot, "settings\nm_config.ini", "Settings", "HiveSlot"
-					nm_setStatus("Claimed", "Hive Slot " . HiveSlot)
-					PostSubmacroMessage("background", 0x5554, 2, HiveSlot)
+					nm_setStatus("Claimed", "Hive Slot " HiveSlot)
 					MouseMove windowX+350, windowY+offsetY+100
 					return 1
 				}
@@ -17911,8 +17910,7 @@ nm_claimHiveSlot(){
 	;update hive slot
 	MainGui["HiveSlot"].Text := HiveSlot
 	IniWrite HiveSlot, "settings\nm_config.ini", "Settings", "HiveSlot"
-	nm_setStatus("Claimed", "Hive Slot " . HiveSlot)
-	PostSubmacroMessage("background", 0x5554, 2, HiveSlot)
+	nm_setStatus("Claimed", "Hive Slot " HiveSlot)
 	MouseMove windowX+350, windowY+offsetY+100
 
 	return 1

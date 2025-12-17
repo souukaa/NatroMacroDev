@@ -82,7 +82,7 @@ nm_setGlobalNum(wParam, lParam, *){
 	global resetTime, StingerCheck, LastConvertBalloon, NightMemoryMatchCheck
 	static arr:=["resetTime", 0, 0, "StingerCheck", 0, "LastConvertBalloon", "NightMemoryMatchCheck", 0]
 
-	var := arr[wParam], %var% := lParam
+	try var := arr[wParam], %var% := lParam
 	return 0
 }
 
