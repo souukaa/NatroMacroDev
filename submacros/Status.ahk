@@ -83,6 +83,7 @@ DebugLogEnabled := A_Args[34]
 MonsterRespawnTime := A_Args[35]
 
 HoneyUpdateSSCheck := A_Args[36]
+discordUIDCommands := A_Args[37]
 
 pToken := Gdip_Startup()
 OnExit(ExitFunc)
@@ -277,7 +278,8 @@ settings["PlanterNectar3"] := {enum: 76, type: "str", section: "Planters", regex
 settings["PlanterHarvestFull1"] := {enum: 77, type: "str", section: "Planters", regex: "i)^(Full|Timed)$"}
 settings["PlanterHarvestFull2"] := {enum: 78, type: "str", section: "Planters", regex: "i)^(Full|Timed)$"}
 settings["PlanterHarvestFull3"] := {enum: 79, type: "str", section: "Planters", regex: "i)^(Full|Timed)$"}
-settings["ClaimMethod"] := {enum: 80 , type: "str", section: "Settings", regex: "i)^(Detect|To Slot)$"}
+;settings["discordUIDCommands"] := {enum: 80, type: "str", section: "Status", regex: "i)^(&?\d{17,20}$"} dangerous
+settings["ClaimMethod"] := {enum: 81 , type: "str", section: "Status", regex: "i)^(Detect|To Slot)$"}
 
 ;settings["discordMode"] := {enum: 1, type: "int", section: "Status", regex: "i)^(0|1|2)$"} dangerous
 ;settings["discordCheck"] := {enum: 2, type: "int", section: "Status", regex: "i)^(0|1)$"} dangerous
@@ -650,6 +652,8 @@ bitmaps := Map()
 bitmaps["moon"] := Gdip_BitmapFromBase64("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")
 #Include "%A_ScriptDir%\..\nm_image_assets\offset\bitmaps.ahk"
 
+discordUIDCommands_is_role := strlen(discordUIDCommands) && SubStr(discordUIDCommands, 1, 1) == "&"
+
 Loop
 {
 	(status_buffer.Length > 0) && nm_status(status_buffer[1])
@@ -802,13 +806,40 @@ CreateHoneyBitmap(honey := 1, backpack := 1)
 	return pBM
 }
 
+
 nm_command(command)
 {
 	global commandPrefix, MacroState, planters, timers, settings, blender, shrine, priorityListNumeric
 	static ssmode := "All"
 	, defaultPriorityList := ["Night", "Mondo", "Planter", "Bugrun", "Collect", "QuestRotate", "Boost", "GoGather"]
 
-	id := command.id, params := []
+	id := command.id, params := [], user_id := command.user_id
+
+	if !UserHasPermission() {
+		discord.SendEmbed("Only <@" discordUIDCommands "> can use commands", 16711731,,,,id)
+		return command_buffer.RemoveAt(1)
+	}
+
+
+	UserHasPermission(){
+		; no whitelist enabled
+		if !discordUIDCommands
+			return 1
+
+		; whitelisted is user, user = msg author
+		if (!discordUIDCommands_is_role && discordUIDCommands = user_id) 
+			return 1
+		
+		; Allowed is role
+		if (discordUIDCommands_is_role) {
+			roles := getUserRoles(user_id)
+			if (ObjHasValue(roles, SubStr(discordUIDCommands, 2)))
+				return 1
+		}
+		return 0
+	}
+
+
 	Loop Parse SubStr(command.content, StrLen(commandPrefix)+1), A_Space
 		if (A_LoopField != "")
 			params.Push(A_LoopField)
@@ -965,20 +996,20 @@ nm_command(command)
 				'
 				{
 					"embeds": [
-					  {
+					{
 						"title": "Priority List",
 						"color": 2829617,
 						"description": "To change the priority list, use the following command:\n``````\n' commandPrefix 'set priorityListNumeric [numbers|default]\n``````\nEach digit represents its slot in the default priority list.\nFor example:\n``````\n' commandPrefix 'set priorityListNumeric 12345678\n``````\n\n**Default Priority List**``````ansi\n1 - Night\n2 - Mondo\n3 - Planter\n4 - Bugrun\n5 - Collect\n6 - Quest Rotate\n7 - Boost\n8 - Go Gather``````"
-					  }
+					}
 					],
 					"allowed_mentions": {
-					  "parse": []
+					"parse": []
 					},
 					"message_reference": {
-					  "message_id": "' id '",
-					  "fail_if_not_exists": false
+					"message_id": "' id '",
+					"fail_if_not_exists": false
 					}
-				  }			  
+				}			  
 				'
 				)
 			default:
@@ -2484,6 +2515,14 @@ nm_command(command)
 	}
 }
 
+getUserRoles(user_id) {
+	if (res := discord.GetChannel(MainChannelID)) = -1
+		return -1
+	channel := JSON.parse(res, false, false)
+	member := JSON.parse(discord.GetMember(channel.guild_id, user_id), false, false)
+	return member.roles
+}
+
 nm_TrimLog(size)
 {
 	global logsize
@@ -2557,7 +2596,18 @@ nm_setGlobalStr(wParam, lParam, *)
 
 	var := arr[wParam], section := sections[lParam]
 	%var% := IniRead(A_ScriptDir "\..\settings\nm_config.ini", section, var)
+
+	UpdateStrActions(var)
 	return 0
+}
+
+UpdateStrActions(var){
+	global
+	
+	switch {
+		case "discordUIDCommands":
+			discordUIDCommands_is_role := StrLen(discordUIDCommands) && SubStr(discordUIDCommands, 1, 1) == "&"
+	}
 }
 
 nm_sendHeartbeat(*)

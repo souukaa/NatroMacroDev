@@ -63,9 +63,9 @@ class discord
 				}
 			}
 			size := FileGetSize(filepath)
-			if (size > 26214076)
+			if (size > 10485760)
 			{
-				this.SendEmbed('``' StrReplace(StrReplace(filepath, "\", "\\"), '"', '\"') '`` is above the Discord file size limit of 25MiB!', 16711731, , , , replyID)
+				this.SendEmbed('``' StrReplace(StrReplace(filepath, "\", "\\"), '"', '\"') '`` is above the Discord file size limit of 10MiB!', 16711731, , , , replyID)
 				return -1
 			}
 		}
@@ -140,9 +140,42 @@ class discord
 		Loop (n := (messages := this.GetRecentMessages(channel)).Length)
 		{
 			i := n - A_Index + 1
-			(SubStr(content := Trim(messages[i]["content"]), 1, StrLen(commandPrefix)) = commandPrefix) && command_buffer.Push({content:content, id:messages[i]["id"], url:messages[i]["attachments"].Has(1) ? messages[i]["attachments"][1]["url"] : ""})
+			(SubStr(content := Trim(messages[i]["content"]), 1, StrLen(commandPrefix)) = commandPrefix) && command_buffer.Push({content:content, id:messages[i]["id"], url:messages[i]["attachments"].Has(1) ? messages[i]["attachments"][1]["url"] : "", user_id: messages[i]["author"]["id"]})
 		}
 	}
+
+	static GetChannel(channelid)
+	{
+		global discordMode
+		if (discordMode == 0)
+			return -1
+
+		wr := ComObject("WinHttp.WinHttpRequest.5.1")
+		wr.Option[9] := 2720
+		wr.Open("GET", Discord.baseURL . "channels/" channelid)
+		wr.SetRequestHeader("User-Agent", "DiscordBot (AHK, " A_AhkVersion ")")
+		wr.SetRequestHeader("Authorization", "Bot " . bottoken)
+		wr.Send()
+		wr.WaitForResponse()
+		return wr.ResponseText
+	}
+
+	static GetMember(guild_id, user_id)
+	{
+		global discordMode
+		if (discordMode == 0)
+			return -1
+
+		wr := ComObject("WinHttp.WinHttpRequest.5.1")
+		wr.Option[9] := 2720
+		wr.Open("GET", Discord.baseURL . "guilds/" . guild_id . "/members/" . user_id)
+		wr.SetRequestHeader("User-Agent", "DiscordBot (AHK, " A_AhkVersion ")")
+		wr.SetRequestHeader("Authorization", "Bot " . bottoken)
+		wr.Send()
+		wr.WaitForResponse()
+		return wr.ResponseText
+	}
+
 
 	static GetRecentMessages(channel)
 	{
