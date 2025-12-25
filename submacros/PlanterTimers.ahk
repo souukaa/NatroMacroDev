@@ -176,7 +176,7 @@ TimersGui.Add("Button", "x322 y200 w25 h15 vAddShrineAmount1", "+1").OnEvent("Cl
 TimersGui.Add("Button", "x436 y200 w25 h15 vAddShrineAmount2", "+1").OnEvent("Click", ba_setShrineAmount)
 
 
-TimersGui.Add("text", "x388 y73 w112 +center +BackgroundTrans vdayOrNight", "Detected: N/A")
+TimersGui.Add("text", "x388 y73 w112 +center +BackgroundTrans vdayOrNight", "Detected: Day")
 TimersGui.Add("text", "x391 y2 w110 h60 vstatus +center +BackgroundTrans", "Status:")
 TimersGui.Add("text", "x392 y13 w104 h56 vpstatus +left +BackgroundTrans", "unknown")
 
@@ -743,6 +743,9 @@ nm_setGlobalInt(wParam, lParam, *)
 }
 
 UpdateGui(var) {
+	if !IsObject(TimersGui)
+		return 0
+
 	switch var {
 		case "dayOrNight":
 			Humanize := Map(0, 'Day'

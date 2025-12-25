@@ -2004,6 +2004,15 @@ QuestRedBoost := 0
 HiveConfirmed := 0
 ShiftLockEnabled := 0
 vicStart := 0
+vicResults := {
+	success: "Killed",
+	;(Killed before detected)
+	otherplayer: "Killed by another player",
+	retry: "Retrying field",
+	inactivehoney: "Inactive Honey",
+	found: "Found",
+	dead: "Dead"
+}
 CUSTOM_CURSOR := 1
 nm_WM_SETCURSOR(*) => CUSTOM_CURSOR
 
@@ -18063,7 +18072,7 @@ nm_ViciousBee(){
  * Check each enabled field for vicious
  */
 nm_locateVB(){ 
-	global vicStart := nowUnix()
+	global vicStart := nowUnix(), fieldsChecked := 0
 	; don't run if disabled or only daily bonus
 	if (StingerCheck=0) || (StingerDailyBonusCheck=1 && (vicStart-VBLastKilled)<79200) {
 		return
@@ -18120,9 +18129,9 @@ nm_locateVB(){
 	]
 
 	for data in VicData { ; if no fields enabled, return
-		if data["enabled"]
+		if data.enabled
 			break
-		if A_Index = VicData.Count
+		if A_Index = VicData.Length
 			return
 	}
 
@@ -18134,11 +18143,13 @@ nm_locateVB(){
 	}
 	nm_updateAction("Stingers")
 
-	fieldsChecked := 0
 	for data in VicData
 	{
 		if !data.enabled || data.bees >= HiveBees
 			continue
+		; This is built into the game
+		if (nowUnix() - vicStart) > 300
+			return vicEnd('Timeout - 5 minute limit')
 
 		fieldloop:
 		Loop 3 ; attempt each field a maximum of 3 times
@@ -18156,9 +18167,11 @@ nm_locateVB(){
 
 			alignment := nm_Walk(data.initRight, RightKey) "`n" nm_Walk(data.initFwd, FwdKey)
 
-			if (vic := SearchforVB(alignment, data.field)).result = "inactivehoney"
+			fieldsChecked++
+
+			if (vic := SearchforVB(alignment, data.field)).result = vicResults.retry
 				continue fieldloop
-			else if vic.result = "otherplayer"
+			else if vic.result = vicResults.otherplayer
 				return vicEnd("Killed by another player")
 
 			patterns := [
@@ -18167,37 +18180,36 @@ nm_locateVB(){
 			]
 
 			Loop data.reps {
-				if (vic := SearchforVB(patterns[1], data.field)).result = "success" 
+				if (vic := SearchforVB(patterns[1], data.field)).result = vicResults.success 
 					return vicEnd()
-				else if vic.result = "otherplayer" 
+				else if vic.result = vicResults.otherplayer
 					return vicEnd("Killed by another player")
-				else if vic.result = "inactivehoney"
+				else if vic.result = vicResults.retry
 					continue fieldloop
 			}
 			
-			if (vic := SearchforVB(patterns[2], data.field)).result = "success"
+			if (vic := SearchforVB(patterns[2], data.field)).result = vicResults.success
 				return vicEnd()
-			else if vic.result = "otherplayer"
+			else if vic.result = vicResults.otherplayer
 				return vicEnd("Killed by another player")
-			else if vic.result = "inactivehoney"
+			else if vic.result = vicResults.retry
 				continue fieldloop
 
 			Click "Up"
 			break fieldLoop
 		}
-		fieldsChecked++
 	}
 }
 /**
  * End cycle and send status message
  */
-vicEnd(reason:='Killed'){
+vicEnd(reason:=vicResults.success){
 	global VBLastKilled
 	Click "Up"
 	duration := DurationFromSeconds(nowUnix() - vicStart, "mm:ss")
 
-	nm_setStatus("Completed", "Vicious Bee - " reason "`nTime: " duration "`nFields Checked:" (++fieldsChecked))
-	if reason = 'killed' {
+	nm_setStatus("Completed", "Vicious Bee - " reason "`nTime: " duration "`nFields Checked: " fieldsChecked)
+	if reason = vicResults.success {
 		nm_IncrementStat("ViciousKills")
 
 		IniWrite((VBLastKilled:=nowUnix()), "settings\nm_config.ini", "Collect", "VBLastKilled")
@@ -18227,8 +18239,12 @@ WalkwithVBCheck(movement, ignoreHoney?, ignoreStatus?){
 		if !nm_activeHoney(){
 			if (!IsSet(ignoreHoney) && inactiveHoney++ >= 10) {
 				nm_endWalk()
-				return {result: 'inactivehoney'}
+				return {result: vicResults.inactivehoney}
 			}
+		}
+		if youDied {
+			nm_endWalk()
+			return {result: vicResults.retry}
 		}
 	}
 	KeyWait "F14", "T120 L"
@@ -18242,19 +18258,20 @@ WalkwithVBCheck(movement, ignoreHoney?, ignoreStatus?){
 SearchforVB(movement, field){
 	static inactiveHoney := 0
 	vic := WalkwithVBCheck(movement)
-	if vic.result = 'found' {
+	if vic.result = vicResults.found {
 		return nm_killVB(field)
-	} else if vic.result = 'dead' {
-		nm_setStatus("Detected", "Vicious Bee - Killed by another player")
-		return {result: 'otherplayer'}
-	} else if vic.result = 'inactivehoney' {
+	} else if vic.result = vicResults.dead {
+		nm_setStatus("Detected", "Vicious Bee - Killed")
+		return {result: vicResults.otherplayer}
+	} else if vic.result = vicResults.inactivehoney {
 		if (inactiveHoney++ < 5) {
 			inactiveHoney := 0
 			nm_setStatus("Warning", "Vicious Bee - Inactive Honey - Retrying")
-			return vic
+			return {result: vicResults.retry}
 		}
-	} else if vic.result = 0 {
-		return {result: 0}
+		return {result: 0} ; since we can't be sure that it's out of the field yet
+	} else if vic.result = 0 || vic.result = vicResults.retry {
+		return vic
 	}
 }
 /**
@@ -18279,9 +18296,9 @@ nm_killVB(field) {
 
 	while nowUnix()-start <= 300 { ; 5 minute timeout
 		vic := WalkwithVBCheck(battlepattern, 1, 1)
-		if vic.result = 'dead' {
+		if vic.result = vicResults.dead {
 			nm_setStatus("Killed", "Vicious Bee (" field ")")
-			return {result: 'success'}
+			return {result: vicResults.success}
 		}
 		sleep 1000
 	}
@@ -18308,13 +18325,13 @@ nm_ViciousCheck() {
     for , x in bitmaps["viciousbee"]["dead"] {
         if Gdip_ImageSearch(pBMScreen, x,,,,,, 5) {
             Gdip_DisposeImage(pBMScreen)
-            return { result: "dead" }
+            return { result: vicResults.dead }
         }
     }
     for , x in bitmaps["viciousbee"]["found"] {
         if Gdip_ImageSearch(pBMScreen, x,,,,,, 5) {
             Gdip_DisposeImage(pBMScreen)
-            return { result: "found" }
+            return { result: vicResults.found }
         }
     }
     Gdip_DisposeImage(pBMScreen)

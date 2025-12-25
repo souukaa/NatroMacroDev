@@ -176,9 +176,11 @@ nm_popStarCheck(){
 	}
 }
 
-nm_CheckNight() { ; 0 = day, 1 = night, 2 = dusk (thank postmessage)
-	static nightConfidence := 0, NightLastDetected := 0
-	local night := 0
+nm_CheckNight() {
+	static nightConfidence := 0, NightLastDetected := 0, LastNightState := 0
+	; 0 = day, 1 = night, 2 = dusk
+	night := 0
+
 
 	if !StingerCheck && !NightMemoryMatchCheck
 		return
@@ -190,7 +192,9 @@ nm_CheckNight() { ; 0 = day, 1 = night, 2 = dusk (thank postmessage)
 			nightConfidence -= 2
 	}
 
+	; max confidence (first trigger) or within 5 mins of last detection means night
 	night := (nightConfidence >= 6 || nowUnix()-NightLastDetected < 300) ? 1 : (nightConfidence > 1 ? 2 : 0)
+	;tooltip "confidence: " nightConfidence "`nnight: " night "/" LastNightState
 	if night = 1 {
 		nightConfidence := 0
 		if (nowUnix()-NightLastDetected > 300 || nowUnix()-NightLastDetected < 0) {
@@ -202,13 +206,16 @@ nm_CheckNight() { ; 0 = day, 1 = night, 2 = dusk (thank postmessage)
 		}
 	}
 
-	if (WinExist("PlanterTimers.ahk ahk_class AutoHotkey"))
+	if (WinExist("PlanterTimers.ahk ahk_class AutoHotkey") && (LastNightState != night))
 		PostMessage 0x5552, 367, night
+
+	; prevent excessive postmessages
+	LastNightState := night
 
 	CheckBitmap(time, variation){
 		try {
 			pBMScreen := Gdip_BitmapFromScreen(windowX "|" windowY + windowHeight//2 "|" windowWidth "|" windowHeight//2)
-			for _, v in bitmaps[time] {
+			for , v in bitmaps[time] {
 				if (Gdip_ImageSearch(pBMScreen, v,,,,,,4) = 1) {
 					Gdip_DisposeImage(pBMScreen)
 					return 1
