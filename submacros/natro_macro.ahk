@@ -22203,7 +22203,7 @@ Background(){
  */
 start(*){
 	global
-	unlockstartbutton() => (MainGui["StartButton"].Enabled := 1, Hotkey(StartHotkey, "On"), nm_LockTabs(0))
+	UnlockStartButton() => (MainGui["StartButton"].Enabled := 1, Hotkey(StartHotkey, "On"), nm_LockTabs(0), nm_setStatus("Error", "Incorrect Roblox Configuration"))
 
 	SetKeyDelay 100+KeyDelay
 	nm_LockTabs()
@@ -22220,21 +22220,21 @@ start(*){
 		robloxtype := nm_DetectRobloxType()
 		if RemoteStart && (robloxtype = RobloxTypes.UWP || robloxtype = RobloxTypes.NotFound) {
 			nm_setStatus("Error","Unable to start macro. Invalid Roblox installation detected. Please install Roblox from https://www.roblox.com/download")
-			return unlockstartbutton()
+			return UnlockStartButton()
 		} else {
 			if robloxtype = RobloxTypes.UWP {
 				MsgBox "UWP Roblox installation is detected, Natro Macro currently does not support it.`nPlease install Roblox from https://www.roblox.com/download", "UWP Roblox Detected", 0x40010 " T60"
-				return unlockstartbutton()
+				return UnlockStartButton()
 			}
 			if robloxtype = RobloxTypes.NotFound {
 				MsgBox "Unable to detect a Roblox installation.`nPlease install Roblox from https://www.roblox.com/download", "Roblox Not Found", 0x40010 " T60"
-				return unlockstartbutton()
+				return UnlockStartButton()
 			}
 		}
 
 		if !RemoteStart && !ForceStart
 			if nm_MsgBoxIncorrectRobloxSettings()
-				return unlockstartbutton()
+				(MainGui["StartButton"].Enabled := 1, Hotkey(StartHotkey, "On"), nm_LockTabs(0))
 
 		;Touchscreen WARNING @ start
 		if (DllCall("GetSystemMetrics", "Int", 95) != 0) {
