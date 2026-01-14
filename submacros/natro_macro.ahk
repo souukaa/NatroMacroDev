@@ -10976,7 +10976,7 @@ nm_Reset(checkAll:=1, wait:=2000, convert:=1, force:=0){
 	nm_AutoFieldBoost(currentField) ; start rolling dice in background() if needed
 
 	; High priority interrupts. Will interrupt any reset not marked with the checkAll flag. Added to avoid infinite recursion
-	if(checkAll=1) {
+	if checkAll {
 		nm_fieldBoostBooster()
 		nm_Night()
 	}
@@ -12711,7 +12711,7 @@ nm_MemoryMatch(MemoryMatchGame) {
 
 	success := deaths := 0
 	loop 2 {
-		nm_reset(MemoryMatchGame = "Night" ? 1 : 0, 0, 0)
+		nm_reset(MemoryMatchGame = "Night" ? 0 : 1, 0, 0)
 		nm_SetStatus("Traveling", MemoryMatchGame " Memory Match" ((A_Index > 1) ? " (Attempt 2)" : "" ))
 		nm_GoToCollect(MemoryMatchGame "mm", 0)
 		loop 720 { ; 3 min timeout
@@ -18219,7 +18219,7 @@ nm_locateVB(){
 		fieldloop:
 		Loop 3 ; attempt each field a maximum of 3 times
 		{
-			nm_Reset(1, 2000, 0)
+			nm_Reset(0, 2000, 0)
 			nm_setStatus("Traveling", "Vicious Bee (" data.field ")" ((A_Index > 1) ? " - Attempt " A_Index : ""))
 			nm_gotoField(data.field)
 			nm_setStatus("Searching", "Vicious Bee (" data.field ")")
