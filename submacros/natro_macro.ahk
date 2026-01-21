@@ -10298,24 +10298,20 @@ nm_copyDebugLog(param:="", *) {
 	debugReport :=
 	(
 	'``````md
-	<NM Debug>
-	#PC Info'
+	<NM Debug>'
+	header("PC Info", "`n")
 	PcInfo()
-	'
 
-	#Macro Info'
+	header("Macro Info")
 	MacroInfo()
-	'
 
-	#Roblox Info'
+	header("Roblox Info")
 	RobloxInfo()
-	'
-
-	#Detected Problems'
+	
+	header("Detected Problems")
 	DetectedProblems()
-	'
 
-	#Recent Issues'
+	header("Recent Issues")
 	RecentIssues()
 	'``````'
 	)
@@ -10326,6 +10322,11 @@ nm_copyDebugLog(param:="", *) {
 
 	return 1
 
+	;formatters
+	header(text, newlines:="`n`n") => newlines "# " text
+	point(label, text) => "`n- " label ": " text
+	path(text) => "``" text "``"
+ 
 	PcInfo(){
 		static DisplayScale := Map(
 		96, 100,
@@ -10336,11 +10337,9 @@ nm_copyDebugLog(param:="", *) {
 		if fromRC {
 			return 
 			(
-			'
-			%OS%
-			* Resolution: ' A_ScreenWidth 'x' A_ScreenHeight ' (' DisplayScale[A_ScreenDPI] '%)
-			%CPU%
-			%RAM%'
+			'%OS%'
+			point("Resolution", A_ScreenWidth 'x' A_ScreenHeight ' (' DisplayScale[A_ScreenDPI] '%)')
+			'%CPU% %RAM%'
 			)
 		}
 		winmgmts := ComObjGet("winmgmts:")
@@ -10361,21 +10360,19 @@ nm_copyDebugLog(param:="", *) {
 
 		return
 		(
-		'
-		* OS: ' os_version ' (' (A_Is64bitOS ? '64-bit' : '32-bit') ')
-		* Resolution: ' A_ScreenWidth 'x' A_ScreenHeight ' (' DisplayScale[A_ScreenDPI] '%)'
-		. (processorName ? '`n* CPU: ' processorName : '')
-		. (RAMAmount ? '`n* RAM: ' RAMAmount ' GB' : '')
+		point("OS", os_version ' (' (A_Is64bitOS ? '64-bit' : '32-bit') ')')
+		point("Resolution", A_ScreenWidth 'x' A_ScreenHeight ' (' DisplayScale[A_ScreenDPI] '%)')
+		. (processorName ? point("CPU", processorName) : '')
+		. (RAMAmount ? point("RAM", RAMAmount ' GB') : '')
 		)
 	}
 	MacroInfo(){
 		return 
 		(
-		'
-		* AHK Version: ' A_AhkVersion (A_AhkPath = A_WorkingDir '\submacros\AutoHotkey32.exe' ? ' (built-in)' : ' (installed)') '
-		* Natro Version: ' VersionID ' (' ((VerCompare(VersionID, LatestVer) = 0) ? 'latest' : 'outdated') ')
-		* Installation Path: ``' StrReplace(A_WorkingDir, EnvGet("USERPROFILE"), '%USERPROFILE%') '``'
-	)
+			point("AHK Version", A_AhkVersion (A_AhkPath = A_WorkingDir '\submacros\AutoHotkey32.exe' ? ' (built-in)' : ' (installed)'))
+			point("Natro Version", VersionID ((VerCompare(VersionID, LatestVer) < 0) ? ' (outdated)' : ''))	
+			point("Installation Path", path(StrReplace(A_WorkingDir, EnvGet("USERPROFILE"), '%USERPROFILE%')))
+		)
 	}
 	RobloxInfo(){
 		robloxtype := nm_DetectRobloxType()
@@ -10384,11 +10381,12 @@ nm_copyDebugLog(param:="", *) {
 			robloxpath := nm_GetRobloxUWPPath()
 		else
 			robloxpath := nm_GetRobloxWebPath()
+		if robloxpath 
+			robloxpath := Trim(StrReplace(StrReplace(StrReplace(robloxpath, EnvGet("USERPROFILE"), '%USERPROFILE%'), '%1', ''), '"', ''))
 		return 
 		(
-		(robloxpath ? '`n* Path: ``' Trim(StrReplace(StrReplace(StrReplace(robloxpath, EnvGet("USERPROFILE"), '%USERPROFILE%'), '%1', ''), '"', '')) '``' : '')
-		'
-		* Default app: ' robloxtype
+			(robloxpath ? point("Path", path(robloxpath)) : '')
+			point("Default app", robloxtype)
 		)
 	}
 	DetectedProblems(){
@@ -10414,14 +10412,13 @@ nm_copyDebugLog(param:="", *) {
 		if (DebugLogEnabled = 0)
 			return '`n<Debugging disabled>'
 		latestDebuglog := FileRead('.\settings\debug_log.txt')
-		latestLogs := SubStr(latestDebugLog, InStr(latestDebuglog, '`n', 0, -1, -250))
+		latestLogs := SubStr(latestDebugLog, ((pos := InStr(latestDebuglog, '`n', 0, -1, -250)) ? pos : 1))
 		issues := '', totalissues := 0
 
 		loop parse latestLogs, '`r`n' {
 			if InStr(A_LoopField, 'Error') || InStr(A_LoopField, 'Warning') || InStr(A_LoopField, 'Failed'){
 				issues .= A_LoopField '`n'
-				totalissues++
-				if totalissues > 10	
+				if ++totalissues > 10	
 					break
 			}
 		}
@@ -22283,9 +22280,10 @@ start(*){
 			}
 		}
 
-		if !RemoteStart && !ForceStart
+		if !RemoteStart && !ForceStart {
 			if nm_MsgBoxIncorrectRobloxSettings()
 				(MainGui["StartButton"].Enabled := 1, Hotkey(StartHotkey, "On"), nm_LockTabs(0))
+		}
 
 		;Touchscreen WARNING @ start
 		if ((DllCall("GetSystemMetrics", "int", 94)) & 0x40 && DllCall("GetSystemMetrics", "int", 95) >= 2) {
