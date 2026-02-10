@@ -1411,9 +1411,9 @@ BuckoBee := Map("Abilities",
 		,[3,"Collect","Pine Tree"]]
 
 	, "Petals",
-		[[1,"Collect","Clover"]
-		,[2,"Collect","Pineapple"]
-		,[3,"Collect","Pine Tree"]])
+		[[1,"Collect","Pine Tree"]
+		,[2,"Collect","Clover"]
+		,[3,"Collect","Pineapple"]])
 
 
 RileyBee := Map("Abilities",
@@ -1486,9 +1486,9 @@ RileyBee := Map("Abilities",
 		,[3,"Collect","Rose"]]
 
 	, "Petals",
-		[[1,"Collect","Clover"]
-		,[2,"Collect","Spider"]
-		,[3,"Collect","Strawberry"]]
+		[[1,"Collect","Strawberry"]
+		,[2,"Collect","Clover"]
+		,[3,"Collect","Spider"]]
 )
 
 ;field booster data
